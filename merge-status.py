@@ -224,7 +224,7 @@ def write_status_page(component, merges, left_distro, right_distro):
                          "have your name and a list of the outstanding "
                          "Ubuntu changes.</li>")
         print >>status, ("<li>Try and keep the diff small, this may involve "
-                         "manually tweaking <tt>po</tt> files and the"
+                         "manually tweaking <tt>po</tt> files and the "
                          "like.</li>")
         print >>status, "</ul>"
 

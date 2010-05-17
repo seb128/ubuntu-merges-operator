@@ -9,5 +9,5 @@ if req.form.has_key("package") and req.form.has_key("comment"):
     else:
         req.write("Comment added.")
 else:
-    req.write("I need at least two parameters: package and comment. component is optional.")
+    req.write("I need at least two parameters: package and comment. Component is optional.")
 %>
