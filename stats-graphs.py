@@ -128,7 +128,11 @@ def read_stats():
     stats = {}
 
     stats_file = "%s/stats.txt" % ROOT
-    stf = open(stats_file, "r");
+    try:
+        stf = open(stats_file, "r");
+    except IOError, e:
+        print e
+        exit(1)
     try:
         for line in stf:
             (date, time, component, info) = line.strip().split(" ", 3)

@@ -62,7 +62,11 @@ class ControlFile(object):
 
     def open(self, file, *args, **kwds):
         """Open and parse a control-file format file."""
-        f = open(file)
+        try:
+            f = open(file)
+        except IOError, e:
+            print e
+            exit(1)
         try:
             try:
                 self.parse(f, *args, **kwds)

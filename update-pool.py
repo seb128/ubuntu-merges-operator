@@ -50,7 +50,11 @@ def main(options, args):
                     if options.package is not None \
                            and source["Package"] not in options.package:
                         continue
-                    update_pool(distro, source)
+                    try:
+                        update_pool(distro, source)
+                    except IOError, e:
+                        print e
+                        exit(1)
 
 
 def sources_url(distro, dist, component):

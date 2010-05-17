@@ -40,7 +40,11 @@ def main(options, args):
 
     # Write to a new list
     list_filename = patch_list_file()
-    list_file = open(list_filename + ".new", "w")
+    try:
+        list_file = open(list_filename + ".new", "w")
+    except IOError, e:
+        print e
+        exit(1)
     try:
         # For each package in the distribution, check for a patch for the
         # current version; publish if it exists, clean up if not

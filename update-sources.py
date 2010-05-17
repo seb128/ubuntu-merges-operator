@@ -33,7 +33,8 @@ def main(options, args):
     for distro in distros:
         try:
             hparts = os.listdir("%s/pool/%s" % (ROOT, distro))
-        except OSError:
+        except OSError, e:
+            print e
             continue
         for hpart in hparts:
             for package in os.listdir("%s/pool/%s/%s" % (ROOT, distro, hpart)):

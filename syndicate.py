@@ -372,7 +372,12 @@ def read_subscriptions():
     """Read the subscriptions file."""
     subscriptions = []
 
-    f = open("%s/subscriptions.txt" % ROOT)
+    try:
+        f = open("%s/subscriptions.txt" % ROOT)
+    except IOError, e:
+        print e
+        exit(1)
+
     try:
         fcntl.flock(f.fileno(), fcntl.LOCK_SH)
 
