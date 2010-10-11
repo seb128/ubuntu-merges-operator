@@ -35,7 +35,7 @@ def main(options, args):
         try:
             hparts = os.listdir("%s/pool/%s" % (ROOT, distro))
         except OSError, e:
-            print >>sys.stderr, e
+            print >>sys.stderr, e, "(continuing)"
             continue
         for hpart in hparts:
             for package in os.listdir("%s/pool/%s/%s" % (ROOT, distro, hpart)):
