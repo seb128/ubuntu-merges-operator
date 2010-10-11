@@ -132,7 +132,7 @@ def read_stats():
     try:
         stf = open(stats_file, "r");
     except IOError, e:
-        print e
+        print >>sys.stderr, e
         sys.exit(1)
     try:
         for line in stf:

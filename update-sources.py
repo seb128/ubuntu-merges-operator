@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import os
 import logging
 
@@ -34,7 +35,7 @@ def main(options, args):
         try:
             hparts = os.listdir("%s/pool/%s" % (ROOT, distro))
         except OSError, e:
-            print e
+            print >>sys.stderr, e
             continue
         for hpart in hparts:
             for package in os.listdir("%s/pool/%s/%s" % (ROOT, distro, hpart)):

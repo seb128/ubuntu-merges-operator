@@ -54,7 +54,7 @@ def main(options, args):
                     try:
                         update_pool(distro, source)
                     except IOError, e:
-                        print e
+                        print >>sys.stderr, e
                         sys.exit(1)
 
 

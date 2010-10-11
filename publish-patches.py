@@ -44,7 +44,7 @@ def main(options, args):
     try:
         list_file = open(list_filename + ".new", "w")
     except IOError, e:
-        print e
+        print >>sys.stderr, e
         sys.exit(1)
     try:
         # For each package in the distribution, check for a patch for the

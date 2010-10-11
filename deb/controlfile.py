@@ -67,7 +67,7 @@ class ControlFile(object):
         try:
             f = open(file)
         except IOError, e:
-            print e
+            print >>sys.stderr, e
             sys.exit(1)
         try:
             try:

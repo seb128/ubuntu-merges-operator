@@ -376,7 +376,7 @@ def read_subscriptions():
     try:
         f = open("%s/subscriptions.txt" % ROOT)
     except IOError, e:
-        print e
+        print >>sys.stderr, e
         sys.exit(1)
 
     try:
