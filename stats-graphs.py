@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os
 import logging
 import calendar
@@ -129,11 +128,7 @@ def read_stats():
     stats = {}
 
     stats_file = "%s/stats.txt" % ROOT
-    try:
-        stf = open(stats_file, "r");
-    except IOError, e:
-        print >>sys.stderr, e
-        sys.exit(1)
+    stf = open(stats_file, "r");
     try:
         for line in stf:
             (date, time, component, info) = line.strip().split(" ", 3)

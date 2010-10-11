@@ -131,14 +131,7 @@ def ensure(path):
     """Ensure that the parent directories for path exist."""
     dirname = os.path.dirname(path)
     if not os.path.isdir(dirname):
-        try:
-            os.makedirs(dirname)
-        except IOError, e:
-            print >>sys.stderr, e
-            sys.exit(1)
-        except OSError, e:
-            print >>sys.stderr, e
-            sys.exit(1)
+        os.makedirs(dirname)
 
 def pathhash(path):
     """Return the path hash component for path."""

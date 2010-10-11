@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-
 class ControlFile(object):
     """Debian control file.
 
@@ -64,11 +62,7 @@ class ControlFile(object):
 
     def open(self, file, *args, **kwds):
         """Open and parse a control-file format file."""
-        try:
-            f = open(file)
-        except IOError, e:
-            print >>sys.stderr, e
-            sys.exit(1)
+        f = open(file)
         try:
             try:
                 self.parse(f, *args, **kwds)

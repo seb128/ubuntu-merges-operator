@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os
 import gzip
 import urllib
@@ -51,11 +50,7 @@ def main(options, args):
                     if options.package is not None \
                            and source["Package"] not in options.package:
                         continue
-                    try:
-                        update_pool(distro, source)
-                    except IOError, e:
-                        print >>sys.stderr, e
-                        sys.exit(1)
+                    update_pool(distro, source)
 
 
 def sources_url(distro, dist, component):

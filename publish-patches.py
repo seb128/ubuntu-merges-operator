@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os
 import logging
 
@@ -41,11 +40,7 @@ def main(options, args):
 
     # Write to a new list
     list_filename = patch_list_file()
-    try:
-        list_file = open(list_filename + ".new", "w")
-    except IOError, e:
-        print >>sys.stderr, e
-        sys.exit(1)
+    list_file = open(list_filename + ".new", "w")
     try:
         # For each package in the distribution, check for a patch for the
         # current version; publish if it exists, clean up if not
