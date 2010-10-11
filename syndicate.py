@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import os
 import bz2
 import md5
@@ -376,7 +377,7 @@ def read_subscriptions():
         f = open("%s/subscriptions.txt" % ROOT)
     except IOError, e:
         print e
-        exit(1)
+        sys.exit(1)
 
     try:
         fcntl.flock(f.fileno(), fcntl.LOCK_SH)

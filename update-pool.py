@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import os
 import gzip
 import urllib
@@ -54,7 +55,7 @@ def main(options, args):
                         update_pool(distro, source)
                     except IOError, e:
                         print e
-                        exit(1)
+                        sys.exit(1)
 
 
 def sources_url(distro, dist, component):

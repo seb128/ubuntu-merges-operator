@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+
 class ControlFile(object):
     """Debian control file.
 
@@ -66,7 +68,7 @@ class ControlFile(object):
             f = open(file)
         except IOError, e:
             print e
-            exit(1)
+            sys.exit(1)
         try:
             try:
                 self.parse(f, *args, **kwds)

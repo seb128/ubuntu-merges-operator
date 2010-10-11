@@ -138,7 +138,7 @@ def ensure(path):
         except OSError, e:
             print e
         finally:
-            exit(1)
+            sys.exit(1)
 
 def pathhash(path):
     """Return the path hash component for path."""
