@@ -135,9 +135,9 @@ def ensure(path):
             os.makedirs(dirname)
         except IOError, e:
             print e
+            sys.exit(1)
         except OSError, e:
             print e
-        finally:
             sys.exit(1)
 
 def pathhash(path):
