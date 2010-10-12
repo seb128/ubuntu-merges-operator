@@ -270,9 +270,13 @@ def get_sources(distro, dist, component):
 def get_source(distro, dist, component, package):
     """Return the source for a package in a distro."""
     sources = get_sources(distro, dist, component)
+    matches = []
     for source in sources:
         if source["Package"] == package:
-            return source
+            matches.append(source)
+    if matches:
+        version_sort(matches)
+        return matches.pop()
     else:
         raise IndexError
 
