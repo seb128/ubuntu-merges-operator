@@ -109,6 +109,9 @@ def main(options, args):
             if len(excludes) and our_source["Package"] in excludes:
                 continue
 
+            if search(".*build[1-9]+$", our_source["Version"]):
+                continue
+
             try:
                 package = our_source["Package"]
                 if options.version:
