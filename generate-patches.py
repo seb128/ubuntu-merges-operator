@@ -75,7 +75,7 @@ def main(options, args):
             if our_source["Package"] in blacklist:
                 continue
 
-            if search(".*build[1-9]+$", our_source["Version"]):
+            if search(".*build[0-9]+$", our_source["Version"]):
                 continue
 
             try:
