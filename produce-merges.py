@@ -109,7 +109,7 @@ def main(options, args):
             if len(excludes) and our_source["Package"] in excludes:
                 continue
 
-            if search(".*build[0-9]+$", our_source["Version"]):
+            if re.search(".*build[0-9]+$", our_source["Version"]):
                 continue
 
             try:
