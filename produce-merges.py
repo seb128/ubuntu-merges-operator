@@ -109,9 +109,6 @@ def main(options, args):
             if len(excludes) and our_source["Package"] in excludes:
                 continue
 
-            if re.search(".*build[0-9]+$", our_source["Version"]):
-                continue
-
             try:
                 package = our_source["Package"]
                 if options.version:
@@ -150,6 +147,10 @@ def produce_merge(left_source, left_distro, left_dist, base_source,
     package = base_source["Package"]
     merged_version = Version(right_source["Version"] + "ubuntu1")
     output_dir = result_dir(package)
+
+    if re.search(".*build[0-9]+$", left_source["Version"]):
+        cleanup(output_dir)
+        return
 
     base_version = Version(base_source["Version"])
     if base_version >= left_source["Version"]:
