@@ -84,6 +84,12 @@ def main(options, args):
                     sources = get_pool_sources(distro, source["Package"])
                     version_sort(sources)
 
+                    for this in sources:
+                        if watermark < this["Version"]:
+                            break
+                    else:
+                        continue
+
                     this_patch_rss = read_rss(patch_rss_file(distro, source),
                                              title="Ubuntu Patches from Debian for %s" % source["Package"],
                                              link=("http://patches.ubuntu.com/by-release/" +
