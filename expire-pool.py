@@ -88,6 +88,7 @@ def expire_pool_sources(distro, package, base):
             keep_files.append(name)
 
     # Expire the older packages
+    need_update = False
     for source in bases:
         logging.info("Expiring %s %s %s", distro, package, source["Version"])
 
@@ -98,8 +99,10 @@ def expire_pool_sources(distro, package, base):
 
             tree.remove("%s/%s/%s" % (ROOT, pooldir, name))
             logging.debug("Removed %s/%s", pooldir, name)
+            need_update = True
 
-    update_pool_sources(distro, package)
+    if need_update:
+        update_pool_sources(distro, package)
 
 
 if __name__ == "__main__":
