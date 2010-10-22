@@ -176,6 +176,7 @@ def write_status_page(component, merges, left_distro, right_distro):
         print >>status, "<html>"
         print >>status
         print >>status, "<head>"
+        print >>status, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
         print >>status, "<title>Ubuntu Merge-o-Matic: %s</title>" % component
         print >>status, "<style>"
         print >>status, "img#ubuntu {"
