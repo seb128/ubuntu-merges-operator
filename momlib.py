@@ -20,7 +20,11 @@
 import os
 import re
 import sys
-import md5
+try:
+    from hashlib import md5
+except ImportError:
+    import md5 as _mod_md5
+    md5 = _mod_md5.new
 import time
 import fcntl
 import errno
@@ -157,7 +161,7 @@ def cleanup(path):
 
 def md5sum(filename):
     """Return an md5sum."""
-    return md5.new(open(filename).read()).hexdigest()
+    return md5(open(filename).read()).hexdigest()
 
 
 # --------------------------------------------------------------------------- #
