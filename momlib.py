@@ -715,7 +715,7 @@ def remove_old_comments(status_file, merges):
 
         new_lines = []
         for line in file_comments:
-            if line.split(": ", 1) not in toremove:
+            if line.split(": ", 1)[0] not in toremove:
                 new_lines.append(line)
 
         file_comments.truncate(0)
