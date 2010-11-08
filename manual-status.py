@@ -272,7 +272,7 @@ def do_table(status, merges, left_distro, right_distro, component):
               "%s\">PTS</a></sup></td>" % package
         print >>status, "<td colspan=2>%s</td>" % who
         print >>status, "<td rowspan=2><form method=\"get\" action=\"addcomment.py\"><br />"
-        print >>status, "<input type=\"hidden\" name=\"component\" value=\"%s\" />" % component
+        print >>status, "<input type=\"hidden\" name=\"component\" value=\"%s-manual\" />" % component
         print >>status, "<input type=\"hidden\" name=\"package\" value=\"%s\" />" % package
         print >>status, "<%%\n\
 the_comment = \"\"\n\
