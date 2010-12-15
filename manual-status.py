@@ -303,7 +303,7 @@ else:\n\
 
 def write_status_json(component, merges, left_distro, right_distro):
     """Write out the merge status JSON dump."""
-    status_file = "%s/merges/%s.json" % (ROOT, component)
+    status_file = "%s/merges/%s-manual.json" % (ROOT, component)
     status = open(status_file + ".new", "w")
     # No json module available on merges.ubuntu.com right now, but it's not
     # that hard to do it ourselves.
