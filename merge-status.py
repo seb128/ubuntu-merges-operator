@@ -22,6 +22,7 @@ import bz2
 import sys
 import glob
 import fcntl
+import re
 
 from rfc822 import parseaddr
 from momlib import *
@@ -358,7 +359,7 @@ def write_status_json(component, merges, left_distro, right_distro):
                     u_who = u_who.replace('\\', '\\\\')
                     u_who = u_who.replace('"', '\\"')
                     print >>status, '"uploader": "%s",' % u_who,
-            binaries = source["Binary"].split(', ')
+            binaries = re.split(', *', source["Binary"].replace('\n', ''))
             print >>status, '"binaries": [ %s ],' % \
                             ', '.join(['"%s"' % b for b in binaries]),
             print >>status, '"base_version": "%s",' % base_version,
