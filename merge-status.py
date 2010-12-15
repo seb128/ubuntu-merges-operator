@@ -141,6 +141,7 @@ def main(options, args):
         merges.sort()
 
         write_status_page(our_component, merges, our_distro, src_distro)
+        write_status_json(our_component, merges, our_distro, src_distro)
 
         status_file = "%s/merges/tomerge-%s" % (ROOT, our_component)
         remove_old_comments(status_file, merges)
@@ -325,6 +326,50 @@ else:\n\
         print >>status, "</tr>"
 
     print >>status, "</table>"
+
+
+def write_status_json(component, merges, left_distro, right_distro):
+    """Write out the merge status JSON dump."""
+    status_file = "%s/merges/%s.json" % (ROOT, component)
+    status = open(status_file + ".new", "w")
+    # No json module available on merges.ubuntu.com right now, but it's not
+    # that hard to do it ourselves.
+    try:
+        print >>status, '['
+        for section in SECTIONS:
+            for uploaded, priority, package, user, uploader, source, \
+                    base_version, left_version, right_version in merges:
+                print >>status, ' { ',
+                # source_package, short_description, and link are for
+                # Harvest (http://daniel.holba.ch/blog/?p=838).
+                print >>status, '"source_package": "%s", ' % package,
+                print >>status, '"short_description": "merge %s", ' % right_version,
+                print >>status, '"link": "https://merges.ubuntu.com/%s/%s/", ' % (pathhash(package), package),
+                print >>status, '"section": "%s", ' % section
+                print >>status, '"uploaded": %s, ' % ("true" if uploaded else "false"),
+                print >>status, '"priority": "%s", ' % priority,
+                if user is not None:
+                    who = user
+                    who = who.replace('\\', '\\\\')
+                    who = who.replace('"', '\\"')
+                    print >>status, '"user": "%s", ' % who,
+                    if uploader is not None:
+                        u_who = uploader
+                        u_who = u_who.replace('\\', '\\\\')
+                        u_who = u_who.replace('"', '\\"')
+                        print >>status, '"uploader": "%s", ' % u_who,
+                binaries = source["Binary"].split(', ')
+                print >>status, '"binaries": [ %s ], ' % \
+                                ', '.join(['"%s"' % b for b in binaries]),
+                print >>status, '"base_version": "%s", ' % base_version,
+                print >>status, '"left_version": "%s", ' % left_version,
+                print >>status, '"right_version": "%s"' % right_version,
+                print >>status, ' }'
+        print >>status, ']'
+    finally:
+        status.close()
+
+    os.rename(status_file + ".new", status_file)
 
 
 def write_status_file(status_file, merges):
