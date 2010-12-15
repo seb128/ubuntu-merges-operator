@@ -328,10 +328,13 @@ def write_status_json(component, merges, left_distro, right_distro):
                 who = who.replace('"', '\\"')
                 print >>status, '"user": "%s",' % who,
                 if uploader is not None:
-                    u_who = uploader
-                    u_who = u_who.replace('\\', '\\\\')
-                    u_who = u_who.replace('"', '\\"')
-                    print >>status, '"uploader": "%s",' % u_who,
+                    (usr_name, usr_mail) = parseaddr(user)
+                    (upl_name, upl_mail) = parseaddr(uploader)
+                    if len(usr_name) and usr_name != upl_name:
+                        u_who = uploader
+                        u_who = u_who.replace('\\', '\\\\')
+                        u_who = u_who.replace('"', '\\"')
+                        print >>status, '"uploader": "%s",' % u_who,
             binaries = re.split(', *', source["Binary"].replace('\n', ''))
             print >>status, '"binaries": [ %s ],' % \
                             ', '.join(['"%s"' % b for b in binaries]),
