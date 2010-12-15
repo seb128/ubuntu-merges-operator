@@ -309,33 +309,37 @@ def write_status_json(component, merges, left_distro, right_distro):
     # that hard to do it ourselves.
     try:
         print >>status, '['
-        for section in SECTIONS:
-            for uploaded, priority, package, user, uploader, source, \
-                    left_version, right_version in merges:
-                print >>status, ' {',
-                # source_package, short_description, and link are for
-                # Harvest (http://daniel.holba.ch/blog/?p=838).
-                print >>status, '"source_package": "%s",' % package,
-                print >>status, '"short_description": "merge %s",' % right_version,
-                print >>status, '"link": "https://merges.ubuntu.com/%s/%s/",' % (pathhash(package), package),
-                print >>status, '"section": "%s",' % section,
-                print >>status, '"uploaded": %s,' % ("true" if uploaded else "false"),
-                print >>status, '"priority": "%s",' % priority,
-                if user is not None:
-                    who = user
-                    who = who.replace('\\', '\\\\')
-                    who = who.replace('"', '\\"')
-                    print >>status, '"user": "%s",' % who,
-                    if uploader is not None:
-                        u_who = uploader
-                        u_who = u_who.replace('\\', '\\\\')
-                        u_who = u_who.replace('"', '\\"')
-                        print >>status, '"uploader": "%s",' % u_who,
-                binaries = source["Binary"].split(', ')
-                print >>status, '"binaries": [ %s ],' % \
-                                ', '.join(['"%s"' % b for b in binaries]),
-                print >>status, '"left_version": "%s",' % left_version,
-                print >>status, '"right_version": "%s"' % right_version,
+        num_merges = len(merges)
+        cur_merge = 0
+        for uploaded, priority, package, user, uploader, source, \
+                left_version, right_version in merges:
+            print >>status, ' {',
+            # source_package, short_description, and link are for
+            # Harvest (http://daniel.holba.ch/blog/?p=838).
+            print >>status, '"source_package": "%s",' % package,
+            print >>status, '"short_description": "merge %s",' % right_version,
+            print >>status, '"link": "https://merges.ubuntu.com/%s/%s/",' % (pathhash(package), package),
+            print >>status, '"uploaded": "%s",' % uploaded,
+            print >>status, '"priority": "%s",' % priority,
+            if user is not None:
+                who = user
+                who = who.replace('\\', '\\\\')
+                who = who.replace('"', '\\"')
+                print >>status, '"user": "%s",' % who,
+                if uploader is not None:
+                    u_who = uploader
+                    u_who = u_who.replace('\\', '\\\\')
+                    u_who = u_who.replace('"', '\\"')
+                    print >>status, '"uploader": "%s",' % u_who,
+            binaries = source["Binary"].split(', ')
+            print >>status, '"binaries": [ %s ],' % \
+                            ', '.join(['"%s"' % b for b in binaries]),
+            print >>status, '"left_version": "%s",' % left_version,
+            print >>status, '"right_version": "%s"' % right_version,
+            cur_merge += 1
+            if cur_merge < len(merges):
+                print >>status, '},'
+            else:
                 print >>status, '}'
         print >>status, ']'
     finally:
