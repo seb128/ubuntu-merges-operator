@@ -68,7 +68,11 @@ def update_sources(distro, dist, component):
     urlfile = urllib.URLopener()
 
     gzfilename = tempfile.mktemp()
-    urllib.URLopener().retrieve(url, gzfilename)
+    try:
+        urllib.URLopener().retrieve(url, gzfilename)
+    except IOError:
+        logging.error("Downloading %s failed", url)
+        raise
     try:
         gzfile = gzip.GzipFile(gzfilename)
         try:
@@ -103,7 +107,11 @@ def update_pool(distro, source):
 
         logging.debug("Downloading %s", url)
         ensure(filename)
-        urllib.URLopener().retrieve(url, filename)
+        try:
+            urllib.URLopener().retrieve(url, filename)
+        except IOError:
+            logging.error("Downloading %s failed", url)
+            raise
         logging.info("Saved %s", tree.subdir(ROOT, filename))
 
 
