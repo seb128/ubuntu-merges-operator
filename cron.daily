@@ -37,7 +37,7 @@ cd /srv/patches.ubuntu.com/code
 cp addcomment.py /srv/patches.ubuntu.com/merges
 
 # Update the blacklist
-wget -q -O/srv/patches.ubuntu.com/sync-blacklist.txt http://people.ubuntu.com/~ubuntu-archive/sync-blacklist.txt
+wget -q -O/srv/patches.ubuntu.com/sync-blacklist.txt http://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
 
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
