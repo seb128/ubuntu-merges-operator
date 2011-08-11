@@ -60,14 +60,18 @@ def main(options, args):
                     version_sort(sources)
 
                     last = None
-                    for this in sources:
-                        try:
-                            generate_diff(distro, last, this)
-                        finally:
-                            if last is not None:
-                                cleanup_source(last)
+                    try:
+                        for this in sources:
+                            try:
+                                generate_diff(distro, last, this)
+                            finally:
+                                if last is not None:
+                                    cleanup_source(last)
 
-                        last = this
+                            last = this
+                    finally:
+                        if last is not None:
+                            cleanup_source(last)
 
 def generate_diff(distro, last, this):
     """Generate the differences."""
