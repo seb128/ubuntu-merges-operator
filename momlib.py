@@ -52,7 +52,7 @@ ROOT = "/srv/patches.ubuntu.com"
 DISTROS = {
     "ubuntu": {
         "mirror": "http://archive.ubuntu.com/ubuntu",
-        "dists": [ "oneiric" ],
+        "dists": [ "precise" ],
         "components": [ "main", "restricted", "universe", "multiverse" ],
         "expire": True,
         },
@@ -90,11 +90,11 @@ DISTROS = {
 
 # Destination distribution and release
 OUR_DISTRO = "ubuntu"
-OUR_DIST   = "oneiric"
+OUR_DIST   = "precise"
 
 # Default source distribution and release
 SRC_DISTRO = "debian"
-SRC_DIST   = "unstable"
+SRC_DIST   = "testing"
 
 
 # Time format for RSS feeds
