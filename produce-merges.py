@@ -701,8 +701,8 @@ def add_changelog(package, merged_version, left_distro, left_dist,
     try:
         new_changelog = open(changelog_file + ".new", "w")
         try:
-            print >>new_changelog, ("%s (%s) %s; urgency=low"
-                                    % (package, merged_version, left_dist))
+            print >>new_changelog, ("%s (%s) UNRELEASED; urgency=low"
+                                    % (package, merged_version))
             print >>new_changelog
             print >>new_changelog, "  * Merge from %s %s.  Remaining changes:" \
                   % (right_distro.title(), right_dist)
