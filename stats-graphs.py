@@ -28,8 +28,8 @@ from momlib import *
 
 
 # Order of stats we pick out
-ORDER = [ "unmodified", "needs-sync", "local",
-          "repackaged", "modified", "needs-merge"  ]
+ORDER = [ "needs-merge", "modified", "unmodified",
+          "needs-sync", "local", "repackaged" ]
 
 # Labels used on the graph
 LABELS = {
