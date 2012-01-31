@@ -174,8 +174,7 @@ def get_history(stats, start):
         if date_to_datetime(date) >= start:
             values[date] = info
 
-    dates = values.keys()
-    dates.sort()
+    dates = sorted(values.keys())
 
     return [ (d, values[d]) for d in dates ]
 
