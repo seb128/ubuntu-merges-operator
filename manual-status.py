@@ -21,7 +21,6 @@ from __future__ import with_statement
 
 import os
 import bz2
-import fcntl
 import re
 
 from rfc822 import parseaddr
@@ -308,7 +307,6 @@ def write_status_json(component, merges, left_distro, right_distro):
         # No json module available on merges.ubuntu.com right now, but it's
         # not that hard to do it ourselves.
         print >>status, '['
-        num_merges = len(merges)
         cur_merge = 0
         for uploaded, priority, package, user, uploader, source, \
                 left_version, right_version in merges:

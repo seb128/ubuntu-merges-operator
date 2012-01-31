@@ -19,7 +19,6 @@
 
 import sys
 import os
-import logging
 
 from momlib import *
 

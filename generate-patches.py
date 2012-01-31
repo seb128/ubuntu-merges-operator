@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
 
 from momlib import *
@@ -130,7 +129,6 @@ def make_patches(our_distro, our_source, src_distro, src_source, base,
 def generate_patch(base_source, distro, our_source,
                    slipped=False, force=False):
     """Generate a patch file for the given comparison."""
-    package = our_source["Package"]
     our_version = Version(our_source["Version"])
     base_version = Version(base_source["Version"])
 

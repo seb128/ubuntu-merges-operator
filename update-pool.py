@@ -68,8 +68,6 @@ def update_sources(distro, dist, component):
 
     logging.debug("Downloading %s", url)
 
-    urlfile = urllib.URLopener()
-
     gzfilename = tempfile.mktemp()
     try:
         urllib.URLopener().retrieve(url, gzfilename)

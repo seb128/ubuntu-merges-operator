@@ -19,8 +19,6 @@
 
 from __future__ import with_statement
 
-import os
-import logging
 import calendar
 import datetime
 from contextlib import closing
