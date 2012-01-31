@@ -2,9 +2,9 @@
 from momlib import *
 from cgi import escape
 
-if req.form.has_key("package") and req.form.has_key("comment"):
+if "package" in req.form and "comment" in req.form:
     add_comment(req.form["package"], req.form["comment"])
-    if req.form.has_key("component"):
+    if "component" in req.form:
         util.redirect(req, req.form["component"]+".html")
     else:
         req.write("Comment added.")
