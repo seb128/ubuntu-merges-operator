@@ -237,7 +237,7 @@ def range_chart(component, history, start, today, events):
                                             sum(x[1:6]),
                                             sum(x[1:7]) ],
                                 [ info_to_data(date, info)
-                                  	for date, info in history ])
+                                        for date, info in history ])
 
     (y_tic_interval, y_minor_tic_interval) = \
                      sources_intervals(max(d[-1] for d in data))
