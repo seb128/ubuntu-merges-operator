@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import re
 import time
@@ -459,8 +461,7 @@ def merge_changelog(left_dir, right_dir, merged_dir, filename):
     left_cl = read_changelog("%s/%s" % (left_dir, filename))
     right_cl = read_changelog("%s/%s" % (right_dir, filename))
 
-    output = open("%s/%s" % (merged_dir, filename), "w")
-    try:
+    with open("%s/%s" % (merged_dir, filename), "w") as output:
         for right_ver, right_text in right_cl:
             while len(left_cl) and left_cl[0][0] > right_ver:
                 (left_ver, left_text) = left_cl.pop(0)
@@ -473,8 +474,6 @@ def merge_changelog(left_dir, right_dir, merged_dir, filename):
 
         for left_ver, left_text in left_cl:
             print >>output, left_text
-    finally:
-        output.close()
 
     return False
 
@@ -482,8 +481,7 @@ def read_changelog(filename):
     """Return a parsed changelog file."""
     entries = []
 
-    cl = open(filename)
-    try:
+    with open(filename) as cl:
         (ver, text) = (None, "")
         for line in cl:
             match = CL_RE.search(line)
@@ -503,8 +501,6 @@ def read_changelog(filename):
                 (ver, text) = (None, "")
             elif len(line.strip()) or ver is not None:
                 text += line
-    finally:
-        cl.close()
 
     if len(text):
         entries.append((ver, text))
@@ -567,15 +563,12 @@ def merge_file(left_dir, left_name, left_distro, base_dir,
     dest = "%s/%s" % (merged_dir, filename)
     ensure(dest)
 
-    output = open(dest, "w")
-    try:
+    with open(dest, "w") as output:
         status = shell.run(("diff3", "-E", "-m",
                             "-L", left_name, "%s/%s" % (left_dir, filename),
                             "-L", "BASE", "%s/%s" % (base_dir, filename),
                             "-L", right_name, "%s/%s" % (right_dir, filename)),
                            stdout=output, okstatus=(0,1,2))
-    finally:
-        output.close()
 
     if status != 0:
         if not tree.exists(dest) or os.stat(dest).st_size == 0:
@@ -697,10 +690,8 @@ def add_changelog(package, merged_version, left_distro, left_dist,
     """Add a changelog entry to the package."""
     changelog_file = "%s/debian/changelog" % merged_dir
 
-    changelog = open(changelog_file)
-    try:
-        new_changelog = open(changelog_file + ".new", "w")
-        try:
+    with open(changelog_file) as changelog:
+        with open(changelog_file + ".new", "w") as new_changelog:
             print >>new_changelog, ("%s (%s) UNRELEASED; urgency=low"
                                     % (package, merged_version))
             print >>new_changelog
@@ -713,10 +704,6 @@ def add_changelog(package, merged_version, left_distro, left_dist,
             print >>new_changelog
             for line in changelog:
                 print >>new_changelog, line.rstrip("\r\n")
-        finally:
-            new_changelog.close()
-    finally:
-        changelog.close()
 
     os.rename(changelog_file + ".new", changelog_file)
 
@@ -813,14 +800,11 @@ def create_patch(package, version, output_dir, merged_dir,
         tree.copytree(merged_dir, "%s/%s" % (parent, version))
         tree.copytree(right_dir, "%s/%s" % (parent, right_source["Version"]))
 
-        diff = open(filename, "w")
-        try:
+        with open(filename, "w") as diff:
             shell.run(("diff", "-pruN",
                        right_source["Version"], "%s" % version),
                       chdir=parent, stdout=diff, okstatus=(0, 1, 2))
             logging.info("Created %s", tree.subdir(ROOT, filename))
-        finally:
-            diff.close()
 
         return os.path.basename(filename)
     finally:
@@ -833,8 +817,7 @@ def write_report(left_source, left_distro, left_patch, base_source,
                  merged_dir):
     """Write the merge report."""
     filename = "%s/REPORT" % output_dir
-    report = open(filename, "w")
-    try:
+    with open(filename, "w") as report:
         package = base_source["Package"]
 
         # Package and time
@@ -990,16 +973,13 @@ def write_report(left_source, left_distro, left_patch, base_source,
         print >>report
         print >>report, "  $ dpkg-genchanges -S -v%s%s" \
               % (left_source["Version"], sa_arg)
-    finally:
-        report.close()
 
 
 def read_package_list(filename):
     """Read a list of packages from the given file."""
     packages = []
 
-    list_file = open(filename)
-    try:
+    with open(filename) as list_file:
         for line in list_file:
             if line.startswith("#"):
                 continue
@@ -1007,8 +987,6 @@ def read_package_list(filename):
             package = line.strip()
             if len(package):
                 packages.append(package)
-    finally:
-        list_file.close()
 
     return packages
 

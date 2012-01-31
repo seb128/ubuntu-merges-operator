@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import re
 import sys
@@ -312,12 +314,9 @@ def update_pool_sources(distro, package):
     filename = pool_sources_file(distro, package)
 
     logging.info("Updating %s", tree.subdir(ROOT, filename))
-    sources = open(filename, "w")
-    try:
+    with open(filename, "w") as sources:
         shell.run(("apt-ftparchive", "sources", pooldir), chdir=ROOT,
                   stdout=sources)
-    finally:
-        sources.close()
 
 def get_pool_sources(distro, package):
     """Parse the Sources file for a package in the pool."""
@@ -418,20 +417,14 @@ def read_basis(filename):
     if not os.path.isfile(basis_file):
         return None
 
-    basis = open(basis_file)
-    try:
+    with open(basis_file) as basis:
         return Version(basis.read().strip())
-    finally:
-        basis.close()
 
 def save_basis(filename, version):
     """Save the basis version of a patch to a file."""
     basis_file = filename + "-basis"
-    basis = open(basis_file, "w")
-    try:
+    with open(basis_file, "w") as basis:
         print >>basis, "%s" % version
-    finally:
-        basis.close()
 
 
 # --------------------------------------------------------------------------- #
@@ -480,8 +473,7 @@ def save_changes_file(filename, source, previous=None):
     filesdir = "%s/%s" % (ROOT, source["Directory"])
 
     ensure(filename)
-    changes = open(filename, "w")
-    try:
+    with open(filename, "w") as changes:
         cmd = ("dpkg-genchanges", "-S", "-u%s" % filesdir)
         orig_cmd = cmd
         if previous is not None:
@@ -491,8 +483,6 @@ def save_changes_file(filename, source, previous=None):
             shell.run(cmd, chdir=srcdir, stdout=changes)
         except (ValueError, OSError):
             shell.run(orig_cmd, chdir=srcdir, stdout=changes)
-    finally:
-        changes.close()
 
     return filename
 
@@ -508,12 +498,9 @@ def save_patch_file(filename, last, this):
     thisdir = tree.subdir(diffdir, thisdir)
 
     ensure(filename)
-    diff = open(filename, "w")
-    try:
+    with open(filename, "w") as diff:
         shell.run(("diff", "-pruN", lastdir, thisdir),
                   chdir=diffdir, stdout=diff, okstatus=(0, 1, 2))
-    finally:
-        diff.close()
 
 
 # --------------------------------------------------------------------------- #
@@ -530,8 +517,7 @@ def read_report(output_dir, left_distro, right_distro):
     left_version = None
     right_version = None
 
-    report = open(filename)
-    try:
+    with open(filename) as report:
         for line in report:
             if line.startswith("base:"):
                 base_version = Version(line[5:].strip())
@@ -539,8 +525,6 @@ def read_report(output_dir, left_distro, right_distro):
                 left_version = Version(line[len(left_distro)+1:].strip())
             elif line.startswith("%s:" % right_distro):
                 right_version = Version(line[len(right_distro)+1:].strip())
-    finally:
-        report.close()
 
     if base_version is None or left_version is None or right_version is None:
         raise AttributeError, "Insufficient detail in report"
@@ -558,8 +542,7 @@ def read_blacklist():
         return []
 
     bl = []
-    blacklist = open(filename)
-    try:
+    with open(filename) as blacklist:
         for line in blacklist:
             try:
                 line = line[:line.index("#")]
@@ -571,8 +554,6 @@ def read_blacklist():
                 continue
 
             bl.append(line)
-    finally:
-        blacklist.close()
 
     return bl
 
@@ -669,27 +650,21 @@ def get_comments():
         containing comments corresponding to packages"""
     comments = {}
 
-    file_comments = open(comments_file(), "r")
-    try:
+    with open(comments_file(), "r") as file_comments:
         fcntl.flock(file_comments, fcntl.LOCK_SH)
         for line in file_comments:
             package, comment = line.rstrip("\n").split(": ", 1)
             comments[package] = comment
-    finally:
-        file_comments.close()
 
     return comments
 
 def add_comment(package, comment):
     """Add a comment to the comments file"""
-    file_comments = open(comments_file(), "a")
-    try:
+    with open(comments_file(), "a") as file_comments:
         fcntl.flock(file_comments, fcntl.LOCK_EX)
         the_comment = comment.replace("\n", " ")
         the_comment = escape(the_comment[:100], quote=True)
         file_comments.write("%s: %s\n" % (package, the_comment))
-    finally:
-        file_comments.close()
 
 def remove_old_comments(status_file, merges):
     """Remove old comments from the comments file using
@@ -700,17 +675,13 @@ def remove_old_comments(status_file, merges):
     packages = [ m[2] for m in merges ]
     toremove = []
 
-    file_status = open(status_file, "r")
-    try:
+    with open(status_file, "r") as file_status:
         for line in file_status:
             package = line.split(" ")[0]
             if package not in packages:
                 toremove.append(package)
-    finally:
-        file_status.close()
 
-    file_comments = open(comments_file(), "a+")
-    try:
+    with open(comments_file(), "a+") as file_comments:
         fcntl.flock(file_comments, fcntl.LOCK_EX)
 
         new_lines = []
@@ -722,8 +693,6 @@ def remove_old_comments(status_file, merges):
 
         for line in new_lines:
             file_comments.write(line)
-    finally:
-        file_comments.close()
 
 def gen_buglink_from_comment(comment):
     """Return an HTML formatted Debian/Ubuntu bug link from comment"""

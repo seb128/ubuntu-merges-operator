@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import bz2
 import sys
@@ -67,12 +69,9 @@ def main(options, args):
     if os.path.isfile("%s/outstanding-merges.txt" % ROOT):
         after_uvf = True
 
-        f = open("%s/outstanding-merges.txt" % ROOT)
-        try:
+        with open("%s/outstanding-merges.txt" % ROOT) as f:
             for line in f:
                 outstanding.append(line.strip())
-        finally:
-            f.close()
     else:
         after_uvf = False
         SECTIONS.remove("new")
@@ -173,8 +172,7 @@ def get_uploader(distro, source):
 def write_status_page(component, merges, left_distro, right_distro):
     """Write out the merge status page."""
     status_file = "%s/merges/%s.html" % (ROOT, component)
-    status = open(status_file + ".new", "w")
-    try:
+    with open(status_file + ".new", "w") as status:
         print >>status, "<html>"
         print >>status
         print >>status, "<head>"
@@ -248,8 +246,6 @@ def write_status_page(component, merges, left_distro, right_distro):
                          % component)
         print >>status, "</body>"
         print >>status, "</html>"
-    finally:
-        status.close()
 
     os.rename(status_file + ".new", status_file)
 
@@ -332,10 +328,9 @@ else:\n\
 def write_status_json(component, merges, left_distro, right_distro):
     """Write out the merge status JSON dump."""
     status_file = "%s/merges/%s.json" % (ROOT, component)
-    status = open(status_file + ".new", "w")
-    # No json module available on merges.ubuntu.com right now, but it's not
-    # that hard to do it ourselves.
-    try:
+    with open(status_file + ".new", "w") as status:
+        # No json module available on merges.ubuntu.com right now, but it's
+        # not that hard to do it ourselves.
         print >>status, '['
         num_merges = len(merges)
         cur_merge = 0
@@ -374,23 +369,18 @@ def write_status_json(component, merges, left_distro, right_distro):
             else:
                 print >>status, '}'
         print >>status, ']'
-    finally:
-        status.close()
 
     os.rename(status_file + ".new", status_file)
 
 
 def write_status_file(status_file, merges):
     """Write out the merge status file."""
-    status = open(status_file + ".new", "w")
-    try:
+    with open(status_file + ".new", "w") as status:
         for uploaded, priority, package, user, uploader, source, \
                 base_version, left_version, right_version in merges:
             print >>status, "%s %s %s %s %s %s, %s, %s" \
                   % (package, priority, base_version,
                      left_version, right_version, user, uploader, uploaded)
-    finally:
-        status.close()
 
     os.rename(status_file + ".new", status_file)
 

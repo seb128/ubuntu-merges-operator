@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 class ControlFile(object):
     """Debian control file.
 
@@ -62,15 +64,12 @@ class ControlFile(object):
 
     def open(self, file, *args, **kwds):
         """Open and parse a control-file format file."""
-        f = open(file)
-        try:
+        with open(file) as f:
             try:
                 self.parse(f, *args, **kwds)
             except Exception, e:
                 e.path = file
                 raise e
-        finally:
-            f.close()
 
     def parse(self, file, multi_para=False, signed=False):
         """Parse a control-file format file.

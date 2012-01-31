@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import bz2
 import md5
@@ -378,8 +380,7 @@ def read_subscriptions():
     """Read the subscriptions file."""
     subscriptions = []
 
-    f = open("%s/subscriptions.txt" % ROOT)
-    try:
+    with open("%s/subscriptions.txt" % ROOT) as f:
         fcntl.flock(f.fileno(), fcntl.LOCK_SH)
 
         for line in f:
@@ -388,8 +389,6 @@ def read_subscriptions():
 
             (addr, distro, filter) = line.strip().split()
             subscriptions.append((addr, distro, filter))
-    finally:
-        f.close()
 
     return subscriptions
 
@@ -400,21 +399,15 @@ def read_watermark(distro, source):
     if not os.path.isfile(mark_file):
         return Version("0")
 
-    mark = open(mark_file)
-    try:
+    with open(mark_file) as mark:
         return Version(mark.read().strip())
-    finally:
-        mark.close()
 
 def save_watermark(distro, source, version):
     """Save the watermark for a given source."""
     mark_file = "%s/%s/watermark" \
                 % (ROOT, pool_directory(distro, source["Package"]))
-    mark = open(mark_file, "w")
-    try:
+    with open(mark_file, "w") as mark:
         print >>mark, "%s" % version
-    finally:
-        mark.close()
 
 
 if __name__ == "__main__":

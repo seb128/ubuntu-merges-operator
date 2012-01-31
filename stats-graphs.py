@@ -17,10 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import logging
 import calendar
 import datetime
+from contextlib import closing
 
 from pychart import *
 
@@ -128,8 +131,7 @@ def read_stats():
     stats = {}
 
     stats_file = "%s/stats.txt" % ROOT
-    stf = open(stats_file, "r");
-    try:
+    with open(stats_file, "r") as stf:
         for line in stf:
             (date, time, component, info) = line.strip().split(" ", 3)
 
@@ -137,8 +139,6 @@ def read_stats():
                 stats[component] = []
 
             stats[component].append([date, time, info])
-    finally:
-        stf.close()
 
     return stats
 
@@ -211,8 +211,7 @@ def pie_chart(component, current):
                info_to_data(None, current))
 
     filename = "%s/merges/%s-now.png" % (ROOT, component)
-    c = canvas.init(filename, format="png")
-    try:
+    with closing(canvas.init(filename, format="png")) as c:
         ar = area.T(size=(300,250), legend=None,
                     x_grid_style=None, y_grid_style=None)
 
@@ -223,8 +222,6 @@ def pie_chart(component, current):
         ar.add_plot(plot)
 
         ar.draw(c)
-    finally:
-        c.close()
 
 def range_chart(component, history, start, today, events):
     """Output a range chart for the given component and data."""
@@ -243,8 +240,7 @@ def range_chart(component, history, start, today, events):
                      sources_intervals(max(d[-1] for d in data))
 
     filename = "%s/merges/%s-trend.png" % (ROOT, component)
-    c = canvas.init(filename, format="png")
-    try:
+    with closing(canvas.init(filename, format="png")) as c:
         ar = area.T(size=(450,225), legend=legend.T(),
                     x_axis=axis.X(label="Date", format=ordinal_to_label,
                                   tic_interval=date_tics,
@@ -284,8 +280,6 @@ def range_chart(component, history, start, today, events):
             tb.draw()
 
             c.line(line_style.black_dash2, xpos, ar.loc[1], xpos, ypos)
-    finally:
-        c.close()
 
 
 if __name__ == "__main__":

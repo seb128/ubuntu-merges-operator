@@ -17,11 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import gzip
 import urllib
 import logging
 import tempfile
+from contextlib import closing
 
 from momlib import *
 from util import tree
@@ -74,16 +77,10 @@ def update_sources(distro, dist, component):
         logging.error("Downloading %s failed", url)
         raise
     try:
-        gzfile = gzip.GzipFile(gzfilename)
-        try:
+        with closing(gzip.GzipFile(gzfilename)) as gzfile:
             ensure(filename)
-            local = open(filename, "w")
-            try:
+            with open(filename, "w") as local:
                 local.write(gzfile.read())
-            finally:
-                local.close()
-        finally:
-            gzfile.close()
     finally:
         os.unlink(gzfilename)
 

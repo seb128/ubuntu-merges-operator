@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import sys
 
@@ -147,11 +149,8 @@ class Process(object):
             elif stderr != sys.stderr:
                 os.dup2(stderr.fileno(), sys.__stderr__.fileno())
         else:
-            null = file("/dev/null", "w")
-            try:
+            with file("/dev/null", "w") as null:
                 os.dup2(null.fileno(), sys.__stderr__.fileno())
-            finally:
-                null.close()
 
         # Set up stdout
         if self.mode[0] == "r":
@@ -163,11 +162,8 @@ class Process(object):
             elif stdout != sys.stdout:
                 os.dup2(stdout.fileno(), sys.__stdout__.fileno())
         else:
-            null = file("/dev/null", "w")
-            try:
+            with file("/dev/null", "w") as null:
                 os.dup2(null.fileno(), sys.__stdout__.fileno())
-            finally:
-                null.close()
 
         # Set up stdin
         if self.mode[0] == "w":
@@ -177,11 +173,8 @@ class Process(object):
             if stdin != sys.stdin:
                 os.dup2(stdin.fileno(), sys.__stdin__.fileno())
         else:
-            null = file("/dev/null", "r")
-            try:
+            with file("/dev/null", "r") as null:
                 os.dup2(null.fileno(), sys.__stdin__.fileno())
-            finally:
-                null.close()
 
         if chdir is not None:
             os.chdir(chdir)

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+
 import os
 import re
 import bz2
@@ -206,21 +208,15 @@ def read_watermark(distro, package):
     if not os.path.isfile(mark_file):
         return Version("0")
 
-    mark = open(mark_file)
-    try:
+    with open(mark_file) as mark:
         return Version(mark.read().strip())
-    finally:
-        mark.close()
 
 def save_watermark(distro, package, version):
     """Save the watermark for a given packagesource."""
     mark_file = "%s/%s/bugs-watermark" \
                 % (ROOT, pool_directory(distro, package))
-    mark = open(mark_file, "w")
-    try:
+    with open(mark_file, "w") as mark:
         print >>mark, "%s" % version
-    finally:
-        mark.close()
 
 
 if __name__ == "__main__":
