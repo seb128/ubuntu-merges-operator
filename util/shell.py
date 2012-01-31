@@ -149,7 +149,7 @@ class Process(object):
             elif stderr != sys.stderr:
                 os.dup2(stderr.fileno(), sys.__stderr__.fileno())
         else:
-            with file("/dev/null", "w") as null:
+            with open("/dev/null", "w") as null:
                 os.dup2(null.fileno(), sys.__stderr__.fileno())
 
         # Set up stdout
@@ -162,7 +162,7 @@ class Process(object):
             elif stdout != sys.stdout:
                 os.dup2(stdout.fileno(), sys.__stdout__.fileno())
         else:
-            with file("/dev/null", "w") as null:
+            with open("/dev/null", "w") as null:
                 os.dup2(null.fileno(), sys.__stdout__.fileno())
 
         # Set up stdin
@@ -173,7 +173,7 @@ class Process(object):
             if stdin != sys.stdin:
                 os.dup2(stdin.fileno(), sys.__stdin__.fileno())
         else:
-            with file("/dev/null", "r") as null:
+            with open("/dev/null", "r") as null:
                 os.dup2(null.fileno(), sys.__stdin__.fileno())
 
         if chdir is not None:
