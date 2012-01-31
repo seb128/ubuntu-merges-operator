@@ -133,7 +133,7 @@ class Process(object):
                 self._pipe = None
         else:
             # Failure
-            raise OSError, "%s failed" % " ".join(args)
+            raise OSError, "%s failed" % " ".join(self.args)
 
     def child(self, pipe_r, pipe_w, stdin, stdout, stderr, chdir):
         """Child process.
