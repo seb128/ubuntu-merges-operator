@@ -137,7 +137,11 @@ def ensure(path):
     """Ensure that the parent directories for path exist."""
     dirname = os.path.dirname(path)
     if not os.path.isdir(dirname):
-        os.makedirs(dirname)
+        if os.path.islink(dirname) and not os.path.exists(dirname):
+            # Broken symbolic link; create the target.
+            os.makedirs(os.path.realpath(dirname))
+        else:
+            os.makedirs(dirname)
 
 def pathhash(path):
     """Return the path hash component for path."""
