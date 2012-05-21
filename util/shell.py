@@ -240,16 +240,6 @@ def run(args, stdin=None, stdout=None, stderr=None, chdir=None, okstatus=(0,)):
                 chdir=chdir, okstatus=okstatus)
     return p.close()
 
-def open(args, mode="r", stdin=None, stdout=None, stderr=None, chdir=None,
-         okstatus=(0,)):
-    """Open a process.
-
-    Shorthand for util.shell.Process(...) with a different default mode.
-    Returns Process object that must be closed.
-    """
-    return Process(args, mode=mode, stdin=stdin, stdout=stdout, stderr=stderr,
-                   chdir=chdir, okstatus=okstatus)
-
 def get(args, stdin=None, stderr=None, chdir=None, okstatus=(0,), strip=True):
     """Get process output.
 
