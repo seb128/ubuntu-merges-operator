@@ -157,8 +157,8 @@ def generate_patch(base_source, distro, our_source,
         if basis is not None and basis == base_version:
             return
 
-    unpack_source(base_source)
-    unpack_source(our_source)
+    unpack_source(distro, base_source)
+    unpack_source(distro, our_source)
 
     ensure(filename)
     save_patch_file(filename, base_source, our_source)

@@ -72,7 +72,7 @@ def generate_dpatch(distro, source):
     if not os.path.isfile(stamp):
         open(stamp, "w").close()
 
-        unpack_source(source)
+        unpack_source(distro, source)
         try:
             dirname = dpatch_directory(distro, source)
             extract_dpatches(dirname, source)

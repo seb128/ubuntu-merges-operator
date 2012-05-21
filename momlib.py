@@ -453,7 +453,7 @@ def save_basis(filename, version):
 # Unpacked source handling
 # --------------------------------------------------------------------------- #
 
-def unpack_source(source):
+def unpack_source(distro, source):
     """Unpack the given source and return location."""
     destdir = unpack_directory(source)
     if os.path.isdir(destdir):
@@ -469,7 +469,10 @@ def unpack_source(source):
 
     ensure(destdir)
     try:
-        shell.run(("dpkg-source", "-x", dsc_file, destdir), chdir=srcdir)
+        env = dict(os.environ)
+        env['DEB_VENDOR'] = distro
+        shell.run(("dpkg-source", "-x", dsc_file, destdir), chdir=srcdir,
+                  env=env)
         # Make sure we can at least read everything under .pc, which isn't
         # automatically true with dpkg-dev 1.15.4.
         pc_dir = os.path.join(destdir, ".pc")
