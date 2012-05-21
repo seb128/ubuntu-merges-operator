@@ -312,10 +312,28 @@ def get_pool_distros():
 
     return distros
 
+def pool_sources_already_updated(pooldir, filename):
+    try:
+        mtime = os.stat(filename).st_mtime
+    except OSError:
+        return False
+
+    poolpath = os.path.join(ROOT, pooldir)
+    for otherfile in os.listdir(poolpath):
+        try:
+            st = os.stat(os.path.join(poolpath, otherfile))
+            if st.st_mtime > mtime or st.st_ctime > mtime:
+                return False
+        except OSError:
+            pass
+    return True
+
 def update_pool_sources(distro, package):
     """Update the Sources files in the pool."""
     pooldir = pool_directory(distro, package)
     filename = pool_sources_file(distro, package)
+    if pool_sources_already_updated(pooldir, filename):
+        return
 
     logging.info("Updating %s", tree.subdir(ROOT, filename))
     with open(filename, "w") as sources:
