@@ -319,7 +319,7 @@ def pool_sources_already_updated(pooldir, filename):
         return False
 
     poolpath = os.path.join(ROOT, pooldir)
-    for otherfile in os.listdir(poolpath):
+    for otherfile in ["."] + os.listdir(poolpath):
         try:
             st = os.stat(os.path.join(poolpath, otherfile))
             if st.st_mtime > mtime or st.st_ctime > mtime:
