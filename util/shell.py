@@ -153,8 +153,6 @@ class Process(object):
         be easily wrapped to catch exceptions and make sure the process
         doesn't run away.
         """
-        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-
         # Set up stderr first, so stderr=sys.stdout works
         if stderr is not None:
             if stderr == sys.stdout:
@@ -191,6 +189,10 @@ class Process(object):
 
         if chdir is not None:
             os.chdir(chdir)
+
+        # Python's default disposition of SIG_IGN for SIGPIPE is not safe
+        # for non-Python subprocesses.
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
         # Run the command
         if self.env is None:
