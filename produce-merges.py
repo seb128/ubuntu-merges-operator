@@ -675,13 +675,13 @@ def conflict_file(left_dir, left_distro, right_dir, right_distro,
 
     if tree.exists(left_src):
         tree.copyfile(left_src, "%s.%s" % (dest, left_distro.upper()))
-    if os.path.isdir(left_src):
+    if os.path.isdir(left_src) and not os.path.islink(left_src):
         os.symlink("%s.%s" % (os.path.basename(dest), left_distro.upper()),
                    dest)
 
     if tree.exists(right_src):
         tree.copyfile(right_src, "%s.%s" % (dest, right_distro.upper()))
-    if os.path.isdir(right_src):
+    if os.path.isdir(right_src) and not os.path.islink(right_src):
         os.symlink("%s.%s" % (os.path.basename(dest), right_distro.upper()),
                    dest)
 
