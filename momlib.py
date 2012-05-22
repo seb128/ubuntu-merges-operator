@@ -338,9 +338,10 @@ def update_pool_sources(distro, package):
         return
 
     logging.info("Updating %s", tree.subdir(ROOT, filename))
-    with open(filename, "w") as sources:
+    with open("%s.new" % filename, "w") as sources:
         shell.run(("apt-ftparchive", "sources", pooldir), chdir=ROOT,
                   stdout=sources)
+    os.rename("%s.new" % filename, filename)
 
 def get_pool_sources(distro, package):
     """Parse the Sources file for a package in the pool."""
