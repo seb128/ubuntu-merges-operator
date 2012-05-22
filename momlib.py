@@ -320,6 +320,8 @@ def pool_sources_already_updated(pooldir, filename):
 
     poolpath = os.path.join(ROOT, pooldir)
     for otherfile in ["."] + os.listdir(poolpath):
+        if otherfile == "watermark":
+            continue
         try:
             st = os.stat(os.path.join(poolpath, otherfile))
             if st.st_mtime > mtime or st.st_ctime > mtime:
