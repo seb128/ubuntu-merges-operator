@@ -96,7 +96,7 @@ OUR_DIST   = "quantal"
 
 # Default source distribution and release
 SRC_DISTRO = "debian"
-SRC_DIST   = "testing"
+SRC_DIST   = "unstable"
 
 
 # Time format for RSS feeds
