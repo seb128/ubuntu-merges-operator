@@ -9,3 +9,4 @@ Dependencies
  * Python 2.4 or higher
  * python-beautifulsoup
  * python-pychart
+ * ghostscript
