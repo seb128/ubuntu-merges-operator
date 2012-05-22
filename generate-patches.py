@@ -121,12 +121,14 @@ def make_patches(our_distro, our_source, src_distro, src_source, base,
         return
 
     try:
-        generate_patch(base_source, our_distro, our_source, slipped, force)
-        generate_patch(base_source, src_distro, src_source, slipped, force)
+        generate_patch(src_distro, base_source, our_distro, our_source,
+                       slipped, force)
+        generate_patch(src_distro, base_source, src_distro, src_source,
+                       slipped, force)
     finally:
         cleanup_source(base_source)
 
-def generate_patch(base_source, distro, our_source,
+def generate_patch(base_distro, base_source, distro, our_source,
                    slipped=False, force=False):
     """Generate a patch file for the given comparison."""
     our_version = Version(our_source["Version"])
@@ -157,7 +159,7 @@ def generate_patch(base_source, distro, our_source,
         if basis is not None and basis == base_version:
             return
 
-    unpack_source(distro, base_source)
+    unpack_source(base_distro, base_source)
     unpack_source(distro, our_source)
 
     ensure(filename)
