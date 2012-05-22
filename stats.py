@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
+from __future__ import print_function, with_statement
 
 import time
 import logging
@@ -127,7 +127,7 @@ def write_stats(component, stats):
     with open(stats_file, "a") as stf:
         stamp = time.strftime("%Y-%m-%d %H:%M", time.gmtime())
         text = " ".join("%s=%d" % (k, v) for k,v in stats.items())
-        print >>stf, "%s %s %s" % (stamp, component, text)
+        print("%s %s %s" % (stamp, component, text), file=stf)
 
 if __name__ == "__main__":
     run(main, options, usage="%prog",

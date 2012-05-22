@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import sys
 import os
 
@@ -34,7 +36,7 @@ def main(options, args):
         try:
             hparts = os.listdir("%s/pool/%s" % (ROOT, distro))
         except OSError, e:
-            print >>sys.stderr, e, "(continuing)"
+            print(e, "(continuing)", file=sys.stderr)
             continue
         for hpart in hparts:
             for package in os.listdir("%s/pool/%s/%s" % (ROOT, distro, hpart)):

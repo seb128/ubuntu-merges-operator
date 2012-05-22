@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
+from __future__ import print_function, with_statement
 
 import os
 import re
@@ -216,7 +216,7 @@ def save_watermark(distro, package, version):
     mark_file = "%s/%s/bugs-watermark" \
                 % (ROOT, pool_directory(distro, package))
     with open(mark_file, "w") as mark:
-        print >>mark, "%s" % version
+        print("%s" % version, file=mark)
 
 
 if __name__ == "__main__":

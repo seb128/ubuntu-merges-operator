@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
+from __future__ import print_function, with_statement
 
 import os
 import bz2
@@ -169,96 +169,99 @@ def write_status_page(component, merges, left_distro, right_distro):
     """Write out the merge status page."""
     status_file = "%s/merges/%s.html" % (ROOT, component)
     with open(status_file + ".new", "w") as status:
-        print >>status, "<html>"
-        print >>status
-        print >>status, "<head>"
-        print >>status, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-        print >>status, "<title>Ubuntu Merge-o-Matic: %s</title>" % component
-        print >>status, "<style>"
-        print >>status, "img#ubuntu {"
-        print >>status, "    border: 0;"
-        print >>status, "}"
-        print >>status, "h1 {"
-        print >>status, "    padding-top: 0.5em;"
-        print >>status, "    font-family: sans-serif;"
-        print >>status, "    font-size: 2.0em;"
-        print >>status, "    font-weight: bold;"
-        print >>status, "}"
-        print >>status, "h2 {"
-        print >>status, "    padding-top: 0.5em;"
-        print >>status, "    font-family: sans-serif;"
-        print >>status, "    font-size: 1.5em;"
-        print >>status, "    font-weight: bold;"
-        print >>status, "}"
-        print >>status, "p, td {"
-        print >>status, "    font-family: sans-serif;"
-        print >>status, "    margin-bottom: 0;"
-        print >>status, "}"
-        print >>status, "li {"
-        print >>status, "    font-family: sans-serif;"
-        print >>status, "    margin-bottom: 1em;"
-        print >>status, "}"
-        print >>status, "tr.first td {"
-        print >>status, "    border-top: 2px solid white;"
-        print >>status, "}"
-        print >>status, "</style>"
-        print >>status, "<% from momlib import * %>"
-        print >>status, "</head>"
-        print >>status, "<body>"
-        print >>status, "<img src=\".img/ubuntulogo-100.png\" id=\"ubuntu\">"
-        print >>status, "<h1>Ubuntu Merge-o-Matic: %s</h1>" % component
+        print("<html>", file=status)
+        print(file=status)
+        print("<head>", file=status)
+        print("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">", file=status)
+        print("<title>Ubuntu Merge-o-Matic: %s</title>" % component,
+              file=status)
+        print("<style>", file=status)
+        print("img#ubuntu {", file=status)
+        print("    border: 0;", file=status)
+        print("}", file=status)
+        print("h1 {", file=status)
+        print("    padding-top: 0.5em;", file=status)
+        print("    font-family: sans-serif;", file=status)
+        print("    font-size: 2.0em;", file=status)
+        print("    font-weight: bold;", file=status)
+        print("}", file=status)
+        print("h2 {", file=status)
+        print("    padding-top: 0.5em;", file=status)
+        print("    font-family: sans-serif;", file=status)
+        print("    font-size: 1.5em;", file=status)
+        print("    font-weight: bold;", file=status)
+        print("}", file=status)
+        print("p, td {", file=status)
+        print("    font-family: sans-serif;", file=status)
+        print("    margin-bottom: 0;", file=status)
+        print("}", file=status)
+        print("li {", file=status)
+        print("    font-family: sans-serif;", file=status)
+        print("    margin-bottom: 1em;", file=status)
+        print("}", file=status)
+        print("tr.first td {", file=status)
+        print("    border-top: 2px solid white;", file=status)
+        print("}", file=status)
+        print("</style>", file=status)
+        print("<% from momlib import * %>", file=status)
+        print("</head>", file=status)
+        print("<body>", file=status)
+        print("<img src=\".img/ubuntulogo-100.png\" id=\"ubuntu\">",
+              file=status)
+        print("<h1>Ubuntu Merge-o-Matic: %s</h1>" % component, file=status)
 
         for section in SECTIONS:
             section_merges = [ m for m in merges if m[0] == section ]
-            print >>status, ("<p><a href=\"#%s\">%s %s merges</a></p>"
-                             % (section, len(section_merges), section))
+            print("<p><a href=\"#%s\">%s %s merges</a></p>"
+                  % (section, len(section_merges), section), file=status)
 
-        print >>status, "<ul>"
-        print >>status, ("<li>If you are not the previous uploader, ask the "
-                         "previous uploader before doing the merge.  This "
-                         "prevents two people from doing the same work.</li>")
-        print >>status, ("<li>Before uploading, update the changelog to "
-                         "have your name and a list of the outstanding "
-                         "Ubuntu changes.</li>")
-        print >>status, ("<li>Try and keep the diff small, this may involve "
-                         "manually tweaking <tt>po</tt> files and the "
-                         "like.</li>")
-        print >>status, "</ul>"
+        print("<ul>", file=status)
+        print("<li>If you are not the previous uploader, ask the "
+              "previous uploader before doing the merge.  This "
+              "prevents two people from doing the same work.</li>",
+              file=status)
+        print("<li>Before uploading, update the changelog to "
+              "have your name and a list of the outstanding "
+              "Ubuntu changes.</li>", file=status)
+        print("<li>Try and keep the diff small, this may involve "
+              "manually tweaking <tt>po</tt> files and the "
+              "like.</li>", file=status)
+        print("</ul>", file=status)
 
-        print >>status, "<% comment = get_comments() %>"
+        print("<% comment = get_comments() %>", file=status)
 
         for section in SECTIONS:
             section_merges = [ m for m in merges if m[0] == section ]
 
-            print >>status, ("<h2 id=\"%s\">%s Merges</h2>"
-                             % (section, section.title()))
+            print("<h2 id=\"%s\">%s Merges</h2>" % (section, section.title()),
+                  file=status)
 
             do_table(status, section_merges, left_distro, right_distro, component)
 
-        print >>status, "<h2 id=stats>Statistics</h2>"
-        print >>status, ("<img src=\"%s-now.png\" title=\"Current stats\">"
-                         % component)
-        print >>status, ("<img src=\"%s-trend.png\" title=\"Six month trend\">"
-                         % component)
-        print >>status, "</body>"
-        print >>status, "</html>"
+        print("<h2 id=stats>Statistics</h2>", file=status)
+        print("<img src=\"%s-now.png\" title=\"Current stats\">" % component,
+              file=status)
+        print("<img src=\"%s-trend.png\" title=\"Six month trend\">"
+              % component, file=status)
+        print("</body>", file=status)
+        print("</html>", file=status)
 
     os.rename(status_file + ".new", status_file)
 
 def do_table(status, merges, left_distro, right_distro, component):
     """Output a table."""
-    print >>status, "<table cellspacing=0>"
-    print >>status, "<tr bgcolor=#d0d0d0>"
-    print >>status, "<td rowspan=2><b>Package</b></td>"
-    print >>status, "<td colspan=3><b>Last Uploader</b></td>"
-    print >>status, "<td rowspan=2><b>Comment</b></td>"
-    print >>status, "<td rowspan=2><b>Bug</b></td>"
-    print >>status, "</tr>"
-    print >>status, "<tr bgcolor=#d0d0d0>"
-    print >>status, "<td><b>%s Version</b></td>" % left_distro.title()
-    print >>status, "<td><b>%s Version</b></td>" % right_distro.title()
-    print >>status, "<td><b>Base Version</b></td>"
-    print >>status, "</tr>"
+    print("<table cellspacing=0>", file=status)
+    print("<tr bgcolor=#d0d0d0>", file=status)
+    print("<td rowspan=2><b>Package</b></td>", file=status)
+    print("<td colspan=3><b>Last Uploader</b></td>", file=status)
+    print("<td rowspan=2><b>Comment</b></td>", file=status)
+    print("<td rowspan=2><b>Bug</b></td>", file=status)
+    print("</tr>", file=status)
+    print("<tr bgcolor=#d0d0d0>", file=status)
+    print("<td><b>%s Version</b></td>" % left_distro.title(), file=status)
+    print("<td><b>%s Version</b></td>" % right_distro.title(), file=status)
+    print("<td><b>Base Version</b></td>", file=status)
+    print("</tr>", file=status)
 
     for uploaded, priority, package, user, uploader, source, \
             base_version, left_version, right_version in merges:
@@ -283,42 +286,43 @@ def do_table(status, merges, left_distro, right_distro, component):
         else:
             who = "&nbsp;"
 
-        print >>status, "<tr bgcolor=%s class=first>" % COLOURS[priority]
-        print >>status, "<td><tt><a href=\"%s/%s/REPORT\">" \
-              "%s</a></tt>" % (pathhash(package), package, package)
-        print >>status, " <sup><a href=\"https://launchpad.net/ubuntu/" \
-              "+source/%s\">LP</a></sup>" % package
-        print >>status, " <sup><a href=\"http://packages.qa.debian.org/" \
-              "%s\">PTS</a></sup></td>" % package
-        print >>status, "<td colspan=3>%s</td>" % who
-        print >>status, "<td rowspan=2><form method=\"get\" action=\"addcomment.py\"><br />"
-        print >>status, "<input type=\"hidden\" name=\"component\" value=\"%s\" />" % component
-        print >>status, "<input type=\"hidden\" name=\"package\" value=\"%s\" />" % package
-        print >>status, "<%%\n\
+        print("<tr bgcolor=%s class=first>" % COLOURS[priority], file=status)
+        print("<td><tt><a href=\"%s/%s/REPORT\">" \
+              "%s</a></tt>" % (pathhash(package), package, package),
+              file=status)
+        print(" <sup><a href=\"https://launchpad.net/ubuntu/" \
+              "+source/%s\">LP</a></sup>" % package, file=status)
+        print(" <sup><a href=\"http://packages.qa.debian.org/" \
+              "%s\">PTS</a></sup></td>" % package, file=status)
+        print("<td colspan=3>%s</td>" % who, file=status)
+        print("<td rowspan=2><form method=\"get\" action=\"addcomment.py\"><br />", file=status)
+        print("<input type=\"hidden\" name=\"component\" value=\"%s\" />" % component, file=status)
+        print("<input type=\"hidden\" name=\"package\" value=\"%s\" />" % package, file=status)
+        print("<%%\n\
 the_comment = \"\"\n\
 if \"%s\" in comment:\n\
     the_comment = comment[\"%s\"]\n\
 req.write(\"<input type=\\\"text\\\" style=\\\"border-style: none; background-color: %s\\\" name=\\\"comment\\\" value=\\\"%%s\\\" title=\\\"%%s\\\" />\" %% (the_comment, the_comment))\n\
-%%>" % (package, package, COLOURS[priority])
-        print >>status, "</form></td>"
-        print >>status, "<td rowspan=2>"
-        print >>status, "<%%\n\
+%%>" % (package, package, COLOURS[priority]), file=status)
+        print("</form></td>", file=status)
+        print("<td rowspan=2>", file=status)
+        print("<%%\n\
 if \"%s\" in comment:\n\
     req.write(\"%%s\" %% gen_buglink_from_comment(comment[\"%s\"]))\n\
 else:\n\
     req.write(\"&nbsp;\")\n\
 \n\
-%%>" % (package, package)
-        print >>status, "</td>"
-        print >>status, "</tr>"
-        print >>status, "<tr bgcolor=%s>" % COLOURS[priority]
-        print >>status, "<td><small>%s</small></td>" % source["Binary"]
-        print >>status, "<td>%s</td>" % left_version
-        print >>status, "<td>%s</td>" % right_version
-        print >>status, "<td>%s</td>" % base_version
-        print >>status, "</tr>"
+%%>" % (package, package), file=status)
+        print("</td>", file=status)
+        print("</tr>", file=status)
+        print("<tr bgcolor=%s>" % COLOURS[priority], file=status)
+        print("<td><small>%s</small></td>" % source["Binary"], file=status)
+        print("<td>%s</td>" % left_version, file=status)
+        print("<td>%s</td>" % right_version, file=status)
+        print("<td>%s</td>" % base_version, file=status)
+        print("</tr>", file=status)
 
-    print >>status, "</table>"
+    print("</table>", file=status)
 
 
 def write_status_json(component, merges, left_distro, right_distro):
@@ -327,23 +331,25 @@ def write_status_json(component, merges, left_distro, right_distro):
     with open(status_file + ".new", "w") as status:
         # No json module available on merges.ubuntu.com right now, but it's
         # not that hard to do it ourselves.
-        print >>status, '['
+        print('[', file=status)
         cur_merge = 0
         for uploaded, priority, package, user, uploader, source, \
                 base_version, left_version, right_version in merges:
-            print >>status, ' {',
+            print(' {', end=' ', file=status)
             # source_package, short_description, and link are for
             # Harvest (http://daniel.holba.ch/blog/?p=838).
-            print >>status, '"source_package": "%s",' % package,
-            print >>status, '"short_description": "merge %s",' % right_version,
-            print >>status, '"link": "https://merges.ubuntu.com/%s/%s/",' % (pathhash(package), package),
-            print >>status, '"uploaded": "%s",' % uploaded,
-            print >>status, '"priority": "%s",' % priority,
+            print('"source_package": "%s",' % package, end=' ', file=status)
+            print('"short_description": "merge %s",' % right_version,
+                  end=' ', file=status)
+            print('"link": "https://merges.ubuntu.com/%s/%s/",' %
+                  (pathhash(package), package), end=' ', file=status)
+            print('"uploaded": "%s",' % uploaded, end=' ', file=status)
+            print('"priority": "%s",' % priority, end=' ', file=status)
             if user is not None:
                 who = user
                 who = who.replace('\\', '\\\\')
                 who = who.replace('"', '\\"')
-                print >>status, '"user": "%s",' % who,
+                print('"user": "%s",' % who, end=' ', file=status)
                 if uploader is not None:
                     (usr_name, usr_mail) = parseaddr(user)
                     (upl_name, upl_mail) = parseaddr(uploader)
@@ -351,19 +357,21 @@ def write_status_json(component, merges, left_distro, right_distro):
                         u_who = uploader
                         u_who = u_who.replace('\\', '\\\\')
                         u_who = u_who.replace('"', '\\"')
-                        print >>status, '"uploader": "%s",' % u_who,
+                        print('"uploader": "%s",' % u_who, end=' ', file=status)
             binaries = re.split(', *', source["Binary"].replace('\n', ''))
-            print >>status, '"binaries": [ %s ],' % \
-                            ', '.join(['"%s"' % b for b in binaries]),
-            print >>status, '"base_version": "%s",' % base_version,
-            print >>status, '"left_version": "%s",' % left_version,
-            print >>status, '"right_version": "%s"' % right_version,
+            print('"binaries": [ %s ],' %
+                  ', '.join(['"%s"' % b for b in binaries]),
+                  end=' ', file=status)
+            print('"base_version": "%s",' % base_version, end=' ', file=status)
+            print('"left_version": "%s",' % left_version, end=' ', file=status)
+            print('"right_version": "%s"' % right_version,
+                  end=' ', file=status)
             cur_merge += 1
             if cur_merge < len(merges):
-                print >>status, '},'
+                print('},', file=status)
             else:
-                print >>status, '}'
-        print >>status, ']'
+                print('}', file=status)
+        print(']', file=status)
 
     os.rename(status_file + ".new", status_file)
 
@@ -373,9 +381,10 @@ def write_status_file(status_file, merges):
     with open(status_file + ".new", "w") as status:
         for uploaded, priority, package, user, uploader, source, \
                 base_version, left_version, right_version in merges:
-            print >>status, "%s %s %s %s %s %s, %s, %s" \
+            print("%s %s %s %s %s %s, %s, %s"
                   % (package, priority, base_version,
-                     left_version, right_version, user, uploader, uploaded)
+                     left_version, right_version, user, uploader, uploaded),
+                  file=status)
 
     os.rename(status_file + ".new", status_file)
 

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import os
 import logging
 
@@ -78,9 +80,9 @@ def publish_patch(distro, source, filename, list_file):
     os.link(filename, publish_filename)
 
     logging.info("Published %s", tree.subdir(ROOT, publish_filename))
-    print >>list_file, "%s %s" % (source["Package"],
-                                  tree.subdir("%s/published" % ROOT,
-                                              publish_filename))
+    print("%s %s" % (source["Package"],
+                     tree.subdir("%s/published" % ROOT, publish_filename)),
+          file=list_file)
 
     # Remove older patches
     for junk in os.listdir(os.path.dirname(publish_filename)):

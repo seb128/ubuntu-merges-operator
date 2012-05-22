@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
+from __future__ import print_function, with_statement
 
 import os
 import bz2
@@ -406,7 +406,7 @@ def save_watermark(distro, source, version):
     mark_file = "%s/%s/watermark" \
                 % (ROOT, pool_directory(distro, source["Package"]))
     with open(mark_file, "w") as mark:
-        print >>mark, "%s" % version
+        print("%s" % version, file=mark)
 
 
 if __name__ == "__main__":

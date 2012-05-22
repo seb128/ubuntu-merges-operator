@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
+from __future__ import print_function, with_statement
 
 import os
 import re
@@ -449,7 +449,7 @@ def save_basis(filename, version):
     """Save the basis version of a patch to a file."""
     basis_file = filename + "-basis"
     with open(basis_file, "w") as basis:
-        print >>basis, "%s" % version
+        print("%s" % version, file=basis)
 
 
 # --------------------------------------------------------------------------- #

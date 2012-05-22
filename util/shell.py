@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
+from __future__ import print_function, with_statement
 
 import os
 import sys
@@ -37,8 +37,8 @@ class Process(object):
     | p = Process(('ls', '/'), 'r')
     | p.read()
     or
-    | for print in p:
-    |     print filename
+    | for line in p:
+    |     print(line)
     | p.close()
     """
 
