@@ -53,6 +53,12 @@ def main(options, args):
                     if options.package is not None \
                            and source["Package"] not in options.package:
                         continue
+                    changes_filename = changes_file(distro, source)
+                    if (os.path.isfile(changes_filename) or
+                        os.path.isfile(changes_filename + ".bz2")):
+                        # It looks as though we've already processed and
+                        # expired this.
+                        continue
                     update_pool(distro, source)
 
 
