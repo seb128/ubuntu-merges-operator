@@ -724,8 +724,8 @@ def remove_old_comments(status_file, merges):
 
 def gen_buglink_from_comment(comment):
     """Return an HTML formatted Debian/Ubuntu bug link from comment"""
-    debian = re.search(".*Debian bug #([0-9]{1,6}).*", comment, re.I)
-    ubuntu = re.search(".*bug #([0-9]{1,6}).*", comment, re.I)
+    debian = re.search(".*Debian bug #([0-9]{1,}).*", comment, re.I)
+    ubuntu = re.search(".*bug #([0-9]{1,}).*", comment, re.I)
 
     html = ""
     if debian:
