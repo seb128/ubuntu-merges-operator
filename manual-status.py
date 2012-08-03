@@ -22,6 +22,7 @@ from __future__ import print_function, with_statement
 import os
 import bz2
 import re
+import time
 
 from rfc822 import parseaddr
 from momlib import *
@@ -202,6 +203,8 @@ def write_status_page(component, merges, left_distro, right_distro):
 
             do_table(status, section_merges, left_distro, right_distro, component)
 
+        print("<p><small>Generated at %s.</small></p>" %
+              time.strftime('%Y-%m-%d %H:%M:%S %Z'))
         print("</body>", file=status)
         print("</html>", file=status)
 

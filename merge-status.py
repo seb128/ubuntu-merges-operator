@@ -22,6 +22,7 @@ from __future__ import print_function, with_statement
 import os
 import bz2
 import re
+import time
 
 from rfc822 import parseaddr
 from momlib import *
@@ -243,6 +244,8 @@ def write_status_page(component, merges, left_distro, right_distro):
               file=status)
         print("<img src=\"%s-trend.png\" title=\"Six month trend\">"
               % component, file=status)
+        print("<p><small>Generated at %s.</small></p>" %
+              time.strftime('%Y-%m-%d %H:%M:%S %Z'))
         print("</body>", file=status)
         print("</html>", file=status)
 
