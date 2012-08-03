@@ -204,7 +204,7 @@ def write_status_page(component, merges, left_distro, right_distro):
             do_table(status, section_merges, left_distro, right_distro, component)
 
         print("<p><small>Generated at %s.</small></p>" %
-              time.strftime('%Y-%m-%d %H:%M:%S %Z'))
+              time.strftime('%Y-%m-%d %H:%M:%S %Z'), file=status)
         print("</body>", file=status)
         print("</html>", file=status)
 
