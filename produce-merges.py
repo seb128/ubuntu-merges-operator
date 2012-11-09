@@ -183,7 +183,7 @@ def produce_merge(left_source, left_distro, left_dist, base_source,
 
     try:
         left_dir = unpack_source(left_distro, left_source)
-        base_dir = unpack_source(left_distro, base_source)
+        base_dir = unpack_source(right_distro, base_source)
         right_dir = unpack_source(right_distro, right_source)
 
         merged_dir = work_dir(package, merged_version)
