@@ -99,10 +99,7 @@ def main(options, args):
             except IndexError:
                 pass
 
-            try:
-                priority_idx = PRIORITY.index(our_source["Priority"])
-            except KeyError:
-                priority_idx = 0
+            priority_idx = PRIORITY.index(adjusted_priority(source))
 
             filename = changes_file(our_distro, our_source)
             if os.path.isfile(filename):
