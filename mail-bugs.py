@@ -90,7 +90,7 @@ def closed_bugs(distro, this):
     elif os.path.isfile(changes_filename + ".bz2"):
         changes = bz2.BZ2File(changes_filename + ".bz2")
     else:
-        logging.warning("Missing changes file")
+        logging.warning("Missing changes file %s" % changes_filename)
         return []
 
     # Extract the closes line from the changes file

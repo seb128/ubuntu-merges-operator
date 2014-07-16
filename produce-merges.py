@@ -773,7 +773,8 @@ def create_source(package, version, since, output_dir, merged_dir):
         try:
             shell.run(cmd, chdir=parent)
         except (ValueError, OSError):
-            logging.error("dpkg-source failed")
+            logging.error(
+                "'%s' to generate %s failed" % (" ".join(cmd), filename))
             return create_tarball(package, version, output_dir, merged_dir)
 
         if os.path.isfile("%s/%s" % (parent, filename)):

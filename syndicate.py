@@ -125,7 +125,8 @@ def main(options, args):
                         elif os.path.isfile(changes_filename + ".bz2"):
                             changes = bz2.BZ2File(changes_filename + ".bz2")
                         else:
-                            logging.warning("Missing changes file")
+                            logging.warning(
+                                "Missing changes file %s" % changes_filename)
                             continue
 
                         # Extract the author's e-mail from the changes file
