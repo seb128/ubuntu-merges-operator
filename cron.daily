@@ -56,10 +56,10 @@ wget -q -O/srv/patches.ubuntu.com/sync-blacklist.txt http://people.canonical.com
 # ./mail-bugs.py $QUIET
 
 # Run the merge tool
-./produce-merges.py -X ../merge-blacklist.txt -X ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt
-./produce-merges.py -X ../merge-blacklist.txt -I ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt -S experimental
-./produce-merges.py -X ../merge-blacklist.txt -X ../experimental.txt -I ../unstable.txt -X ../testing-proposed-updates.txt -S unstable
-./produce-merges.py -X ../merge-blacklist.txt -X ../experimental.txt -X ../unstable.txt -I ../testing-proposed-updates.txt -S testing-proposed-updates
+./produce-merges.py $QUIET -X ../merge-blacklist.txt -X ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt
+./produce-merges.py $QUIET -X ../merge-blacklist.txt -I ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt -S experimental
+./produce-merges.py $QUIET -X ../merge-blacklist.txt -X ../experimental.txt -I ../unstable.txt -X ../testing-proposed-updates.txt -S unstable
+./produce-merges.py $QUIET -X ../merge-blacklist.txt -X ../experimental.txt -X ../unstable.txt -I ../testing-proposed-updates.txt -S testing-proposed-updates
 
 # Produce pretty reports
 ./stats.py $QUIET
