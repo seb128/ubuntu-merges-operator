@@ -41,6 +41,7 @@ SECTIONS = [ "outstanding", "new", "updated" ]
 # mapping of uploader emails to Launchpad pages
 person_lp_page_mapping = None
 
+
 def options(parser):
     parser.add_option("-D", "--source-distro", type="string", metavar="DISTRO",
                       default=SRC_DISTRO,
@@ -188,6 +189,7 @@ def get_person_lp_page(person_email):
         return None
     person_lp_page_mapping[person_email] = data[0]["web_link"].encode('utf-8')
     return person_lp_page_mapping[person_email]
+
 
 def write_status_page(component, merges, left_distro, right_distro):
     """Write out the merge status page."""
