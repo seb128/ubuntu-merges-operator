@@ -21,13 +21,11 @@ from __future__ import print_function, with_statement
 
 import os
 import bz2
-import json
 import re
 import time
 
 from rfc822 import parseaddr
 from momlib import *
-from urllib import urlopen, quote
 
 
 # Order of priorities
@@ -37,9 +35,6 @@ COLOURS =  [ "#ff8080", "#ffb580", "#ffea80", "#dfff80", "#abff80", "#80ff8b" ]
 
 # Sections
 SECTIONS = [ "new", "updated" ]
-
-# mapping of uploader emails to Launchpad pages
-person_lp_page_mapping = None
 
 
 def options(parser):
@@ -140,29 +135,6 @@ def main(options, args):
         status_file = "%s/merges/tomerge-%s-manual" % (ROOT, our_component)
         remove_old_comments(status_file, merges)
         write_status_file(status_file, merges)
-
-
-def get_person_lp_page(person_email):
-    global person_lp_page_mapping
-    if person_lp_page_mapping and person_email in person_lp_page_mapping:
-        return person_lp_page_mapping[person_email]
-    elif not person_lp_page_mapping:
-        person_lp_page_mapping = {}
-    email = quote(person_email)
-    find_person = "https://api.launchpad.net/devel/people/?ws.op=findPerson&text=%s" % email
-    try:
-        response = urlopen(find_person)
-    except IOError:
-        return None
-    try:
-        content = response.read()
-    except IOError:
-        return None
-    data = json.loads(content)["entries"]
-    if len(data) != 1:
-        return None
-    person_lp_page_mapping[person_email] = data[0]["web_link"].encode('utf-8')
-    return person_lp_page_mapping[person_email]
 
 
 def write_status_page(component, merges, left_distro, right_distro):
@@ -277,7 +249,10 @@ def do_table(status, merges, left_distro, right_distro, component):
             user = user.replace("&", "&amp;")
             user = user.replace("<", "&lt;")
             user = user.replace(">", "&gt;")
-            who = "<a href='%s'>%s</a>" % (user_lp_page, user)
+            if user_lp_page:
+                who = "<a href='%s'>%s</a>" % (user_lp_page.encode("utf-8"), user)
+            else:
+                who = "%s" % user
 
             if uploader is not None:
                 (upl_name, upl_mail) = parseaddr(uploader)
@@ -288,9 +263,12 @@ def do_table(status, merges, left_distro, right_distro, component):
                     u_who = u_who.replace("&", "&amp;")
                     u_who = u_who.replace("<", "&lt;")
                     u_who = u_who.replace(">", "&gt;")
-
-                    who = "%s<br><small><em>Uploader:</em> <a href='%s'>%s</a></small>" \
-                            % (who, upl_lp_page, u_who)                   
+                    if upl_lp_page:
+                        who = "%s<br><small><em>Uploader:</em> <a href='%s'>%s</a></small>" \
+                                % (who, upl_lp_page.encode("utf-8"), u_who)
+                    else:
+                        who = "%s<br><small><em>Uploader:</em> %s</small>" \
+                               % (who, u_who)
         else:
             who = "&nbsp;"
 
