@@ -252,7 +252,7 @@ def do_table(status, merges, left_distro, right_distro, component):
             if user_lp_page:
                 who = "<a href='%s'>%s</a>" % (user_lp_page.encode("utf-8"), user)
             else:
-                who = "%s" % user
+                who = user
 
             if uploader is not None:
                 (upl_name, upl_mail) = parseaddr(uploader)

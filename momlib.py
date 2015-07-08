@@ -37,7 +37,8 @@ import json
 
 from cgi import escape
 from optparse import OptionParser
-from urllib2 import urlopen, quote
+from urllib import quote
+from urllib2 import urlopen
 from contextlib import closing
 
 from deb.controlfile import ControlFile
@@ -176,6 +177,7 @@ def md5sum(filename):
     return md5(open(filename).read()).hexdigest()
 
 def get_person_lp_page(person_email):
+    """Make a best guess at what the person's LP page is."""
     if person_email in person_lp_page_mapping:
         return person_lp_page_mapping[person_email]
     email = quote(person_email)
@@ -186,6 +188,8 @@ def get_person_lp_page(person_email):
     except IOError:
         return None
     data = json.loads(content)["entries"]
+    # findPerson does a startswith match so could return multiple entries, if
+    # that happens return None as credentials are needed to confirm the email.
     if len(data) != 1:
         person_lp_page_mapping[person_email] = None
     else:
