@@ -33,9 +33,13 @@ import errno
 import logging
 import datetime
 import stat
+import json
 
 from cgi import escape
 from optparse import OptionParser
+from urllib import quote
+from urllib2 import urlopen
+from contextlib import closing
 
 from deb.controlfile import ControlFile
 from deb.version import Version
@@ -106,6 +110,9 @@ RSS_TIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"
 # Cache of parsed sources files
 SOURCES_CACHE = {}
 
+# mapping of uploader emails to Launchpad pages
+person_lp_page_mapping = {}
+
 
 # --------------------------------------------------------------------------- #
 # Command-line tool functions
@@ -168,6 +175,26 @@ def cleanup(path):
 def md5sum(filename):
     """Return an md5sum."""
     return md5(open(filename).read()).hexdigest()
+
+def get_person_lp_page(person_email):
+    """Make a best guess at what the person's LP page is."""
+    if person_email in person_lp_page_mapping:
+        return person_lp_page_mapping[person_email]
+    email = quote(person_email)
+    find_person = "https://api.launchpad.net/devel/people/?ws.op=findPerson&text=%s" % email
+    try:
+        with closing(urlopen(find_person)) as response:
+            content = response.read()
+    except IOError:
+        return None
+    data = json.loads(content)["entries"]
+    # findPerson does a startswith match so could return multiple entries, if
+    # that happens return None as credentials are needed to confirm the email.
+    if len(data) != 1:
+        person_lp_page_mapping[person_email] = None
+    else:
+        person_lp_page_mapping[person_email] = data[0]["web_link"]
+    return person_lp_page_mapping[person_email]
 
 
 # --------------------------------------------------------------------------- #

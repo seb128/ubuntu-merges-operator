@@ -244,23 +244,31 @@ def do_table(status, merges, left_distro, right_distro, component):
     for uploaded, priority, package, user, uploader, source, \
             left_version, right_version in merges:
         if user is not None:
-            who = user
-            who = who.replace("&", "&amp;")
-            who = who.replace("<", "&lt;")
-            who = who.replace(">", "&gt;")
+            (usr_name, usr_mail) = parseaddr(user)
+            user_lp_page = get_person_lp_page(usr_mail)
+            user = user.replace("&", "&amp;")
+            user = user.replace("<", "&lt;")
+            user = user.replace(">", "&gt;")
+            if user_lp_page:
+                who = "<a href='%s'>%s</a>" % (user_lp_page.encode("utf-8"), user)
+            else:
+                who = user
 
             if uploader is not None:
-                (usr_name, usr_mail) = parseaddr(user)
                 (upl_name, upl_mail) = parseaddr(uploader)
+                upl_lp_page = get_person_lp_page(upl_mail)
 
                 if len(usr_name) and usr_name != upl_name:
                     u_who = uploader
                     u_who = u_who.replace("&", "&amp;")
                     u_who = u_who.replace("<", "&lt;")
                     u_who = u_who.replace(">", "&gt;")
-
-                    who = "%s<br><small><em>Uploader:</em> %s</small>" \
-                            % (who, u_who)
+                    if upl_lp_page:
+                        who = "%s<br><small><em>Uploader:</em> <a href='%s'>%s</a></small>" \
+                                % (who, upl_lp_page.encode("utf-8"), u_who)
+                    else:
+                        who = "%s<br><small><em>Uploader:</em> %s</small>" \
+                               % (who, u_who)
         else:
             who = "&nbsp;"
 
