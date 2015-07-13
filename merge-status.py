@@ -116,7 +116,12 @@ def main(options, args):
                 except KeyError:
                     user = None
                 try:
-                    uploaded = info["Distribution"] == OUR_DIST
+                    uploaded = False
+                    # not enough to determine if it is updated
+                    # uploaded = info["Distribution"] == OUR_DIST
+                    # if info["Distribution"] == OUR_DIST:
+                    #     if base_version.upstream == left_version.upstream:
+                    #         uploaded = True
                 except KeyError:
                     uploaded = False
             else:
