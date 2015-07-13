@@ -19,11 +19,12 @@
 
 from __future__ import print_function, with_statement
 
-import os
 import bz2
+import os
 import re
 import time
 
+from datetime import datetime
 from rfc822 import parseaddr
 from momlib import *
 
@@ -99,7 +100,13 @@ def main(options, args):
             except IndexError:
                 pass
 
-            priority_idx = PRIORITY.index(adjusted_priority(our_source))
+            date_superseded = get_date_superseded(source["Package"],
+                                                  base_version)
+            if not date_superseded:
+                age = datetime.datetime.utcnow() - datetime.datetime.utcnow()
+            else:
+                age = datetime.datetime.utcnow() - date_superseded.replace(tzinfo=None)
+            priority_idx = age.days
 
             filename = changes_file(our_distro, our_source)
             if os.path.isfile(filename):
@@ -139,7 +146,7 @@ def main(options, args):
 
 def write_status_page(component, merges, left_distro, right_distro):
     """Write out the manual merge status page."""
-    merges.sort()
+    merges.sort(reverse=True)
 
     status_file = "%s/merges/%s-manual.html" % (ROOT, component)
     with open(status_file + ".new", "w") as status:
@@ -235,14 +242,16 @@ def do_table(status, merges, left_distro, right_distro, component):
     print("<td colspan=2><b>Last Uploader</b></td>", file=status)
     print("<td rowspan=2><b>Comment</b></td>", file=status)
     print("<td rowspan=2><b>Bug</b></td>", file=status)
+    print("<td rowspan=2><b>Days Old</b></td>", file=status)
     print("</tr>", file=status)
     print("<tr bgcolor=#d0d0d0>", file=status)
     print("<td><b>%s Version</b></td>" % left_distro.title(), file=status)
     print("<td><b>%s Version</b></td>" % right_distro.title(), file=status)
     print("</tr>", file=status)
 
-    for uploaded, priority, package, user, uploader, source, \
+    for uploaded, age, package, user, uploader, source, \
             left_version, right_version in merges:
+        priority = set_priority(age)
         if user is not None:
             (usr_name, usr_mail) = parseaddr(user)
             user_lp_page = get_person_lp_page(usr_mail)
@@ -303,6 +312,9 @@ else:\n\
     req.write(\"&nbsp;\")\n\
 \n\
 %%>" % (package, package), file=status)
+        print("</td>", file=status)
+        print("<td rowspan=2>", file=status)
+        print("%s" % age, file=status)
         print("</td>", file=status)
         print("</tr>", file=status)
         print("<tr bgcolor=%s>" % COLOURS[priority], file=status)

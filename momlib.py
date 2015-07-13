@@ -204,13 +204,13 @@ def get_person_lp_page(person_email):
 def set_priority(days):
     if days <= 30:
         return 5
-    if days <= 60:
+    elif days <= 60:
         return 4
-    if days <= 90:
+    elif days <= 90:
         return 3
-    if days <= 180:
+    elif days <= 180:
         return 2
-    if days <= 365:
+    elif days <= 365:
         return 1
     return 0
 

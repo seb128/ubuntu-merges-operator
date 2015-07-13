@@ -305,6 +305,7 @@ def do_table(status, merges, left_distro, right_distro, component):
                                % (who, u_who)
         else:
             who = "&nbsp;"
+
         print("<tr bgcolor=%s class=first>" % COLOURS[priority], file=status)
         print("<td><tt><a href=\"%s/%s/REPORT\">" \
               "%s</a></tt>" % (pathhash(package), package, package),
