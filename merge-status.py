@@ -97,7 +97,7 @@ def main(options, args):
                 age = datetime.datetime.utcnow() - datetime.datetime.utcnow()
             else:
                 age = datetime.datetime.utcnow() - date_superseded.replace(tzinfo=None)
-            priority_idx = age.days
+            days_old = age.days
 
             filename = changes_file(our_distro, source)
             if os.path.isfile(filename):
@@ -139,7 +139,7 @@ def main(options, args):
             else:
                 section = "new"
 
-            merges.append((section, priority_idx, source["Package"], user,
+            merges.append((section, days_old, source["Package"], user,
                            uploader, source, base_version,
                            left_version, right_version))
         merges.sort(reverse=True)
@@ -276,7 +276,7 @@ def do_table(status, merges, left_distro, right_distro, component):
 
     for uploaded, age, package, user, uploader, source, \
             base_version, left_version, right_version in merges:
-        priority = set_priority(age)
+        priority_idx = set_priority(age)
         if user is not None:
             (usr_name, usr_mail) = parseaddr(user)
             user_lp_page = get_person_lp_page(usr_mail)
@@ -306,7 +306,7 @@ def do_table(status, merges, left_distro, right_distro, component):
         else:
             who = "&nbsp;"
 
-        print("<tr bgcolor=%s class=first>" % COLOURS[priority], file=status)
+        print("<tr bgcolor=%s class=first>" % COLOURS[priority_idx], file=status)
         print("<td><tt><a href=\"%s/%s/REPORT\">" \
               "%s</a></tt>" % (pathhash(package), package, package),
               file=status)
@@ -323,7 +323,7 @@ the_comment = \"\"\n\
 if \"%s\" in comment:\n\
     the_comment = comment[\"%s\"]\n\
 req.write(\"<input type=\\\"text\\\" style=\\\"border-style: none; background-color: %s\\\" name=\\\"comment\\\" value=\\\"%%s\\\" title=\\\"%%s\\\" />\" %% (the_comment, the_comment))\n\
-%%>" % (package, package, COLOURS[priority]), file=status)
+%%>" % (package, package, COLOURS[priority_idx]), file=status)
         print("</form></td>", file=status)
         print("<td rowspan=2>", file=status)
         print("<%%\n\
@@ -338,7 +338,7 @@ else:\n\
         print("%s" % age, file=status)
         print("</td>", file=status)
         print("</tr>", file=status)
-        print("<tr bgcolor=%s>" % COLOURS[priority], file=status)
+        print("<tr bgcolor=%s>" % COLOURS[priority_idx], file=status)
         print("<td><small>%s</small></td>" % source["Binary"], file=status)
         print("<td>%s</td>" % left_version, file=status)
         print("<td>%s</td>" % right_version, file=status)
