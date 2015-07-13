@@ -334,7 +334,7 @@ def write_status_json(component, merges, left_distro, right_distro):
         # not that hard to do it ourselves.
         print('[', file=status)
         cur_merge = 0
-        for uploaded, priority, package, user, uploader, source, \
+        for uploaded, age, package, user, uploader, source, \
                 left_version, right_version in merges:
             print(' {', end=' ', file=status)
             # source_package, short_description, and link are for
@@ -345,7 +345,7 @@ def write_status_json(component, merges, left_distro, right_distro):
             print('"link": "https://merges.ubuntu.com/%s/%s/",' %
                   (pathhash(package), package), end=' ', file=status)
             print('"uploaded": "%s",' % uploaded, end=' ', file=status)
-            print('"priority": "%s",' % priority, end=' ', file=status)
+            print('"age": "%s",' % age, end=' ', file=status)
             if user is not None:
                 who = user
                 who = who.replace('\\', '\\\\')
@@ -379,10 +379,10 @@ def write_status_json(component, merges, left_distro, right_distro):
 def write_status_file(status_file, merges):
     """Write out the merge status file."""
     with open(status_file + ".new", "w") as status:
-        for uploaded, priority, package, user, uploader, source, \
+        for uploaded, age, package, user, uploader, source, \
                 left_version, right_version in merges:
             print("%s %s %s %s, %s, %s, %s"
-                  % (package, priority,
+                  % (package, age,
                      left_version, right_version, user, uploader, uploaded),
                   file=status)
 
