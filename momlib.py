@@ -822,9 +822,7 @@ def get_date_superseded(package, base_version):
     from debian.debian_support import Version
     base_version = Version(base_version)
 
-    dest_distro = LAUNCHPAD.projects[OUR_DISTRO]
     src_distro = LAUNCHPAD.projects[SRC_DISTRO]
-    dest_archive = dest_distro.main_archive
     src_archive = src_distro.main_archive
 
     date_superseded = None
@@ -838,6 +836,7 @@ def get_date_superseded(package, base_version):
         date_superseded = spph.date_created
         ver_superseded = version
     else:
-         print("Base version %s of %s never published in Debian." %
-               (base_version, package))
+        if False:
+            print("Base version %s of %s never published in Debian." %
+                  (base_version, package))
     return date_superseded
