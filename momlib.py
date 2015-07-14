@@ -116,8 +116,7 @@ SOURCES_CACHE = {}
 person_lp_page_mapping = {}
 
 # Launchpad connection
-LAUNCHPAD = Launchpad.login_anonymously('merge-o-matic', 'production',
-                                        '/tmp/lplib-cache')
+LAUNCHPAD = Launchpad.login_anonymously('merge-o-matic', 'production')
 
 # --------------------------------------------------------------------------- #
 # Command-line tool functions
