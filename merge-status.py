@@ -117,8 +117,9 @@ def main(options, args):
                     user = None
                 try:
                     uploaded = False
-                    # not enough to determine if it is updated
+                    # not enough to determine if it is updated LP: #1474139
                     # uploaded = info["Distribution"] == OUR_DIST
+                    # better but not sufficient
                     # if info["Distribution"] == OUR_DIST:
                     #     if base_version.upstream == left_version.upstream:
                     #         uploaded = True

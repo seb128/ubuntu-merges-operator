@@ -121,7 +121,9 @@ def main(options, args):
                                    multi_para=False, signed=False).para
 
                 user = info["Changed-By"]
-                uploaded = info["Distribution"] == OUR_DIST
+                # not enough to determine if it is updated LP: #1474139
+                # uploaded = info["Distribution"] == OUR_DIST
+                uploaded = False
             else:
                 user = None
                 uploaded = False
