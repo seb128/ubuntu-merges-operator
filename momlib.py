@@ -201,7 +201,8 @@ def get_person_lp_page(person_email):
         person_lp_page_mapping[person_email] = data[0]["web_link"]
     return person_lp_page_mapping[person_email]
 
-def set_priority(days):
+def get_importance(days):
+    "Return an int representing the importance of an item."
     if days <= 30:
         return 5
     elif days <= 60:
