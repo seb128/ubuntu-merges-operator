@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # momlib.py - common utility functions
 #
-# Copyright © 2008 Canonical Ltd.
-# Author: Scott James Remnant <scott@ubuntu.com>.
+# Copyright © 2008 - 2015 Canonical Ltd.
+# Authors: Scott James Remnant <scott@ubuntu.com>,
+#          Brian Murray <brian@ubuntu.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of version 3 of the GNU General Public License as
@@ -36,6 +37,7 @@ import stat
 import json
 
 from cgi import escape
+from launchpadlib.launchpad import Launchpad
 from optparse import OptionParser
 from urllib import quote
 from urllib2 import urlopen
@@ -113,6 +115,9 @@ SOURCES_CACHE = {}
 # mapping of uploader emails to Launchpad pages
 person_lp_page_mapping = {}
 
+# Launchpad connection
+LAUNCHPAD = Launchpad.login_anonymously('merge-o-matic', 'production',
+                                        '/tmp/lplib-cache')
 
 # --------------------------------------------------------------------------- #
 # Command-line tool functions
@@ -196,6 +201,19 @@ def get_person_lp_page(person_email):
         person_lp_page_mapping[person_email] = data[0]["web_link"]
     return person_lp_page_mapping[person_email]
 
+def get_importance(days):
+    "Return an int representing the importance of an item."
+    if days <= 30:
+        return 5
+    elif days <= 60:
+        return 4
+    elif days <= 90:
+        return 3
+    elif days <= 180:
+        return 2
+    elif days <= 365:
+        return 1
+    return 0
 
 # --------------------------------------------------------------------------- #
 # Location functions
@@ -731,7 +749,7 @@ def comments_file():
 
 def get_comments():
     """Extract the comments from file, and return a dictionary
-        containing comments corresponding to packages"""
+       containing comments corresponding to packages"""
     comments = {}
 
     with open(comments_file(), "r") as file_comments:
@@ -796,3 +814,29 @@ def gen_buglink_from_comment(comment):
         html += "&nbsp;"
 
     return html
+
+# --------------------------------------------------------------------------- #
+# Launchpadlib functions
+# --------------------------------------------------------------------------- #
+def get_date_superseded(package, base_version):
+    from debian.debian_support import Version
+    base_version = Version(base_version)
+
+    src_distro = LAUNCHPAD.projects[SRC_DISTRO]
+    src_archive = src_distro.main_archive
+
+    date_superseded = None
+    ver_superseded = None
+    for spph in src_archive.getPublishedSources(source_name=package,
+                                                exact_match=True,
+                                                pocket='Release'):
+        version = Version(spph.source_package_version)
+        if version <= base_version:
+            break
+        date_superseded = spph.date_created
+        ver_superseded = version
+    else:
+        if False:
+            print("Base version %s of %s never published in Debian." %
+                  (base_version, package))
+    return date_superseded

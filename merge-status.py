@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # merge-status.py - output merge status
 #
-# Copyright © 2008 Canonical Ltd.
-# Author: Scott James Remnant <scott@ubuntu.com>.
+# Copyright © 2008 - 2015 Canonical Ltd.
+# Authors: Scott James Remnant <scott@ubuntu.com>,
+#          Brian Murray <brian@ubuntu.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of version 3 of the GNU General Public License as
@@ -19,11 +20,12 @@
 
 from __future__ import print_function, with_statement
 
-import os
 import bz2
+import os
 import re
 import time
 
+from datetime import datetime
 from rfc822 import parseaddr
 from momlib import *
 
@@ -90,8 +92,13 @@ def main(options, args):
                                              our_distro, src_distro)
             except ValueError:
                 continue
-
-            priority_idx = PRIORITY.index(adjusted_priority(source))
+            date_superseded = get_date_superseded(source["Package"],
+                                                  base_version)
+            if not date_superseded:
+                age = datetime.datetime.utcnow() - datetime.datetime.utcnow()
+            else:
+                age = datetime.datetime.utcnow() - date_superseded.replace(tzinfo=None)
+            days_old = age.days
 
             filename = changes_file(our_distro, source)
             if os.path.isfile(filename):
@@ -110,7 +117,13 @@ def main(options, args):
                 except KeyError:
                     user = None
                 try:
-                    uploaded = info["Distribution"] == OUR_DIST
+                    uploaded = False
+                    # not enough to determine if it is updated LP: #1474139
+                    # uploaded = info["Distribution"] == OUR_DIST
+                    # better but not sufficient
+                    # if info["Distribution"] == OUR_DIST:
+                    #     if base_version.upstream == left_version.upstream:
+                    #         uploaded = True
                 except KeyError:
                     uploaded = False
             else:
@@ -128,11 +141,10 @@ def main(options, args):
             else:
                 section = "new"
 
-            merges.append((section, priority_idx, source["Package"], user,
+            merges.append((section, days_old, source["Package"], user,
                            uploader, source, base_version,
                            left_version, right_version))
-
-        merges.sort()
+        merges.sort(reverse=True)
 
         write_status_page(our_component, merges, our_distro, src_distro)
         write_status_json(our_component, merges, our_distro, src_distro)
@@ -256,6 +268,7 @@ def do_table(status, merges, left_distro, right_distro, component):
     print("<td colspan=3><b>Last Uploader</b></td>", file=status)
     print("<td rowspan=2><b>Comment</b></td>", file=status)
     print("<td rowspan=2><b>Bug</b></td>", file=status)
+    print("<td rowspan=2><b>Days Old</b></td>", file=status)
     print("</tr>", file=status)
     print("<tr bgcolor=#d0d0d0>", file=status)
     print("<td><b>%s Version</b></td>" % left_distro.title(), file=status)
@@ -263,8 +276,9 @@ def do_table(status, merges, left_distro, right_distro, component):
     print("<td><b>Base Version</b></td>", file=status)
     print("</tr>", file=status)
 
-    for uploaded, priority, package, user, uploader, source, \
+    for uploaded, age, package, user, uploader, source, \
             base_version, left_version, right_version in merges:
+        colour_idx = get_importance(age)
         if user is not None:
             (usr_name, usr_mail) = parseaddr(user)
             user_lp_page = get_person_lp_page(usr_mail)
@@ -294,7 +308,7 @@ def do_table(status, merges, left_distro, right_distro, component):
         else:
             who = "&nbsp;"
 
-        print("<tr bgcolor=%s class=first>" % COLOURS[priority], file=status)
+        print("<tr bgcolor=%s class=first>" % COLOURS[colour_idx], file=status)
         print("<td><tt><a href=\"%s/%s/REPORT\">" \
               "%s</a></tt>" % (pathhash(package), package, package),
               file=status)
@@ -311,7 +325,7 @@ the_comment = \"\"\n\
 if \"%s\" in comment:\n\
     the_comment = comment[\"%s\"]\n\
 req.write(\"<input type=\\\"text\\\" style=\\\"border-style: none; background-color: %s\\\" name=\\\"comment\\\" value=\\\"%%s\\\" title=\\\"%%s\\\" />\" %% (the_comment, the_comment))\n\
-%%>" % (package, package, COLOURS[priority]), file=status)
+%%>" % (package, package, COLOURS[colour_idx]), file=status)
         print("</form></td>", file=status)
         print("<td rowspan=2>", file=status)
         print("<%%\n\
@@ -322,8 +336,11 @@ else:\n\
 \n\
 %%>" % (package, package), file=status)
         print("</td>", file=status)
+        print("<td rowspan=2>", file=status)
+        print("%s" % age, file=status)
+        print("</td>", file=status)
         print("</tr>", file=status)
-        print("<tr bgcolor=%s>" % COLOURS[priority], file=status)
+        print("<tr bgcolor=%s>" % COLOURS[colour_idx], file=status)
         print("<td><small>%s</small></td>" % source["Binary"], file=status)
         print("<td>%s</td>" % left_version, file=status)
         print("<td>%s</td>" % right_version, file=status)
@@ -341,7 +358,7 @@ def write_status_json(component, merges, left_distro, right_distro):
         # not that hard to do it ourselves.
         print('[', file=status)
         cur_merge = 0
-        for uploaded, priority, package, user, uploader, source, \
+        for uploaded, age, package, user, uploader, source, \
                 base_version, left_version, right_version in merges:
             print(' {', end=' ', file=status)
             # source_package, short_description, and link are for
@@ -352,7 +369,7 @@ def write_status_json(component, merges, left_distro, right_distro):
             print('"link": "https://merges.ubuntu.com/%s/%s/",' %
                   (pathhash(package), package), end=' ', file=status)
             print('"uploaded": "%s",' % uploaded, end=' ', file=status)
-            print('"priority": "%s",' % priority, end=' ', file=status)
+            print('"age": "%s",' % age, end=' ', file=status)
             if user is not None:
                 who = user
                 who = who.replace('\\', '\\\\')
@@ -387,10 +404,10 @@ def write_status_json(component, merges, left_distro, right_distro):
 def write_status_file(status_file, merges):
     """Write out the merge status file."""
     with open(status_file + ".new", "w") as status:
-        for uploaded, priority, package, user, uploader, source, \
+        for uploaded, age, package, user, uploader, source, \
                 base_version, left_version, right_version in merges:
             print("%s %s %s %s %s %s, %s, %s"
-                  % (package, priority, base_version,
+                  % (package, age, base_version,
                      left_version, right_version, user, uploader, uploaded),
                   file=status)
 
