@@ -101,7 +101,7 @@ def main(options, args):
             except IndexError:
                 pass
 
-            date_superseded = get_date_superseded(source["Package"],
+            date_superseded = get_date_superseded(package,
                                                   base_version)
             if not date_superseded:
                 age = datetime.datetime.utcnow() - datetime.datetime.utcnow()
