@@ -33,7 +33,7 @@ from util import tree
 def options(parser):
     parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
                       action="append",
-                      help="Process only theses packages")
+                      help="Process only these packages")
 
 def main(options, args):
     if len(args):
