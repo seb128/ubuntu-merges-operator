@@ -115,9 +115,6 @@ SOURCES_CACHE = {}
 # mapping of uploader emails to Launchpad pages
 person_lp_page_mapping = {}
 
-# Launchpad connection
-LAUNCHPAD = Launchpad.login_anonymously('merge-o-matic', 'production')
-
 # --------------------------------------------------------------------------- #
 # Command-line tool functions
 # --------------------------------------------------------------------------- #
@@ -817,11 +814,21 @@ def gen_buglink_from_comment(comment):
 # --------------------------------------------------------------------------- #
 # Launchpadlib functions
 # --------------------------------------------------------------------------- #
+
+LAUNCHPAD = None
+
+def get_launchpad():
+    global LAUNCHPAD
+
+    if LAUNCHPAD is None:
+        LAUNCHPAD = Launchpad.login_anonymously('merge-o-matic', 'production')
+    return LAUNCHPAD
+
 def get_date_superseded(package, base_version):
     from debian.debian_support import Version
     base_version = Version(base_version)
 
-    src_distro = LAUNCHPAD.projects[SRC_DISTRO]
+    src_distro = get_launchpad().projects[SRC_DISTRO]
     src_archive = src_distro.main_archive
 
     date_superseded = None
