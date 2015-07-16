@@ -21,6 +21,7 @@
 from __future__ import print_function, with_statement
 
 import bz2
+import json
 import os
 import re
 import time
@@ -353,50 +354,38 @@ else:\n\
 def write_status_json(component, merges, left_distro, right_distro):
     """Write out the merge status JSON dump."""
     status_file = "%s/merges/%s.json" % (ROOT, component)
+    data = []
+    for uploaded, age, package, user, uploader, source, \
+            base_version, left_version, right_version in merges:
+        who = None
+        u_who = None
+        if user is not None:
+            who = user
+            who = who.replace('\\', '\\\\')
+            who = who.replace('"', '\\"')
+            if uploader is not None:
+                (usr_name, usr_mail) = parseaddr(user)
+                (upl_name, upl_mail) = parseaddr(uploader)
+                if len(usr_name) and usr_name != upl_name:
+                    u_who = uploader
+                    u_who = u_who.replace('\\', '\\\\')
+                    u_who = u_who.replace('"', '\\"')
+        binaries = re.split(', *', source["Binary"].replace('\n', ''))
+        # source_package, short_description, and link are for
+        # Harvest (http://daniel.holba.ch/blog/?p=838).
+        data.append({"source_package": package,
+            "short_description": "merge %s" % right_version,
+            "link": "https://merges.ubuntu.com/%s/%s/" %
+                (pathhash(package), package),
+            "uploaded": uploaded, "age": age,
+            "user": who, "uploader": u_who,
+            "binaries": binaries,
+            "base_version": "%s" % base_version,
+            "left_version": "%s" % left_version,
+            "right_version": "%s" % right_version
+        })
     with open(status_file + ".new", "w") as status:
-        # No json module available on merges.ubuntu.com right now, but it's
-        # not that hard to do it ourselves.
-        print('[', file=status)
-        cur_merge = 0
-        for uploaded, age, package, user, uploader, source, \
-                base_version, left_version, right_version in merges:
-            print(' {', end=' ', file=status)
-            # source_package, short_description, and link are for
-            # Harvest (http://daniel.holba.ch/blog/?p=838).
-            print('"source_package": "%s",' % package, end=' ', file=status)
-            print('"short_description": "merge %s",' % right_version,
-                  end=' ', file=status)
-            print('"link": "https://merges.ubuntu.com/%s/%s/",' %
-                  (pathhash(package), package), end=' ', file=status)
-            print('"uploaded": "%s",' % uploaded, end=' ', file=status)
-            print('"age": "%s",' % age, end=' ', file=status)
-            if user is not None:
-                who = user
-                who = who.replace('\\', '\\\\')
-                who = who.replace('"', '\\"')
-                print('"user": "%s",' % who, end=' ', file=status)
-                if uploader is not None:
-                    (usr_name, usr_mail) = parseaddr(user)
-                    (upl_name, upl_mail) = parseaddr(uploader)
-                    if len(usr_name) and usr_name != upl_name:
-                        u_who = uploader
-                        u_who = u_who.replace('\\', '\\\\')
-                        u_who = u_who.replace('"', '\\"')
-                        print('"uploader": "%s",' % u_who, end=' ', file=status)
-            binaries = re.split(', *', source["Binary"].replace('\n', ''))
-            print('"binaries": [ %s ],' %
-                  ', '.join(['"%s"' % b for b in binaries]),
-                  end=' ', file=status)
-            print('"base_version": "%s",' % base_version, end=' ', file=status)
-            print('"left_version": "%s",' % left_version, end=' ', file=status)
-            print('"right_version": "%s"' % right_version,
-                  end=' ', file=status)
-            cur_merge += 1
-            if cur_merge < len(merges):
-                print('},', file=status)
-            else:
-                print('}', file=status)
-        print(']', file=status)
+        status.write(json.dumps(data, indent=4))
 
     os.rename(status_file + ".new", status_file)
 
