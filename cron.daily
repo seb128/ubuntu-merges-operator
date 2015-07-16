@@ -39,6 +39,9 @@ cp addcomment.py /srv/patches.ubuntu.com/merges
 # Update the blacklist
 wget -q -O/srv/patches.ubuntu.com/sync-blacklist.txt http://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
 
+# Update the package to team mapping
+wget -q -O/srv/patches.ubuntu.com/code/package-team-mapping.json http://people.canonical.com/~ubuntu-archive/package-team-mapping.json
+
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
 

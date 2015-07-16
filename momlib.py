@@ -37,6 +37,7 @@ import stat
 import json
 
 from cgi import escape
+from collections import defaultdict
 from launchpadlib.launchpad import Launchpad
 from optparse import OptionParser
 from urllib import quote
@@ -114,6 +115,9 @@ SOURCES_CACHE = {}
 
 # mapping of uploader emails to Launchpad pages
 person_lp_page_mapping = {}
+
+# mapping of packages to teams
+package_team_mapping = ''
 
 # --------------------------------------------------------------------------- #
 # Command-line tool functions
@@ -210,6 +214,25 @@ def get_importance(days):
     elif days <= 365:
         return 1
     return 0
+
+def get_responsible_team(source_package):
+    """Return teams subscribed to a package using the package to team
+       mapping."""
+    global package_team_mapping
+    if not package_team_mapping:
+        package_team_mapping = defaultdict(set)
+        mapping_file = "%s/code/package-team-mapping.json" % ROOT
+        if os.path.exists(mapping_file):
+            with open(mapping_file) as ptm_file:
+                for team, packages in json.load(ptm_file).items():
+                    if team == "unsubscribed":
+                        continue
+                    for package in packages:
+                        package_team_mapping[package].add(team)
+    if source_package in package_team_mapping:
+        return package_team_mapping[source_package]
+    else:
+        return ""
 
 # --------------------------------------------------------------------------- #
 # Location functions
