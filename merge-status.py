@@ -93,6 +93,7 @@ def main(options, args):
                                              our_distro, src_distro)
             except ValueError:
                 continue
+            teams = get_responsible_team(source["Package"])
             date_superseded = get_date_superseded(source["Package"],
                                                   base_version)
             if not date_superseded:
@@ -144,7 +145,7 @@ def main(options, args):
 
             merges.append((section, days_old, source["Package"], user,
                            uploader, source, base_version,
-                           left_version, right_version))
+                           left_version, right_version, teams))
         merges.sort(reverse=True)
 
         write_status_page(our_component, merges, our_distro, src_distro)
@@ -265,7 +266,7 @@ def do_table(status, merges, left_distro, right_distro, component):
     """Output a table."""
     print("<table cellspacing=0>", file=status)
     print("<tr bgcolor=#d0d0d0>", file=status)
-    print("<td rowspan=2><b>Package</b></td>", file=status)
+    print("<td rowspan=2><b>Package [Responsible Teams]</b></td>", file=status)
     print("<td colspan=3><b>Last Uploader</b></td>", file=status)
     print("<td rowspan=2><b>Comment</b></td>", file=status)
     print("<td rowspan=2><b>Bug</b></td>", file=status)
@@ -278,7 +279,8 @@ def do_table(status, merges, left_distro, right_distro, component):
     print("</tr>", file=status)
 
     for uploaded, age, package, user, uploader, source, \
-            base_version, left_version, right_version in merges:
+            base_version, left_version, right_version, \
+            teams in merges:
         colour_idx = get_importance(age)
         if user is not None:
             (usr_name, usr_mail) = parseaddr(user)
@@ -316,7 +318,15 @@ def do_table(status, merges, left_distro, right_distro, component):
         print(" <sup><a href=\"https://launchpad.net/ubuntu/" \
               "+source/%s\">LP</a></sup>" % package, file=status)
         print(" <sup><a href=\"http://packages.qa.debian.org/" \
-              "%s\">PTS</a></sup></td>" % package, file=status)
+              "%s\">PTS</a></sup>" % package, file=status)
+        cell_data = ""
+        if teams:
+            cell_data += "["
+            cell_data += "%s" % ", ".join(t for t in teams)
+            cell_data += "]</td>"
+        else:
+            cell_data = "</td>"
+        print(cell_data, file=status)
         print("<td colspan=3>%s</td>" % who, file=status)
         print("<td rowspan=2><form method=\"get\" action=\"addcomment.py\"><br />", file=status)
         print("<input type=\"hidden\" name=\"component\" value=\"%s\" />" % component, file=status)
@@ -356,7 +366,8 @@ def write_status_json(component, merges, left_distro, right_distro):
     status_file = "%s/merges/%s.json" % (ROOT, component)
     data = []
     for uploaded, age, package, user, uploader, source, \
-            base_version, left_version, right_version in merges:
+            base_version, left_version, right_version, \
+            teams in merges:
         who = None
         u_who = None
         if user is not None:
@@ -394,7 +405,8 @@ def write_status_file(status_file, merges):
     """Write out the merge status file."""
     with open(status_file + ".new", "w") as status:
         for uploaded, age, package, user, uploader, source, \
-                base_version, left_version, right_version in merges:
+                base_version, left_version, right_version, \
+                teams in merges:
             print("%s %s %s %s %s %s, %s, %s"
                   % (package, age, base_version,
                      left_version, right_version, user, uploader, uploaded),
