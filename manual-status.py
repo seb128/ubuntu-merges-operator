@@ -66,6 +66,8 @@ def main(options, args):
     our_distro = options.dest_distro
     our_dist = options.dest_suite
 
+    blacklist = read_blacklist()
+
     # For each package in the destination distribution, find out whether
     # there's an open merge, and if so add an entry to the table for it.
     for our_component in DISTROS[our_distro]["components"]:
@@ -76,6 +78,8 @@ def main(options, args):
         merges = []
 
         for our_source in get_sources(our_distro, our_dist, our_component):
+            if our_source["Package"] in blacklist:
+                continue
             try:
                 package = our_source["Package"]
                 our_version = Version(our_source["Version"])

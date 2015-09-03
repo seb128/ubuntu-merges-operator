@@ -65,6 +65,8 @@ def main(options, args):
     our_distro = options.dest_distro
     our_dist = options.dest_suite
 
+    blacklist = read_blacklist()
+
     outstanding = []
     if os.path.isfile("%s/outstanding-merges.txt" % ROOT):
         after_uvf = True
@@ -86,6 +88,8 @@ def main(options, args):
         merges = []
 
         for source in get_sources(our_distro, our_dist, our_component):
+            if source["Package"] in blacklist:
+                continue
             try:
                 output_dir = result_dir(source["Package"])
                 (base_version, left_version, right_version) \
