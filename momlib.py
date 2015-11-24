@@ -869,3 +869,26 @@ def get_date_superseded(package, base_version):
             print("Base version %s of %s never published in Debian." %
                   (base_version, package))
     return date_superseded
+
+def check_for_proposed_package(package, our_dist, our_version):
+    from debian.debian_support import Version
+    our_version = Version(our_version)
+
+    our_distro = get_launchpad().projects[OUR_DISTRO]
+    our_series = our_distro.getSeries(name_or_version=our_dist)
+    our_archive = our_distro.main_archive
+
+    proposed_pkg = False
+    for spph in our_archive.getPublishedSources(source_name=package,
+                                                distro_series=our_series,
+                                                exact_match=True,
+                                                pocket='Proposed'):
+        if spph.status not in ['Pending', 'Published']:
+            continue
+        version = Version(spph.source_package_version)
+        if version >= our_version:
+            proposed_pkg = True
+            break
+        if version < our_version:
+            break
+    return proposed_pkg
