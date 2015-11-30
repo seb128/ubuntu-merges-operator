@@ -34,7 +34,8 @@ from momlib import *
 # Order of priorities
 PRIORITY = [ "unknown", "required", "important", "standard", "optional",
              "extra" ]
-COLOURS =  [ "#ff8080", "#ffb580", "#ffea80", "#dfff80", "#abff80", "#80ff8b" ]
+COLOURS =  [ "#ff8080", "#ffb580", "#ffea80", "#dfff80", "#abff80",
+             "#80ff8b", "#d0d0d0" ]
 
 # Sections
 SECTIONS = [ "outstanding", "new", "updated" ]
@@ -315,6 +316,15 @@ def do_table(status, merges, left_distro, right_distro, component):
         else:
             who = "&nbsp;"
 
+        if left_distro == 'ubuntu':
+            proposed_version = proposed_package_version(package, left_version)
+        else:
+            proposed_version = None
+        if proposed_version:
+            # If there is a proposed verison we want to set the bg colour to
+            # grey and display the version number.
+            colour_idx = 6
+
         print("<tr bgcolor=%s class=first>" % COLOURS[colour_idx], file=status)
         print("<td><tt><a href=\"%s/%s/REPORT\">" \
               "%s</a></tt>" % (pathhash(package), package, package),
@@ -357,7 +367,11 @@ else:\n\
         print("</tr>", file=status)
         print("<tr bgcolor=%s>" % COLOURS[colour_idx], file=status)
         print("<td><small>%s</small></td>" % source["Binary"], file=status)
-        print("<td>%s</td>" % left_version, file=status)
+        if proposed_version:
+            print("<td>%s (%s)</td>" % (left_version, proposed_version),
+                  file=status)
+        else:
+            print("<td>%s</td>" % left_version, file=status)
         print("<td>%s</td>" % right_version, file=status)
         print("<td>%s</td>" % base_version, file=status)
         print("</tr>", file=status)
