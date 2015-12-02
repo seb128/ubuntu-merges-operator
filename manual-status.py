@@ -307,7 +307,7 @@ def do_table(status, merges, left_distro, right_distro, component):
               file=status)
         print(" <sup><a href=\"https://launchpad.net/ubuntu/" \
               "+source/%s\">LP</a></sup>" % package, file=status)
-        print(" <sup><a href=\"http://packages.qa.debian.org/" \
+        print(" <sup><a href=\"http://tracker.debian.org/" \
               "%s\">PTS</a></sup>" % package, file=status)
         cell_data = ""
         if teams:
