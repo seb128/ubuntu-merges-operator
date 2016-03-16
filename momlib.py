@@ -495,9 +495,15 @@ def version_sort(sources):
     sources.sort(key=lambda x: Version(x["Version"]))
 
 def files(source):
-    """Return (sha256sum, size, name) for each file."""
-    files = source["Checksums-Sha256"].strip("\n").split("\n")
-    return [ f.split(None, 2) for f in files ]
+    """Return (size, name) for each file."""
+    for name in (
+            "Checksums-Sha512", "Checksums-Sha256", "Checksums-Sha1", "Files"):
+        if name in source:
+            files = source[name].strip("\n").split("\n")
+            break
+    else:
+        raise KeyError("Package '%s' has no file list" % source["Package"])
+    return [ f.split(None, 2)[1:] for f in files ]
 
 def package_list(source):
     """Return (package, type, section, priority) for each binary."""
@@ -555,7 +561,7 @@ def unpack_source(distro, source):
         return destdir
 
     srcdir = "%s/%s" % (ROOT, source["Directory"])
-    for _, _, name in files(source):
+    for _, name in files(source):
         if name.endswith(".dsc"):
             dsc_file = name
             break

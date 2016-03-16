@@ -226,7 +226,7 @@ def write_status_page(component, merges, left_distro, right_distro):
 
 def get_uploader(distro, source):
     """Obtain the uploader from the dsc file signature."""
-    for _, _, name in files(source):
+    for _, name in files(source):
         if name.endswith(".dsc"):
             dsc_file = name
             break
