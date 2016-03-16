@@ -20,11 +20,12 @@
 from __future__ import with_statement
 
 import os
-import gzip
 import urllib
 import logging
+import subprocess
+import sys
 import tempfile
-from contextlib import closing
+from contextlib import contextmanager
 
 from momlib import *
 from util import tree
@@ -62,34 +63,56 @@ def main(options, args):
                     update_pool(distro, source)
 
 
-def sources_url(distro, dist, component):
-    """Return a URL for a remote Sources.gz file."""
+def sources_urls(distro, dist, component):
+    """Return possible URLs for a remote Sources file."""
     mirror = DISTROS[distro]["mirror"]
-    return "%s/dists/%s/%s/source/Sources.gz" % (mirror, dist, component)
+    base_url = "%s/dists/%s/%s/source/Sources" % (mirror, dist, component)
+    yield "%s.xz" % base_url
+    yield "%s.gz" % base_url
 
 def update_sources(distro, dist, component):
     """Update a Sources file."""
-    url = sources_url(distro, dist, component)
-    filename = sources_file(distro, dist, component)
+    for url in sources_urls(distro, dist, component):
+        filename = sources_file(distro, dist, component)
 
-    logging.debug("Downloading %s", url)
+        logging.debug("Downloading %s", url)
 
-    gzfilename = tempfile.mktemp()
-    try:
-        urllib.URLopener().retrieve(url, gzfilename)
-    except IOError:
-        logging.error("Downloading %s failed", url)
-        raise
-    try:
-        with closing(gzip.GzipFile(gzfilename)) as gzfile:
-            ensure(filename)
-            with open(filename, "w") as local:
-                local.write(gzfile.read())
-    finally:
-        os.unlink(gzfilename)
+        compfilename = tempfile.mktemp()
+        try:
+            urllib.URLopener().retrieve(url, compfilename)
+        except IOError:
+            logging.error("Downloading %s failed", url)
+            continue
+        try:
+            if url.endswith(".gz"):
+                import gzip
+                decompressor = gzip.GzipFile
+            if url.endswith(".xz"):
+                if sys.version >= "3.3":
+                    import lzma
+                    decompressor = lzma.LZMAFile
+                else:
+                    @contextmanager
+                    def decompressor(name):
+                        proc = subprocess.Popen(
+                            ["xzcat", name], stdout=subprocess.PIPE)
+                        yield proc.stdout
+                        proc.stdout.close()
+                        proc.wait()
+            else:
+                raise RuntimeError("Don't know how to decompress %s" % url)
+            with decompressor(compfilename) as compfile:
+                ensure(filename)
+                with open(filename, "w") as local:
+                    local.write(compfile.read())
+        finally:
+            os.unlink(compfilename)
 
-    logging.info("Saved %s", tree.subdir(ROOT, filename))
-    return filename
+        logging.info("Saved %s", tree.subdir(ROOT, filename))
+        return filename
+    else:
+        raise IOError(
+            "No Sources found for %s/%s/%s" % (distro, dist, component))
 
 def update_pool(distro, source):
     """Download a source package into our pool."""
