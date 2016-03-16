@@ -84,7 +84,7 @@ def expire_pool_sources(distro, package, base):
     # Identify filenames we don't want to delete
     keep_files = []
     for source in keep:
-        for md5sum, size, name in files(source):
+        for _, _, name in files(source):
             keep_files.append(name)
 
     # Expire the older packages
@@ -92,7 +92,7 @@ def expire_pool_sources(distro, package, base):
     for source in bases:
         logging.info("Expiring %s %s %s", distro, package, source["Version"])
 
-        for md5sum, size, name in files(source):
+        for _, _, name in files(source):
             if name in keep_files:
                 logging.debug("Not removing %s/%s", pooldir, name)
                 continue

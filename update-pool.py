@@ -121,7 +121,7 @@ def update_pool(distro, source):
 
     pooldir = pool_directory(distro, source["Package"])
 
-    for md5sum, size, name in files(source):
+    for _, size, name in files(source):
         url = "%s/%s/%s" % (mirror, sourcedir, name)
         filename = "%s/%s/%s" % (ROOT, pooldir, name)
 

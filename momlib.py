@@ -495,8 +495,8 @@ def version_sort(sources):
     sources.sort(key=lambda x: Version(x["Version"]))
 
 def files(source):
-    """Return (md5sum, size, name) for each file."""
-    files = source["Files"].strip("\n").split("\n")
+    """Return (sha256sum, size, name) for each file."""
+    files = source["Checksums-Sha256"].strip("\n").split("\n")
     return [ f.split(None, 2) for f in files ]
 
 def package_list(source):
@@ -555,7 +555,7 @@ def unpack_source(distro, source):
         return destdir
 
     srcdir = "%s/%s" % (ROOT, source["Directory"])
-    for md5sum, size, name in files(source):
+    for _, _, name in files(source):
         if name.endswith(".dsc"):
             dsc_file = name
             break

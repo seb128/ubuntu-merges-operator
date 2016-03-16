@@ -163,7 +163,7 @@ def main(options, args):
 
 def get_uploader(distro, source):
     """Obtain the uploader from the dsc file signature."""
-    for md5sum, size, name in files(source):
+    for _, _, name in files(source):
         if name.endswith(".dsc"):
             dsc_file = name
             break

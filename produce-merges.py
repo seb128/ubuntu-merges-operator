@@ -710,7 +710,7 @@ def add_changelog(package, merged_version, left_distro, left_dist,
 
 def copy_in(output_dir, source, distro=None):
     """Make a copy of the source files."""
-    for md5sum, size, name in files(source):
+    for _, _, name in files(source):
         src = "%s/%s/%s" % (ROOT, source["Directory"], name)
         dest = "%s/%s" % (output_dir, name)
         if os.path.isfile(dest):
@@ -857,13 +857,13 @@ def write_report(left_source, left_distro, left_patch, base_source,
 
         # Base version and files
         print("base: %s" % base_source["Version"], file=report)
-        for md5sum, size, name in files(base_source):
+        for _, _, name in files(base_source):
             print("    %s" % name, file=report)
         print(file=report)
 
         # Left version and files
         print("%s: %s" % (left_distro, left_source["Version"]), file=report)
-        for md5sum, size, name in files(left_source):
+        for _, _, name in files(left_source):
             print("    %s" % name, file=report)
         print(file=report)
         if left_patch is not None:
@@ -873,7 +873,7 @@ def write_report(left_source, left_distro, left_patch, base_source,
 
         # Right version and files
         print("%s: %s" % (right_distro, right_source["Version"]), file=report)
-        for md5sum, size, name in files(right_source):
+        for _, _, name in files(right_source):
             print("    %s" % name, file=report)
         print(file=report)
         if right_patch is not None:
@@ -907,7 +907,7 @@ def write_report(left_source, left_distro, left_patch, base_source,
             dsc = ControlFile("%s/%s" % (output_dir, src_file),
                               multi_para=False, signed=False).para
             print("    %s" % src_file, file=report)
-            for md5sum, size, name in files(dsc):
+            for _, _, name in files(dsc):
                 print("    %s" % name, file=report)
             print(file=report)
             if patch_file is not None:
