@@ -87,7 +87,7 @@ def update_sources(distro, dist, component):
             if url.endswith(".gz"):
                 import gzip
                 decompressor = gzip.GzipFile
-            if url.endswith(".xz"):
+            elif url.endswith(".xz"):
                 if sys.version >= "3.3":
                     import lzma
                     decompressor = lzma.LZMAFile
