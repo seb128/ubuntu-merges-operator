@@ -61,7 +61,7 @@ ROOT = "/srv/patches.ubuntu.com"
 DISTROS = {
     "ubuntu": {
         "mirror": "http://archive.ubuntu.com/ubuntu",
-        "dists": [ "xenial" ],
+        "dists": [ "yakkety" ],
         "components": [ "main", "restricted", "universe", "multiverse" ],
         "expire": True,
         },
@@ -99,7 +99,7 @@ DISTROS = {
 
 # Destination distribution and release
 OUR_DISTRO = "ubuntu"
-OUR_DIST   = "xenial"
+OUR_DIST   = "yakkety"
 
 # Default source distribution and release
 SRC_DISTRO = "debian"
