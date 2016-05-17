@@ -102,7 +102,7 @@ def main(options, args):
             date_superseded = get_date_superseded(source["Package"],
                                                   base_version)
             if not date_superseded:
-                age = datetime.datetime.utcnow() - datetime.datetime.utcnow()
+                age = datetime.timedelta(0)
             else:
                 age = datetime.datetime.utcnow() - date_superseded.replace(tzinfo=None)
             days_old = age.days
