@@ -38,7 +38,7 @@ from deb.version import Version
 def options(parser):
     parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
                       action="append",
-                      help="Process only theses packages")
+                      help="Process only these packages")
     parser.add_option("-c", "--component", type="string", metavar="COMPONENT",
                       action="append",
                       help="Process only these components")
