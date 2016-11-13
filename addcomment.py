@@ -1,6 +1,5 @@
 <%
-from momlib import *
-from cgi import escape
+from momlib import add_comment
 
 if "package" in req.form and "comment" in req.form:
     add_comment(req.form["package"], req.form["comment"])
