@@ -20,8 +20,8 @@
 from __future__ import print_function, with_statement
 
 import os
-import sys
 import signal
+import sys
 
 
 class Process(object):

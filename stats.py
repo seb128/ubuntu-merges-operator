@@ -19,9 +19,10 @@
 
 from __future__ import print_function, with_statement
 
-import time
 import logging
+import time
 
+from deb.version import Version
 from momlib import (
     DISTROS,
     get_base,
@@ -35,7 +36,6 @@ from momlib import (
     SRC_DIST,
     SRC_DISTRO,
     )
-from deb.version import Version
 
 
 def options(parser):

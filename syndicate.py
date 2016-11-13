@@ -19,15 +19,14 @@
 
 from __future__ import print_function, with_statement
 
-import os
 import bz2
-import fcntl
-import logging
-
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.Utils import formatdate, make_msgid, parseaddr
+import fcntl
 from fnmatch import fnmatch
+import logging
+import os
 from smtplib import SMTP, SMTPSenderRefused, SMTPDataError
 
 from deb.controlfile import ControlFile

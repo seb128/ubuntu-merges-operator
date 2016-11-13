@@ -19,8 +19,8 @@
 
 from __future__ import print_function, with_statement
 
-import os
 import logging
+import os
 import re
 import stat
 import tempfile

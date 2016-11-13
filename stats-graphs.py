@@ -20,8 +20,8 @@
 from __future__ import with_statement
 
 import calendar
-import datetime
 from contextlib import closing
+import datetime
 
 from pychart import (
     area,

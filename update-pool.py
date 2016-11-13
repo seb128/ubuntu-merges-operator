@@ -19,13 +19,13 @@
 
 from __future__ import with_statement
 
-import os
-import urllib
+from contextlib import contextmanager
 import logging
+import os
 import subprocess
 import sys
 import tempfile
-from contextlib import contextmanager
+import urllib
 
 from momlib import (
     changes_file,

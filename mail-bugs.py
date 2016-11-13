@@ -19,18 +19,19 @@
 
 from __future__ import print_function, with_statement
 
+import bz2
+from email.MIMEText import MIMEText
+from email.Utils import formatdate, make_msgid
+import logging
 import os
 import re
-import bz2
-import logging
+from smtplib import SMTP
 import urllib2
 
 from BeautifulSoup import BeautifulSoup
 
-from email.MIMEText import MIMEText
-from email.Utils import formatdate, make_msgid
-from smtplib import SMTP
-
+from deb.controlfile import ControlFile
+from deb.version import Version
 from momlib import (
     changes_file,
     DISTROS,
@@ -43,8 +44,6 @@ from momlib import (
     SRC_DISTRO,
     version_sort,
     )
-from deb.controlfile import ControlFile
-from deb.version import Version
 
 
 # Order of severities

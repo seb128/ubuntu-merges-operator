@@ -18,7 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from re import search
 
+from deb.version import Version
 from momlib import (
     cleanup_source,
     DISTROS,
@@ -41,9 +43,7 @@ from momlib import (
     SRC_DISTRO,
     unpack_source,
     )
-from deb.version import Version
 from util import tree
-from re import search
 
 
 def options(parser):

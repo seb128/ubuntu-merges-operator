@@ -20,26 +20,26 @@
 
 from __future__ import print_function, with_statement
 
-import os
-import re
-import sys
-from hashlib import md5
-import time
-import fcntl
-import errno
-import logging
-import datetime
-import stat
-import json
-from xml.etree import ElementTree
-
 from cgi import escape
 from collections import defaultdict
-from launchpadlib.launchpad import Launchpad
+from contextlib import closing
+import datetime
+import errno
+import fcntl
+from hashlib import md5
+import json
+import logging
 from optparse import OptionParser
+import os
+import re
+import stat
+import sys
+import time
 from urllib import quote
 from urllib2 import urlopen
-from contextlib import closing
+from xml.etree import ElementTree
+
+from launchpadlib.launchpad import Launchpad
 
 from deb.controlfile import ControlFile
 from deb.version import Version
