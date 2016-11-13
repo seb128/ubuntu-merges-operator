@@ -67,7 +67,7 @@ class ControlFile(object):
         with open(file) as f:
             try:
                 self.parse(f, *args, **kwds)
-            except Exception, e:
+            except Exception as e:
                 e.path = file
                 raise e
 

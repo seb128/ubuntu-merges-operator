@@ -55,7 +55,7 @@ def under(root, path):
 def subdir(root, path):
     """Return path relative to root."""
     if not under(root, path):
-        raise ValueError, "path must start with root"
+        raise ValueError("path must start with root")
 
     return relative(path[len(root):])
 
@@ -142,7 +142,7 @@ def movetree(path, newpath, eat_toplevel=False):
     """
     if not os.path.isdir(newpath) or os.path.islink(newpath):
         if exists(newpath):
-            raise OSError, "Not a directory: %s" % newpath
+            raise OSError("Not a directory: %s" % newpath)
         else:
             os.makedirs(newpath)
 
@@ -175,7 +175,7 @@ def rmtree(path):
                 os.rmdir(filename)
             else:
                 os.unlink(filename)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
 
@@ -188,7 +188,7 @@ def remove(filename):
             rmtree(filename)
         elif os.path.exists(filename):
             os.unlink(filename)
-    except OSError, e:
+    except OSError as e:
         if e.errno != errno.ENOENT:
             raise
 
