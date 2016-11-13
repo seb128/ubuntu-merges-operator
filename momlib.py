@@ -856,7 +856,7 @@ def get_date_superseded(package, base_version):
     from debian.debian_support import Version
     base_version = Version(base_version)
 
-    src_distro = get_launchpad().projects[SRC_DISTRO]
+    src_distro = get_launchpad().distributions[SRC_DISTRO]
     src_archive = src_distro.main_archive
 
     date_superseded = None
@@ -877,7 +877,7 @@ def proposed_package_version(package, our_version):
     from debian.debian_support import Version
     our_version = Version(our_version)
 
-    our_distro = get_launchpad().projects[OUR_DISTRO]
+    our_distro = get_launchpad().distributions[OUR_DISTRO]
     our_series = our_distro.getSeries(name_or_version=OUR_DIST)
     our_archive = our_distro.main_archive
 
