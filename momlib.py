@@ -23,11 +23,7 @@ from __future__ import print_function, with_statement
 import os
 import re
 import sys
-try:
-    from hashlib import md5
-except ImportError:
-    import md5 as _mod_md5
-    md5 = _mod_md5.new
+from hashlib import md5
 import time
 import fcntl
 import errno
