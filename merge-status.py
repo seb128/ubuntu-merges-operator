@@ -21,7 +21,7 @@
 from __future__ import print_function, with_statement
 
 import bz2
-from datetime import datetime
+import datetime
 import json
 import os
 import re
