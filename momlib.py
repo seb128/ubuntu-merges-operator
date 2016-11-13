@@ -860,7 +860,6 @@ def get_date_superseded(package, base_version):
     src_archive = src_distro.main_archive
 
     date_superseded = None
-    ver_superseded = None
     for spph in src_archive.getPublishedSources(source_name=package,
                                                 exact_match=True,
                                                 pocket='Release'):
@@ -868,7 +867,6 @@ def get_date_superseded(package, base_version):
         if version <= base_version:
             break
         date_superseded = spph.date_created
-        ver_superseded = version
     else:
         if False:
             print("Base version %s of %s never published in Debian." %
