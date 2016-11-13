@@ -120,7 +120,7 @@ def main(options, args):
                             pass
                         except Mismatch as e:
                             logging.warning(
-                                "FAIL: %s %s %s %s: %s" %
+                                "%s %s %s %s: %s" %
                                 (distro, dist, component, sourcename, e))
 
 
