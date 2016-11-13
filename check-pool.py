@@ -19,15 +19,14 @@
 
 from __future__ import print_function
 
+from contextlib import closing
 import hashlib
 import logging
 import os.path
 import shutil
 import tempfile
-from urllib import (
-    quote,
-    urlretrieve,
-    )
+from urllib import quote
+from urllib2 import urlopen
 
 from momlib import (
     DISTROS,
@@ -51,9 +50,11 @@ def download_source(distro, source, targetdir):
         logging.debug("Downloading %s", url)
         ensure(filename)
         try:
-            urlretrieve(url, filename)
+            with closing(urlopen(url)) as url_f, open(filename, "wb") as out_f:
+                for chunk in iter(lambda: url_f.read(256 * 1024), ""):
+                    out_f.write(chunk)
         except IOError:
-            logging.error("Downloading %s failed", url)
+            logging.warning("Downloading %s failed", url)
             raise
         logging.info("Saved %s", name)
 
@@ -99,6 +100,9 @@ def main(options, args):
                     for source_entry in sources:
                         try:
                             check_source(distro, source_entry)
+                        except IOError:
+                            # Already logged above.
+                            pass
                         except Mismatch as e:
                             logging.warning(
                                 "FAIL: %s %s %s %s: %s" %
