@@ -101,9 +101,9 @@ def main(options, args):
                             check_source(distro, source_entry)
                         except Mismatch as e:
                             logging.warning(
-                                "FAIL: %s %s %s %s %s: %s" %
+                                "FAIL: %s %s %s %s: %s" %
                                 (distro, dist, component, source["Package"],
-                                 source["Version"], e))
+                                 e))
 
 
 if __name__ == "__main__":
