@@ -644,7 +644,7 @@ def merge_attr(base_dir, left_dir, right_dir, merged_dir, filename):
 
 def set_attr(src_dir, dest_dir, filename):
     """Set the initial attributes."""
-    mode = os.stat("%s/%s" % (src_dir, filename)).st_mode & 0777
+    mode = os.stat("%s/%s" % (src_dir, filename)).st_mode & 0o777
     os.chmod("%s/%s" % (dest_dir, filename), mode)
 
 def apply_attr(base_dir, src_dir, dest_dir, filename):
@@ -670,7 +670,7 @@ def change_attr(dest_dir, filename, bit, shift, add):
                     "o+r", "o+w", "o+x" ][shift])
 
     dest = "%s/%s" % (dest_dir, filename)
-    attr = os.stat(dest).st_mode & 0777
+    attr = os.stat(dest).st_mode & 0o777
     if add:
         attr |= bit
     else:
@@ -767,7 +767,7 @@ def create_tarball(package, version, output_dir, merged_dir):
 
         debian_rules = "%s/%s/debian/rules" % (parent, contained)
         if os.path.isfile(debian_rules):
-            os.chmod(debian_rules, os.stat(debian_rules).st_mode | 0111)
+            os.chmod(debian_rules, os.stat(debian_rules).st_mode | 0o111)
 
         shell.run(("tar", "czf", filename, contained), chdir=parent)
 
