@@ -170,7 +170,7 @@ def cleanup(path):
     while dirname != ROOT:
         try:
             os.rmdir(dirname)
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.ENOTEMPTY or e.errno == errno.ENOENT:
                 break
             raise
@@ -457,7 +457,7 @@ def get_same_source(distro, dist, package):
         except IndexError:
             pass
     else:
-        raise IndexError, "%s not found in %s %s" % (package, distro, dist)
+        raise IndexError("%s not found in %s %s" % (package, distro, dist))
 
 
 # --------------------------------------------------------------------------- #
@@ -566,7 +566,7 @@ def unpack_source(distro, source):
             dsc_file = name
             break
     else:
-        raise ValueError, "Missing dsc file"
+        raise ValueError("Missing dsc file")
 
     ensure(destdir)
     try:
@@ -637,7 +637,7 @@ def read_report(output_dir, left_distro, right_distro):
     """Read the report to determine the versions that went into it."""
     filename = "%s/REPORT" % output_dir
     if not os.path.isfile(filename):
-        raise ValueError, "No report exists"
+        raise ValueError("No report exists")
 
     base_version = None
     left_version = None
@@ -653,7 +653,7 @@ def read_report(output_dir, left_distro, right_distro):
                 right_version = Version(line[len(right_distro)+1:].strip())
 
     if base_version is None or left_version is None or right_version is None:
-        raise AttributeError, "Insufficient detail in report"
+        raise AttributeError("Insufficient detail in report")
 
     return (base_version, left_version, right_version)
 

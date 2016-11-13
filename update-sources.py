@@ -40,7 +40,7 @@ def main(options, args):
     for distro in distros:
         try:
             hparts = os.listdir("%s/pool/%s" % (ROOT, distro))
-        except OSError, e:
+        except OSError as e:
             print(e, "(continuing)", file=sys.stderr)
             continue
         for hpart in hparts:
