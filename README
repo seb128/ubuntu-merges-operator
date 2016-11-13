@@ -6,7 +6,7 @@ For detailed information on Merge-o-Matic, see:
 Dependencies
 ------------
 
- * Python 2.4 or higher
+ * Python 2.6 or higher
  * python-beautifulsoup
  * python-pychart
  * ghostscript
