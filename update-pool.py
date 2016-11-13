@@ -27,7 +27,18 @@ import sys
 import tempfile
 from contextlib import contextmanager
 
-from momlib import *
+from momlib import (
+    changes_file,
+    DISTROS,
+    ensure,
+    files,
+    get_pool_distros,
+    get_sources,
+    pool_directory,
+    ROOT,
+    run,
+    sources_file,
+    )
 from util import tree
 
 

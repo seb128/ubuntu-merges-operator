@@ -22,7 +22,12 @@ from __future__ import print_function
 import sys
 import os
 
-from momlib import *
+from momlib import (
+    get_pool_distros,
+    ROOT,
+    run,
+    update_pool_sources,
+    )
 
 
 def main(options, args):

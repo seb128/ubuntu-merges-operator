@@ -30,9 +30,32 @@ from email.Utils import formatdate, make_msgid, parseaddr
 from fnmatch import fnmatch
 from smtplib import SMTP, SMTPSenderRefused, SMTPDataError
 
-from momlib import *
 from deb.controlfile import ControlFile
 from deb.version import Version
+from momlib import (
+    append_rss,
+    changes_file,
+    diff_directory,
+    diff_file,
+    diff_rss_file,
+    DISTROS,
+    get_base,
+    get_pool_distros,
+    get_pool_sources,
+    get_sources,
+    OUR_DISTRO,
+    patch_directory,
+    patch_file,
+    patch_rss_file,
+    pool_directory,
+    read_rss,
+    ROOT,
+    run,
+    SRC_DISTRO,
+    version_sort,
+    write_rss,
+    )
+from util import tree
 
 
 def options(parser):

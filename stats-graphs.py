@@ -23,9 +23,28 @@ import calendar
 import datetime
 from contextlib import closing
 
-from pychart import *
+from pychart import (
+    area,
+    arrow,
+    axis,
+    canvas,
+    chart_data,
+    fill_style,
+    font,
+    legend,
+    line_style,
+    pie_plot,
+    range_plot,
+    text_box,
+    theme,
+    )
 
-from momlib import *
+from momlib import (
+    DISTROS,
+    OUR_DISTRO,
+    ROOT,
+    run,
+    )
 
 
 # Order of stats we pick out

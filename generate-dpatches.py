@@ -20,7 +20,21 @@
 import os
 import logging
 
-from momlib import *
+from momlib import (
+    cleanup_source,
+    DISTROS,
+    dpatch_directory,
+    ensure,
+    get_pool_distros,
+    get_pool_sources,
+    get_sources,
+    read_blacklist,
+    ROOT,
+    run,
+    unpack_directory,
+    unpack_source,
+    version_sort,
+    )
 from util import tree
 
 

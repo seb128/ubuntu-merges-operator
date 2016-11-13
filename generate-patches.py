@@ -19,7 +19,28 @@
 
 import logging
 
-from momlib import *
+from momlib import (
+    cleanup_source,
+    DISTROS,
+    ensure,
+    get_base,
+    get_nearest_source,
+    get_pool_source,
+    get_same_source,
+    get_sources,
+    OUR_DIST,
+    OUR_DISTRO,
+    patch_file,
+    read_basis,
+    read_blacklist,
+    ROOT,
+    run,
+    save_basis,
+    save_patch_file,
+    SRC_DIST,
+    SRC_DISTRO,
+    unpack_source,
+    )
 from deb.version import Version
 from util import tree
 from re import search

@@ -22,7 +22,21 @@ from __future__ import print_function
 import os
 import logging
 
-from momlib import *
+from momlib import (
+    cleanup,
+    DISTROS,
+    dpatch_directory,
+    ensure,
+    get_sources,
+    OUR_DIST,
+    OUR_DISTRO,
+    patch_file,
+    patch_list_file,
+    published_file,
+    read_blacklist,
+    ROOT,
+    run,
+    )
 from util import tree
 
 

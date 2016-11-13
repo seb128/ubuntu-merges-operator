@@ -31,7 +31,18 @@ from email.MIMEText import MIMEText
 from email.Utils import formatdate, make_msgid
 from smtplib import SMTP
 
-from momlib import *
+from momlib import (
+    changes_file,
+    DISTROS,
+    get_pool_sources,
+    get_sources,
+    pool_directory,
+    ROOT,
+    run,
+    SRC_DIST,
+    SRC_DISTRO,
+    version_sort,
+    )
 from deb.controlfile import ControlFile
 from deb.version import Version
 

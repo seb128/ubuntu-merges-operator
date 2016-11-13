@@ -21,14 +21,40 @@
 from __future__ import print_function, with_statement
 
 import bz2
+from datetime import datetime
 import json
+import logging
 import os
 import re
+from rfc822 import parseaddr
 import time
 
-from datetime import datetime
-from rfc822 import parseaddr
-from momlib import *
+from deb.controlfile import ControlFile
+from deb.version import Version
+from momlib import (
+    changes_file,
+    DISTROS,
+    files,
+    get_base,
+    get_date_superseded,
+    get_importance,
+    get_nearest_source,
+    get_person_lp_page,
+    get_pool_source,
+    get_responsible_team,
+    get_same_source,
+    get_sources,
+    OUR_DIST,
+    OUR_DISTRO,
+    pathhash,
+    proposed_package_version,
+    read_blacklist,
+    remove_old_comments,
+    ROOT,
+    run,
+    SRC_DIST,
+    SRC_DISTRO,
+    )
 
 
 # Order of priorities

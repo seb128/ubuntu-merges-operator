@@ -22,7 +22,19 @@ from __future__ import print_function, with_statement
 import time
 import logging
 
-from momlib import *
+from momlib import (
+    DISTROS,
+    get_base,
+    get_same_source,
+    get_sources,
+    OUR_DIST,
+    OUR_DISTRO,
+    read_blacklist,
+    ROOT,
+    run,
+    SRC_DIST,
+    SRC_DISTRO,
+    )
 from deb.version import Version
 
 

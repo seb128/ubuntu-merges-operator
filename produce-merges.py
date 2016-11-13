@@ -20,17 +20,40 @@
 from __future__ import print_function, with_statement
 
 import os
-import re
-import time
 import logging
+import re
+import stat
 import tempfile
-
-from stat import *
 from textwrap import fill
+import time
 
-from momlib import *
 from deb.controlfile import ControlFile
 from deb.version import Version
+from momlib import (
+    cleanup,
+    cleanup_source,
+    DISTROS,
+    ensure,
+    files,
+    get_base,
+    get_nearest_source,
+    get_pool_source,
+    get_same_source,
+    get_sources,
+    md5sum,
+    OUR_DIST,
+    OUR_DISTRO,
+    patch_file,
+    read_blacklist,
+    read_report,
+    result_dir,
+    ROOT,
+    run,
+    SRC_DIST,
+    SRC_DISTRO,
+    unpack_source,
+    work_dir,
+    )
 from util import tree, shell
 
 
@@ -280,7 +303,8 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
                               merged_dir, filename)
                 conflicts.append(filename)
 
-        elif S_ISREG(left_stat.st_mode) and S_ISREG(right_stat.st_mode):
+        elif (stat.S_ISREG(left_stat.st_mode) and
+                stat.S_ISREG(right_stat.st_mode)):
             # Common case: left and right are both files
             if handle_file(left_stat, left_dir, left_name, left_distro,
                            right_dir, right_stat, right_name, right_distro,
@@ -331,7 +355,8 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
         left_stat = os.lstat("%s/%s" % (left_dir, filename))
         right_stat = os.lstat("%s/%s" % (right_dir, filename))
 
-        if S_ISREG(left_stat.st_mode) and S_ISREG(right_stat.st_mode):
+        if (stat.S_ISREG(left_stat.st_mode) and
+                stat.S_ISREG(right_stat.st_mode)):
             # Common case: left and right are both files
             if handle_file(left_stat, left_dir, left_name, left_distro,
                            right_dir, right_stat, right_name, right_distro,
@@ -397,7 +422,7 @@ def handle_file(left_stat, left_dir, left_name, left_distro,
             conflict_file(left_dir, left_distro, right_dir, right_distro,
                           merged_dir, filename)
             return True
-    elif base_stat is not None and S_ISREG(base_stat.st_mode):
+    elif base_stat is not None and stat.S_ISREG(base_stat.st_mode):
         # was file in base: diff3 possible
         if merge_file(left_dir, left_name, left_distro, base_dir,
                       right_dir, right_name, right_distro, merged_dir,
@@ -421,10 +446,10 @@ def handle_file(left_stat, left_dir, left_name, left_distro,
 
 def same_file(left_stat, left_dir, right_stat, right_dir, filename):
     """Are two filesystem objects the same?"""
-    if S_IFMT(left_stat.st_mode) != S_IFMT(right_stat.st_mode):
+    if stat.S_IFMT(left_stat.st_mode) != stat.S_IFMT(right_stat.st_mode):
         # Different fundamental types
         return False
-    elif S_ISREG(left_stat.st_mode):
+    elif stat.S_ISREG(left_stat.st_mode):
         # Files with the same size and MD5sum are the same
         if left_stat.st_size != right_stat.st_size:
             return False
@@ -433,17 +458,17 @@ def same_file(left_stat, left_dir, right_stat, right_dir, filename):
             return False
         else:
             return True
-    elif S_ISDIR(left_stat.st_mode) or S_ISFIFO(left_stat.st_mode) \
-             or S_ISSOCK(left_stat.st_mode):
+    elif stat.S_ISDIR(left_stat.st_mode) or stat.S_ISFIFO(left_stat.st_mode) \
+             or stat.S_ISSOCK(left_stat.st_mode):
         # Directories, fifos and sockets are always the same
         return True
-    elif S_ISCHR(left_stat.st_mode) or S_ISBLK(left_stat.st_mode):
+    elif stat.S_ISCHR(left_stat.st_mode) or stat.S_ISBLK(left_stat.st_mode):
         # Char/block devices are the same if they have the same rdev
         if left_stat.st_rdev != right_stat.st_rdev:
             return False
         else:
             return True
-    elif S_ISLNK(left_stat.st_mode):
+    elif stat.S_ISLNK(left_stat.st_mode):
         # Symbolic links are the same if they have the same target
         if os.readlink("%s/%s" % (left_dir, filename)) \
                != os.readlink("%s/%s" % (right_dir, filename)):

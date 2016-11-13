@@ -19,7 +19,21 @@
 
 import logging
 
-from momlib import *
+from momlib import (
+    DISTROS,
+    files,
+    get_base,
+    get_pool_distros,
+    get_pool_sources,
+    get_sources,
+    OUR_DIST,
+    OUR_DISTRO,
+    pool_directory,
+    ROOT,
+    run,
+    update_pool_sources,
+    version_sort,
+    )
 from util import tree
 
 
