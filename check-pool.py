@@ -39,6 +39,15 @@ from momlib import (
     )
 
 
+def options(parser):
+    parser.add_option("-d", "--distro", type="string", metavar="DISTRO",
+                      action="append",
+                      help="Process only these distros")
+    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
+                      action="append",
+                      help="Process only these packages")
+
+
 def download_source(distro, source, targetdir):
     for size, name in files(source):
         # We compose the URL manually rather than going through launchpadlib
@@ -90,11 +99,17 @@ def check_source(distro, source):
 
 def main(options, args):
     for distro in get_pool_distros():
+        if options.distro is not None and distro not in options.distro:
+            continue
         for dist in DISTROS[distro]["dists"]:
             for component in DISTROS[distro]["components"]:
                 for source in get_sources(distro, dist, component):
+                    sourcename = source["Package"]
+                    if (options.package is not None and
+                            sourcename not in options.package):
+                        continue
                     try:
-                        sources = get_pool_sources(distro, source["Package"])
+                        sources = get_pool_sources(distro, sourcename)
                     except IOError:
                         continue
                     for source_entry in sources:
@@ -106,10 +121,9 @@ def main(options, args):
                         except Mismatch as e:
                             logging.warning(
                                 "FAIL: %s %s %s %s: %s" %
-                                (distro, dist, component, source["Package"],
-                                 e))
+                                (distro, dist, component, sourcename, e))
 
 
 if __name__ == "__main__":
-    run(main, usage="%prog",
+    run(main, options, usage="%prog",
         description="check the pool against Launchpad")
