@@ -31,6 +31,7 @@ import logging
 import datetime
 import stat
 import json
+from xml.etree import ElementTree
 
 from cgi import escape
 from collections import defaultdict
@@ -43,11 +44,6 @@ from contextlib import closing
 from deb.controlfile import ControlFile
 from deb.version import Version
 from util import shell, tree
-
-try:
-    from xml.etree import ElementTree
-except ImportError:
-    from elementtree import ElementTree
 
 
 # Output root
