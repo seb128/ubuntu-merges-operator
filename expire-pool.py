@@ -37,6 +37,12 @@ from momlib import (
 from util import tree
 
 
+def options(parser):
+    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
+                      action="append",
+                      help="Process only these packages")
+
+
 def main(options, args):
     if len(args):
         distros = args
@@ -47,6 +53,10 @@ def main(options, args):
     # package names.  Expire from all distributions.
     for component in DISTROS[OUR_DISTRO]["components"]:
         for source in get_sources(OUR_DISTRO, OUR_DIST, component):
+            if (options.package is not None and
+                    source["Package"] not in options.package):
+                continue
+
             base = get_base(source)
             logging.debug("%s %s", source["Package"], source["Version"])
             logging.debug("base is %s", base)
@@ -120,5 +130,5 @@ def expire_pool_sources(distro, package, base):
 
 
 if __name__ == "__main__":
-    run(main, usage="%prog [DISTRO...]",
+    run(main, options, usage="%prog [DISTRO...]",
         description="expires packages from all pools")
