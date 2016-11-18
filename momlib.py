@@ -380,10 +380,9 @@ def update_pool_sources(distro, package):
         return
 
     logging.info("Updating %s", tree.subdir(ROOT, filename))
-    with open("%s.new" % filename, "w") as sources:
+    with tree.AtomicFile(filename) as sources:
         shell.run(("apt-ftparchive", "sources", pooldir), chdir=ROOT,
                   stdout=sources)
-    os.rename("%s.new" % filename, filename)
 
 def get_pool_sources(distro, package):
     """Parse the Sources file for a package in the pool."""
@@ -709,9 +708,9 @@ def read_rss(filename, title, link, description):
 def write_rss(filename, rss):
     """Write out an RSS feed."""
     ensure(filename)
-    tree = ElementTree.ElementTree(rss)
-    tree.write(filename + ".new")
-    os.rename(filename + ".new", filename)
+    etree = ElementTree.ElementTree(rss)
+    with tree.AtomicFile(filename) as fd:
+        etree.write(fd)
 
 def append_rss(rss, title, link, author=None, filename=None):
     """Append an element to an RSS feed."""

@@ -51,6 +51,7 @@ from momlib import (
     SRC_DIST,
     SRC_DISTRO,
     )
+from util import tree
 
 
 # Order of priorities
@@ -207,7 +208,7 @@ def get_uploader(distro, source):
 def write_status_page(component, merges, left_distro, right_distro):
     """Write out the merge status page."""
     status_file = "%s/merges/%s.html" % (ROOT, component)
-    with open(status_file + ".new", "w") as status:
+    with tree.AtomicFile(status_file) as status:
         print("<html>", file=status)
         print(file=status)
         print("<head>", file=status)
@@ -286,8 +287,6 @@ def write_status_page(component, merges, left_distro, right_distro):
               time.strftime('%Y-%m-%d %H:%M:%S %Z'), file=status)
         print("</body>", file=status)
         print("</html>", file=status)
-
-    os.rename(status_file + ".new", status_file)
 
 def do_table(status, merges, left_distro, right_distro, component):
     """Output a table."""
@@ -437,15 +436,13 @@ def write_status_json(component, merges, left_distro, right_distro):
             "left_version": "%s" % left_version,
             "right_version": "%s" % right_version
         })
-    with open(status_file + ".new", "w") as status:
+    with tree.AtomicFile(status_file) as status:
         status.write(json.dumps(data, indent=4))
-
-    os.rename(status_file + ".new", status_file)
 
 
 def write_status_file(status_file, merges):
     """Write out the merge status file."""
-    with open(status_file + ".new", "w") as status:
+    with tree.AtomicFile(status_file) as status:
         for uploaded, age, package, user, uploader, source, \
                 base_version, left_version, right_version, \
                 teams in merges:
@@ -453,8 +450,6 @@ def write_status_file(status_file, merges):
                   % (package, age, base_version,
                      left_version, right_version, user, uploader, uploaded),
                   file=status)
-
-    os.rename(status_file + ".new", status_file)
 
 if __name__ == "__main__":
     run(main, options, usage="%prog",

@@ -716,7 +716,7 @@ def add_changelog(package, merged_version, left_distro, left_dist,
     changelog_file = "%s/debian/changelog" % merged_dir
 
     with open(changelog_file) as changelog:
-        with open(changelog_file + ".new", "w") as new_changelog:
+        with tree.AtomicFile(changelog_file) as new_changelog:
             print("%s (%s) UNRELEASED; urgency=low"
                   % (package, merged_version), file=new_changelog)
             print(file=new_changelog)
@@ -730,8 +730,6 @@ def add_changelog(package, merged_version, left_distro, left_dist,
             print(file=new_changelog)
             for line in changelog:
                 print(line.rstrip("\r\n"), file=new_changelog)
-
-    os.rename(changelog_file + ".new", changelog_file)
 
 def copy_in(output_dir, source, distro=None):
     """Make a copy of the source files."""

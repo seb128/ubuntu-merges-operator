@@ -200,3 +200,19 @@ def exists(path):
         return True
     else:
         return False
+
+
+class AtomicFile(object):
+    """Facilitate atomic writing of files."""
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def __enter__(self):
+        self.fd = open("%s.new" % self.filename, "w")
+        return self.fd
+
+    def __exit__(self, exc_type, unused_exc_value, unused_exc_tb):
+        self.fd.close()
+        if exc_type is None:
+            os.rename("%s.new" % self.filename, self.filename)

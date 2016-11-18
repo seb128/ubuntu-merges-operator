@@ -55,9 +55,7 @@ def main(options, args):
     blacklist = read_blacklist()
 
     # Write to a new list
-    list_filename = patch_list_file()
-    list_file = open(list_filename + ".new", "w")
-    try:
+    with tree.AtomicFile(patch_list_file()) as list_file:
         # For each package in the distribution, check for a patch for the
         # current version; publish if it exists, clean up if not
         for component in DISTROS[distro]["components"]:
@@ -77,11 +75,6 @@ def main(options, args):
                     publish_patch(distro, source, filename, list_file)
                 else:
                     unpublish_patch(distro, source)
-    finally:
-        list_file.close()
-
-    # Move the new list over the old one
-    os.rename(list_filename + ".new", list_filename)
 
 
 def publish_patch(distro, source, filename, list_file):
