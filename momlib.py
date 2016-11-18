@@ -236,7 +236,7 @@ def sources_file(distro, dist, component):
 
 def pool_directory(distro, package):
     """Return the pool directory for a source"""
-    return "pool/%s/%s/%s" % (pool_name(distro), pathhash(package), package)
+    return "pool/%s/%s/%s" % (distro, pathhash(package), package)
 
 def pool_sources_file(distro, package):
     """Return the location of a pool Sources file for a source."""
@@ -350,22 +350,9 @@ def get_source(distro, dist, component, package):
 # Pool handling
 # --------------------------------------------------------------------------- #
 
-def pool_name(distro):
-    """Return the name of the pool for the given distro."""
-    if "pool" in DISTROS[distro]:
-        return DISTROS[distro]["pool"]
-    else:
-        return distro
-
 def get_pool_distros():
     """Return the list of distros with pools."""
-    distros = []
-    for distro in DISTROS:
-        pool = pool_name(distro)
-        if pool not in distros:
-            distros.append(pool)
-
-    return distros
+    return list(distros)
 
 def pool_sources_already_updated(pooldir, filename):
     try:
