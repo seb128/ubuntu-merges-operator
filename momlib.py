@@ -360,7 +360,7 @@ def pool_name(distro):
 def get_pool_distros():
     """Return the list of distros with pools."""
     distros = []
-    for distro in DISTROS.keys():
+    for distro in DISTROS:
         pool = pool_name(distro)
         if pool not in distros:
             distros.append(pool)
