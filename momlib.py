@@ -352,7 +352,7 @@ def get_source(distro, dist, component, package):
 
 def get_pool_distros():
     """Return the list of distros with pools."""
-    return list(distros)
+    return list(DISTROS)
 
 def pool_sources_already_updated(pooldir, filename):
     try:
