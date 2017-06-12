@@ -355,7 +355,7 @@ the_color = \"white\"\n\
 if \"%s\" in comment:\n\
     the_comment = comment[\"%s\"]\n\
     the_color = \"%s\"\n\
-    req.write(\"<input type=\\\"text\\\" style=\\\"border-style: none; background-color: %%s\\\" name=\\\"comment\\\" value=\\\"%%s\\\" title=\\\"%%s\\\" />\" %% (the_color, the_comment, the_comment))\n\
+req.write(\"<input type=\\\"text\\\" style=\\\"border-style: none; background-color: %%s\\\" name=\\\"comment\\\" value=\\\"%%s\\\" title=\\\"%%s\\\" />\" %% (the_color, the_comment, the_comment))\n\
 %%>" % (package, package, COLOURS[colour_idx]), file=status)
         print("</form></td>", file=status)
         print("<td rowspan=2>", file=status)
