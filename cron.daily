@@ -19,12 +19,14 @@
 set -e
 umask 002
 
+MOMLIB_ROOT=/srv/patches.ubuntu.com
+
 if [ "$DEBUG" = "y" ]; then
 	QUIET=""
 else
 	QUIET="-q"
 
-	if ! mkdir /srv/patches.ubuntu.com/.lock 2>/dev/null; then
+	if ! mkdir $MOMLIB_ROOT/.lock 2>/dev/null; then
 		# Only produce cronspam if running from a terminal or the
 		# lock has been held for more than three hours.
 		age () {
@@ -34,7 +36,7 @@ else
 			echo "$(($now - $mtime))"
 		}
 		if [ -t 0 ] || \
-		   [ "$(age /srv/patches.ubuntu.com/.lock)" -gt \
+		   [ "$(age $MOMLIB_ROOT/.lock)" -gt \
 		     $((3 * 60 * 60)) ]; then
 			echo "LOCKED (another one running?)"
 			exit 1
@@ -42,19 +44,19 @@ else
 			exit 0
 		fi
 	fi
-	trap "rmdir /srv/patches.ubuntu.com/.lock" 0
+	trap "rmdir $MOMLIB_ROOT/.lock" 0
 fi
 
-cd /srv/patches.ubuntu.com/code
+cd $MOMLIB_ROOT/code
 #bzr update
 
-cp addcomment.py /srv/patches.ubuntu.com/merges
+cp addcomment.py $MOMLIB_ROOT/merges
 
 # Update the blacklist
-wget -q -O/srv/patches.ubuntu.com/sync-blacklist.txt http://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
+wget -q -O$MOMLIB_ROOT/sync-blacklist.txt http://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
 
 # Update the package to team mapping
-wget -q -O/srv/patches.ubuntu.com/code/package-team-mapping.json http://people.canonical.com/~ubuntu-archive/package-team-mapping.json
+wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json http://people.canonical.com/~ubuntu-archive/package-team-mapping.json
 
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
@@ -88,4 +90,4 @@ wget -q -O/srv/patches.ubuntu.com/code/package-team-mapping.json http://people.c
 ./expire-pool.py $QUIET
 
 # ?! untidy
-rm -rf /srv/patches.ubuntu.com/unpacked/*
+rm -rf $MOMLIB_ROOT/unpacked/*
