@@ -226,6 +226,20 @@ def get_responsible_team(source_package):
     else:
         return ""
 
+def get_team_packages(team):
+    """Return list of packages owned by a team."""
+    if not team:
+        return []
+
+    mapping_file = "%s/code/package-team-mapping.json" % ROOT
+    if os.path.exists(mapping_file):
+        with open(mapping_file) as ptm_file:
+            for fteam, packages in json.load(ptm_file).items():
+                if team == fteam:
+                    return packages
+
+    return []
+
 # --------------------------------------------------------------------------- #
 # Location functions
 # --------------------------------------------------------------------------- #
