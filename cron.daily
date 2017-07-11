@@ -83,6 +83,7 @@ wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json http://people.canonical.co
 # Produce pretty reports
 ./stats.py $QUIET
 ./stats.py $QUIET -t ubuntu-server
+./stats.py $QUIET -t foundations-bugs
 ./stats-graphs.py $QUIET
 ./merge-status.py $QUIET
 ./manual-status.py $QUIET
