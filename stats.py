@@ -28,6 +28,7 @@ from momlib import (
     get_base,
     get_same_source,
     get_sources,
+    get_team_packages,
     OUR_DIST,
     OUR_DISTRO,
     read_blacklist,
@@ -59,6 +60,8 @@ def options(parser):
     parser.add_option("-c", "--component", type="string", metavar="COMPONENT",
                       action="append",
                       help="Process only these destination components")
+    parser.add_option("-t", "--team", type="string", metavar="TEAM",
+                      help="Process only packages owned by this team")
 
 def main(options, args):
     src_distro = options.source_distro
@@ -67,6 +70,8 @@ def main(options, args):
     our_distro = options.dest_distro
     our_dist = options.dest_suite
 
+    team = options.team
+    team_package_list = get_team_packages(team)
     blacklist = read_blacklist()
 
     # For each package in the destination distribution, locate the latest in
@@ -91,6 +96,9 @@ def main(options, args):
                 continue
 
             package = our_source["Package"]
+            if team_package_list and package not in team_package_list:
+                continue
+
             our_version = Version(our_source["Version"])
             logging.debug("%s: %s is %s", package, our_distro, our_version)
 
@@ -131,11 +139,15 @@ def main(options, args):
                 logging.debug("%s: modified", package)
                 stats["modified"] += 1
 
-        write_stats(our_component, stats)
+        write_stats(our_component, stats, team)
 
-def write_stats(component, stats):
+def write_stats(component, stats, team):
     """Write out the collected stats."""
     stats_file = "%s/stats.txt" % ROOT
+
+    if team:
+        stats_file = "%s/stats-%s.txt" % (ROOT, team)
+
     with open(stats_file, "a") as stf:
         stamp = time.strftime("%Y-%m-%d %H:%M", time.gmtime())
         text = " ".join("%s=%d" % (k, v) for k,v in stats.items())
