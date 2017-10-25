@@ -53,7 +53,7 @@ ROOT = "/srv/patches.ubuntu.com"
 DISTROS = {
     "ubuntu": {
         "mirror": "http://archive.ubuntu.com/ubuntu",
-        "dists": [ "artful" ],
+        "dists": [ "bionic" ],
         "components": [ "main", "restricted", "universe", "multiverse" ],
         "expire": True,
         },
@@ -91,7 +91,7 @@ DISTROS = {
 
 # Destination distribution and release
 OUR_DISTRO = "ubuntu"
-OUR_DIST   = "artful"
+OUR_DIST   = "bionic"
 
 # Default source distribution and release
 SRC_DISTRO = "debian"
