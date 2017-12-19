@@ -20,6 +20,7 @@
 from __future__ import print_function, with_statement
 
 import logging
+import os
 import time
 
 from deb.version import Version
