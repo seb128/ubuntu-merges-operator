@@ -39,6 +39,27 @@ from momlib import (
     )
 
 
+def read_excluded_packages(path):
+    if not path or not os.path.isfile(path):
+        return set()
+
+    exclude = set()
+    with open(path) as excludelist:
+        for line in excludelist:
+            try:
+                line = line[:line.index("#")]
+            except ValueError:
+                pass
+
+            line = line.strip()
+            if not line:
+                continue
+
+            exclude.add(line)
+
+    return exclude
+
+
 def options(parser):
     parser.add_option("-D", "--source-distro", type="string", metavar="DISTRO",
                       default=SRC_DISTRO,
@@ -62,6 +83,9 @@ def options(parser):
                       help="Process only these destination components")
     parser.add_option("-t", "--team", type="string", metavar="TEAM",
                       help="Process only packages owned by this team")
+    parser.add_option("-E", "--exclude-packages", type="string", metavar="FILE",
+                      help="Exclude packages listed in the following file")
+
 
 def main(options, args):
     src_distro = options.source_distro
@@ -72,6 +96,7 @@ def main(options, args):
 
     team = options.team
     team_package_list = get_team_packages(team)
+    exclude_packages = read_excluded_packages(options.exclude_packages)
     blacklist = read_blacklist()
 
     # For each package in the destination distribution, locate the latest in
@@ -101,6 +126,10 @@ def main(options, args):
 
             our_version = Version(our_source["Version"])
             logging.debug("%s: %s is %s", package, our_distro, our_version)
+
+            if package in exclude_packages:
+                logging.debug("%s: excluded from statistics")
+                continue
 
             stats["total"] += 1
 
