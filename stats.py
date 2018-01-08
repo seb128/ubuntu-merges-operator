@@ -41,7 +41,7 @@ from momlib import (
 
 
 def read_excluded_packages(path):
-    if not path or not os.path.isfile(path):
+    if not os.path.isfile(path):
         return set()
 
     exclude = set()
