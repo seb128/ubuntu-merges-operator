@@ -111,6 +111,7 @@ def main(options, args):
         stats["needs-merge"] = 0
         stats["repackaged"] = 0
         stats["modified"] = 0
+        stats["excluded"] = 0
 
         if options.component is not None \
                and our_component not in options.component:
@@ -130,6 +131,7 @@ def main(options, args):
 
             if package in exclude_packages:
                 logging.debug("%s: excluded from statistics")
+                stats["excluded"] += 1
                 continue
 
             stats["total"] += 1
