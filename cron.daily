@@ -58,9 +58,6 @@ wget -q -O$MOMLIB_ROOT/sync-blacklist.txt http://people.canonical.com/~ubuntu-ar
 # Update the package to team mapping
 wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json http://people.canonical.com/~ubuntu-archive/package-team-mapping.json
 
-# Update the list of excluded packages from the foundations reports
-wget -q -O$MOMLIB_ROOT/foundations.exclude http://people.canonical.com/~ubuntu-archive/foundations.exclude-mom
-
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
 
@@ -86,7 +83,7 @@ wget -q -O$MOMLIB_ROOT/foundations.exclude http://people.canonical.com/~ubuntu-a
 # Produce pretty reports
 ./stats.py $QUIET
 ./stats.py $QUIET -t ubuntu-server
-./stats.py $QUIET -t foundations-bugs -E $MOMLIB_ROOT/foundations.exclude
+./stats.py $QUIET -t foundations-bugs -E foundations.exclude
 ./stats.py $QUIET -t ubuntu-openstack
 ./stats-graphs.py $QUIET
 ./merge-status.py $QUIET
