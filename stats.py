@@ -20,6 +20,7 @@
 from __future__ import print_function, with_statement
 
 import logging
+import os
 import time
 
 from deb.version import Version
@@ -37,6 +38,27 @@ from momlib import (
     SRC_DIST,
     SRC_DISTRO,
     )
+
+
+def read_excluded_packages(path):
+    if not os.path.isfile(path):
+        return set()
+
+    exclude = set()
+    with open(path) as excludelist:
+        for line in excludelist:
+            try:
+                line = line[:line.index("#")]
+            except ValueError:
+                pass
+
+            line = line.strip()
+            if not line:
+                continue
+
+            exclude.add(line)
+
+    return exclude
 
 
 def options(parser):
@@ -62,6 +84,9 @@ def options(parser):
                       help="Process only these destination components")
     parser.add_option("-t", "--team", type="string", metavar="TEAM",
                       help="Process only packages owned by this team")
+    parser.add_option("-E", "--exclude-packages", type="string", metavar="FILE",
+                      help="Exclude packages listed in the following file")
+
 
 def main(options, args):
     src_distro = options.source_distro
@@ -72,6 +97,7 @@ def main(options, args):
 
     team = options.team
     team_package_list = get_team_packages(team)
+    exclude_packages = read_excluded_packages(options.exclude_packages)
     blacklist = read_blacklist()
 
     # For each package in the destination distribution, locate the latest in
@@ -85,6 +111,7 @@ def main(options, args):
         stats["needs-merge"] = 0
         stats["repackaged"] = 0
         stats["modified"] = 0
+        stats["excluded"] = 0
 
         if options.component is not None \
                and our_component not in options.component:
@@ -101,6 +128,11 @@ def main(options, args):
 
             our_version = Version(our_source["Version"])
             logging.debug("%s: %s is %s", package, our_distro, our_version)
+
+            if package in exclude_packages:
+                logging.debug("%s: excluded from statistics")
+                stats["excluded"] += 1
+                continue
 
             stats["total"] += 1
 
