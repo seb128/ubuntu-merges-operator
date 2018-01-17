@@ -849,7 +849,12 @@ def get_date_superseded(package, base_version):
     base_version = Version(base_version)
 
     src_distro = get_launchpad().distributions[SRC_DISTRO]
-    src_series = src_distro.getSeries(name_or_version=SRC_DIST)
+    src_series_name = SRC_DIST
+    # Hack to cope with Launchpad only knowing about Debian codenames, not
+    # suite names.
+    if src_series_name == "unstable":
+        src_series_name = "sid"
+    src_series = src_distro.getSeries(name_or_version=src_series_name)
     src_archive = src_distro.main_archive
 
     date_superseded = None
