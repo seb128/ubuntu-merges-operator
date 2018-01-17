@@ -228,7 +228,7 @@ def pie_chart(component, current):
 
     filename = "%s/merges/%s-now.png" % (ROOT, component)
     with closing(canvas.init(filename, format="png")) as c:
-        ar = area.T(size=(300,250), legend=None,
+        ar = area.T(size=(600,500), legend=None,
                     x_grid_style=None, y_grid_style=None)
 
         plot = pie_plot.T(data=data, arrow_style=arrow.a0, label_offset=25,
@@ -257,7 +257,7 @@ def range_chart(component, history, start, today, events):
 
     filename = "%s/merges/%s-trend.png" % (ROOT, component)
     with closing(canvas.init(filename, format="png")) as c:
-        ar = area.T(size=(450,225), legend=legend.T(),
+        ar = area.T(size=(900,450), legend=legend.T(),
                     x_axis=axis.X(label="Date", format=ordinal_to_label,
                                   tic_interval=date_tics,
                                   tic_label_offset=(10,0)),
