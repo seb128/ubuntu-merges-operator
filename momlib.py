@@ -849,10 +849,12 @@ def get_date_superseded(package, base_version):
     base_version = Version(base_version)
 
     src_distro = get_launchpad().distributions[SRC_DISTRO]
+    src_series = src_distro.getSeries(name_or_version=SRC_DIST)
     src_archive = src_distro.main_archive
 
     date_superseded = None
     for spph in src_archive.getPublishedSources(source_name=package,
+                                                distro_series=src_series,
                                                 exact_match=True,
                                                 pocket='Release'):
         version = Version(spph.source_package_version)
@@ -861,8 +863,8 @@ def get_date_superseded(package, base_version):
         date_superseded = spph.date_created
     else:
         if False:
-            print("Base version %s of %s never published in Debian." %
-                  (base_version, package))
+            print("Base version %s of %s never published in Debian %s." %
+                  (base_version, package, SRC_DIST))
     return date_superseded
 
 def proposed_package_version(package, our_version):
