@@ -564,7 +564,7 @@ def unpack_source(distro, source):
     try:
         env = dict(os.environ)
         env['DEB_VENDOR'] = distro
-        shell.run(("dpkg-source", "-x", dsc_file, destdir), chdir=srcdir,
+        shell.run(("dpkg-source", "--skip-patches", "-x", dsc_file, destdir), chdir=srcdir,
                   env=env)
         # Make sure we can at least read everything under .pc, which isn't
         # automatically true with dpkg-dev 1.15.4.
