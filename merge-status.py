@@ -276,7 +276,6 @@ def write_status_page(component, merges, left_distro, right_distro):
               "manually tweaking <tt>po</tt> files and the "
               "like.</li>", file=status)
         print("</ul>", file=status)
-        
 
         print("<% comment = get_comments() %>", file=status)
 
@@ -331,10 +330,10 @@ def write_status_page(component, merges, left_distro, right_distro):
                                 query.value = decodeURIComponent(kv[1]);
                                 break;
                             case "showProposed":
-                                showProposed.checked = ("true" == decodeURIComponent(kv[1]))
+                                showProposed.checked = ("true" === decodeURIComponent(kv[1]))
                                 break;
                             case "showMergeNeeded":
-                                showMergeNeeded.checked = ("true" == decodeURIComponent(kv[1]));
+                                showMergeNeeded.checked = ("true" === decodeURIComponent(kv[1]));
                                 break;
                         }
                     }
