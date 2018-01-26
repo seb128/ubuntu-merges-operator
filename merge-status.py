@@ -26,6 +26,7 @@ import json
 import os
 import re
 from rfc822 import parseaddr
+import textwrap
 import time
 
 from deb.controlfile import ControlFile
@@ -295,56 +296,57 @@ def write_status_page(component, merges, left_distro, right_distro):
         print("<p><small>Generated at %s.</small></p>" %
               time.strftime('%Y-%m-%d %H:%M:%S %Z'), file=status)
               
-        print("""<script>
-(function() {
-    var query = document.getElementById("query");
-    var showProposed = document.getElementById("showProposed");
-    var showMergeNeeded = document.getElementById("showMergeNeeded");
+        print(textwrap.dedent("""
+            <script>
+                (function() {
+                    var query = document.getElementById("query");
+                    var showProposed = document.getElementById("showProposed");
+                    var showMergeNeeded = document.getElementById("showMergeNeeded");
 
-    // Function to filter stuff
-    function filterText() {
-        var tables=document.getElementsByTagName("table");
-        for (var t=0; t < tables.length; t++) {
-            var rows=tables[t].getElementsByTagName("tr");
-            for (var i=2; i < rows.length; i += 2)  {
-                var hide = (query.value && !rows[i].textContent.match(query.value)) ||
-                           (!showProposed.checked && rows[i].bgColor == '#d0d0d0') ||
-                           (!showMergeNeeded.checked && rows[i].bgColor != '#d0d0d0');
-                rows[i].hidden=rows[i+1].hidden=hide;
-            }
-        }
-        
-        var search = (query.value ? "query=" + encodeURIComponent(query.value) + "&": "")  + "showProposed=" + encodeURIComponent(showProposed.checked) + "&showMergeNeeded=" + encodeURIComponent(showMergeNeeded.checked);
-        
-        history.replaceState({"query": query.value, "showProposed": showProposed.checked, "showMergeNeeded": showMergeNeeded.checked}, "", "?" + search);
+                    // Function to filter stuff
+                    function filterText() {
+                        var tables=document.getElementsByTagName("table");
+                        for (var t=0; t < tables.length; t++) {
+                            var rows=tables[t].getElementsByTagName("tr");
+                            for (var i=2; i < rows.length; i += 2)  {
+                                var hide = (query.value && !rows[i].textContent.match(query.value)) ||
+                                           (!showProposed.checked && rows[i].bgColor == '#d0d0d0') ||
+                                           (!showMergeNeeded.checked && rows[i].bgColor != '#d0d0d0');
+                                rows[i].hidden=rows[i+1].hidden=hide;
+                            }
+                        }
+                        
+                        var search = (query.value ? "query=" + encodeURIComponent(query.value) + "&": "")  + "showProposed=" + encodeURIComponent(showProposed.checked) + "&showMergeNeeded=" + encodeURIComponent(showMergeNeeded.checked);
+                        
+                        history.replaceState({"query": query.value, "showProposed": showProposed.checked, "showMergeNeeded": showMergeNeeded.checked}, "", "?" + search);
 
-    }
-    
-    // Set initial filter state from search part of URL
-    var initState = location.search.substring(1).split("&");
-    for (var i = 0; i < initState.length; i++) {
-        var kv = initState[i].split("=");
-        switch (decodeURIComponent(kv[0])) {
-            case "query":
-                query.value = decodeURIComponent(kv[1]);
-                break;
-            case "showProposed":
-                showProposed.checked = ("true" == decodeURIComponent(kv[1]))
-                break;
-            case "showMergeNeeded":
-                showMergeNeeded.checked = ("true" == decodeURIComponent(kv[1]));
-                break;
-        }
-    }
+                    }
+                    
+                    // Set initial filter state from search part of URL
+                    var initState = location.search.substring(1).split("&");
+                    for (var i = 0; i < initState.length; i++) {
+                        var kv = initState[i].split("=");
+                        switch (decodeURIComponent(kv[0])) {
+                            case "query":
+                                query.value = decodeURIComponent(kv[1]);
+                                break;
+                            case "showProposed":
+                                showProposed.checked = ("true" == decodeURIComponent(kv[1]))
+                                break;
+                            case "showMergeNeeded":
+                                showMergeNeeded.checked = ("true" == decodeURIComponent(kv[1]));
+                                break;
+                        }
+                    }
 
-    filterText();
+                    filterText();
 
-    // Add event listeners
-    query.addEventListener('input', filterText);
-    showProposed.addEventListener('change', filterText);
-    showMergeNeeded.addEventListener('change', filterText);
-})();
-</script>""", file=status)
+                    // Add event listeners
+                    query.addEventListener('input', filterText);
+                    showProposed.addEventListener('change', filterText);
+                    showMergeNeeded.addEventListener('change', filterText);
+                })();
+            </script>"""), file=status)
         print("</body>", file=status)
         print("</html>", file=status)
 
