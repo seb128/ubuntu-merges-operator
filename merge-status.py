@@ -309,8 +309,8 @@ def write_status_page(component, merges, left_distro, right_distro):
                             var rows=tables[t].getElementsByTagName("tr");
                             for (var i=2; i < rows.length; i += 2)  {
                                 var hide = (query.value && !rows[i].textContent.match(query.value)) ||
-                                           (!showProposed.checked && rows[i].bgColor == '#d0d0d0') ||
-                                           (!showMergeNeeded.checked && rows[i].bgColor != '#d0d0d0');
+                                           (!showProposed.checked && rows[i].bgColor === '#d0d0d0') ||
+                                           (!showMergeNeeded.checked && rows[i].bgColor !== '#d0d0d0');
                                 rows[i].hidden=rows[i+1].hidden=hide;
                             }
                         }
