@@ -297,7 +297,7 @@ def write_status_page(component, merges, left_distro, right_distro):
               time.strftime('%Y-%m-%d %H:%M:%S %Z'), file=status)
               
         print(textwrap.dedent("""
-            <script>
+            <script type="text/javascript">
                 (function() {
                     var query = document.getElementById("query");
                     var showProposed = document.getElementById("showProposed");
