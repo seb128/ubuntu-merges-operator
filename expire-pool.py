@@ -80,8 +80,10 @@ def main(options, args):
                 for source in get_sources(distro, dist, component):
                     distro_sources[source["Package"]].append(source)
 
-        # Run expiry on packages not in our default distribution, which
-        # won't have been expired above.
+        # Packages not in our default distribution won't have been expired
+        # above.  For these, we don't need to do particularly sophisticated
+        # expiry, but just remove any files that aren't in the
+        # distribution's Sources file.
         if distro != OUR_DISTRO:
             for package in sorted(distro_sources):
                 if package in our_sources:
@@ -90,15 +92,21 @@ def main(options, args):
                         package not in options.package):
                     continue
 
-                sources = list(distro_sources[package])
-                version_sort(sources)
-                source = sources[0]
+                distro_versions = set(
+                    source["Version"] for source in distro_sources[package])
 
-                base = get_base(source)
-                logging.debug("%s %s", source["Package"], source["Version"])
-                logging.debug("base is %s", base)
-
-                expire_pool_sources(distro, source["Package"], base)
+                try:
+                    pool_sources = get_pool_sources(distro, package)
+                except IOError:
+                    pass
+                else:
+                    remove_sources = [
+                        source for source in pool_sources
+                        if source["Version"] not in distro_versions]
+                    version_sort(remove_sources)
+                    expire_sources(
+                        distro, package,
+                        distro_sources[package], remove_sources)
 
         # Any pool directories whose sources are in neither the default
         # distribution nor their own distribution are entirely obsolete, so
@@ -109,8 +117,8 @@ def main(options, args):
                 continue
             if (name not in our_sources and name not in distro_sources and
                     os.path.isdir(pooldir)):
-                logging.debug("Removing %s", pooldir)
                 tree.remove(pooldir)
+                logging.debug("Removed %s", pooldir)
 
 
 def expire_pool_sources(distro, package, base):
@@ -119,7 +127,6 @@ def expire_pool_sources(distro, package, base):
     If the base doesn't exist, then the newest source that is older is also
     kept.
     """
-    pooldir = pool_directory(distro, package)
     try:
         sources = get_pool_sources(distro, package)
     except IOError:
@@ -152,15 +159,21 @@ def expire_pool_sources(distro, package, base):
 
         keep.append(source)
 
+    expire_sources(distro, package, keep, bases)
+
+
+def expire_sources(distro, package, keep_sources, remove_sources):
+    pooldir = pool_directory(distro, package)
+
     # Identify filenames we don't want to delete
-    keep_files = []
-    for source in keep:
+    keep_files = set()
+    for source in keep_sources:
         for _, name in files(source):
-            keep_files.append(name)
+            keep_files.add(name)
 
     # Expire the older packages
     need_update = False
-    for source in bases:
+    for source in remove_sources:
         logging.info("Expiring %s %s %s", distro, package, source["Version"])
 
         for _, name in files(source):
