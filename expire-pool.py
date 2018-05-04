@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 import glob
 import logging
 import os.path
@@ -53,10 +54,10 @@ def main(options, args):
 
     # Run through our default distribution and use that for the base
     # package names.  Expire from all distributions.
-    all_sources = set()
+    our_sources = set()
     for component in DISTROS[OUR_DISTRO]["components"]:
         for source in get_sources(OUR_DISTRO, OUR_DIST, component):
-            all_sources.add(source["Package"])
+            our_sources.add(source["Package"])
             if (options.package is not None and
                     source["Package"] not in options.package):
                 continue
@@ -69,22 +70,44 @@ def main(options, args):
                 if DISTROS[distro]["expire"]:
                     expire_pool_sources(distro, source["Package"], base)
 
-    # Any pool directories whose sources are in neither the default
-    # distribution nor their own distribution are entirely obsolete, so
-    # remove them.
     for distro in distros:
         if not DISTROS[distro]["expire"]:
             continue
 
-        distro_sources = set()
+        distro_sources = defaultdict(list)
         for dist in DISTROS[distro]["dists"]:
             for component in DISTROS[distro]["components"]:
                 for source in get_sources(distro, dist, component):
-                    distro_sources.add(source["Package"])
+                    distro_sources[source["Package"]].append(source)
 
+        # Run expiry on packages not in our default distribution, which
+        # won't have been expired above.
+        if distro != OUR_DISTRO:
+            for package in sorted(distro_sources):
+                if package in our_sources:
+                    continue
+                if (options.package is not None and
+                        package not in options.package):
+                    continue
+
+                sources = list(distro_sources[package])
+                version_sort(sources)
+                source = sources[0]
+
+                base = get_base(source)
+                logging.debug("%s %s", source["Package"], source["Version"])
+                logging.debug("base is %s", base)
+
+                expire_pool_sources(distro, source["Package"], base)
+
+        # Any pool directories whose sources are in neither the default
+        # distribution nor their own distribution are entirely obsolete, so
+        # remove them.
         for pooldir in glob.iglob("%s/pool/%s/*/*" % (ROOT, distro)):
             name = os.path.basename(pooldir)
-            if (name not in all_sources and name not in distro_sources and
+            if options.package is not None and name not in options.package:
+                continue
+            if (name not in our_sources and name not in distro_sources and
                     os.path.isdir(pooldir)):
                 logging.debug("Removing %s", pooldir)
                 tree.remove(pooldir)
