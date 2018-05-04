@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import glob
 import logging
+import os.path
 
 from momlib import (
     DISTROS,
@@ -51,8 +53,10 @@ def main(options, args):
 
     # Run through our default distribution and use that for the base
     # package names.  Expire from all distributions.
+    all_sources = set()
     for component in DISTROS[OUR_DISTRO]["components"]:
         for source in get_sources(OUR_DISTRO, OUR_DIST, component):
+            all_sources.add(source["Package"])
             if (options.package is not None and
                     source["Package"] not in options.package):
                 continue
@@ -64,6 +68,26 @@ def main(options, args):
             for distro in distros:
                 if DISTROS[distro]["expire"]:
                     expire_pool_sources(distro, source["Package"], base)
+
+    # Any pool directories whose sources are in neither the default
+    # distribution nor their own distribution are entirely obsolete, so
+    # remove them.
+    for distro in distros:
+        if not DISTROS[distro]["expire"]:
+            continue
+
+        distro_sources = set()
+        for dist in DISTROS[distro]["dists"]:
+            for component in DISTROS[distro]["components"]:
+                for source in get_sources(distro, dist, component):
+                    distro_sources.add(source["Package"])
+
+        for pooldir in glob.iglob("%s/pool/%s/*/*" % (ROOT, distro)):
+            name = os.path.basename(pooldir)
+            if (name not in all_sources and name not in distro_sources and
+                    os.path.isdir(pooldir)):
+                logging.debug("Removing %s", pooldir)
+                tree.remove(pooldir)
 
 
 def expire_pool_sources(distro, package, base):
