@@ -52,8 +52,11 @@ def download_source(distro, source, targetdir):
     for size, name in files(source):
         # We compose the URL manually rather than going through launchpadlib
         # to save several round-trips.
-        url = "https://launchpad.net/%s/+archive/primary/+files/%s" % (
-            quote(distro), quote(name))
+        url = (
+            "https://launchpad.net/%s/+archive/primary/"
+            "+sourcefiles/%s/%s/%s" %
+            (quote(distro), quote(source["Package"]), quote(source["Version"]),
+             quote(name)))
         filename = os.path.join(targetdir, name)
 
         logging.debug("Downloading %s", url)
