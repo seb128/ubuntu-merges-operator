@@ -104,27 +104,28 @@ def main(options, args):
     for distro in get_pool_distros():
         if options.distro is not None and distro not in options.distro:
             continue
+        sourcenames = set()
         for dist in DISTROS[distro]["dists"]:
             for component in DISTROS[distro]["components"]:
                 for source in get_sources(distro, dist, component):
-                    sourcename = source["Package"]
-                    if (options.package is not None and
-                            sourcename not in options.package):
-                        continue
-                    try:
-                        sources = get_pool_sources(distro, sourcename)
-                    except IOError:
-                        continue
-                    for source_entry in sources:
-                        try:
-                            check_source(distro, source_entry)
-                        except IOError:
-                            # Already logged above.
-                            pass
-                        except Mismatch as e:
-                            logging.warning(
-                                "%s %s %s %s: %s" %
-                                (distro, dist, component, sourcename, e))
+                    sourcenames.add(source["Package"])
+        for sourcename in sorted(sourcenames):
+            sourcename = source["Package"]
+            if (options.package is not None and
+                    sourcename not in options.package):
+                continue
+            try:
+                sources = get_pool_sources(distro, sourcename)
+            except IOError:
+                continue
+            for source_entry in sources:
+                try:
+                    check_source(distro, source_entry)
+                except IOError:
+                    # Already logged above.
+                    pass
+                except Mismatch as e:
+                    logging.warning("%s %s: %s" % (distro, sourcename, e))
 
 
 if __name__ == "__main__":
