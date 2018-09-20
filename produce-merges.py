@@ -596,11 +596,20 @@ def merge_file(left_dir, left_name, left_distro, base_dir,
     right_stat = os.stat(right)
     base_stat = os.stat(base)
 
+    # Preserve execute bit on merged file.  This all ignores the distinction
+    # between the ugo exec bits because it's hard to think of a reason we
+    # should.
     mode = 0o644
-    if stat.S_IMODE(left_stat) & 0o111 \
-          or stat.S_IMODE(right_stat) & 0o111 \
-          or stat.S_IMODE(base_stat) & 0o111:
-        mode |= 0o111
+    if stat.S_IMODE(base_stat) & 0o111:
+        # If base was executable and both left and right are, make output
+        # executable.
+        if stat.S_IMODE(right_stat) & stat.S_IMODE(left_stat) & 0o111:
+            mode |= 0o111
+    else:
+        # Alternatively, if base was not executable and either of left and right
+        # are, make output executable.
+        if (stat.S_IMODE(right_stat) | stat.S_IMODE(left_stat)) & 0o111:
+            mode |= 0o111
 
     with open(dest, "w", mode) as output:
         status = shell.run(("diff3", "-E", "-m",
