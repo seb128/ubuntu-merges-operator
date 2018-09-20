@@ -588,36 +588,50 @@ def merge_file(left_dir, left_name, left_distro, base_dir,
     dest = "%s/%s" % (merged_dir, filename)
     ensure(dest)
 
-    with open(dest, "w") as output:
+    left = "%s/%s" % (left_dir, filename)
+    right = "%s/%s" % (right_dir, filename)
+    base = "%s/%s" % (base_dir, filename)
+
+    left_stat = os.stat(left)
+    right_stat = os.stat(right)
+    base_stat = os.stat(base)
+
+    # Preserve execute bit on merged file.  This all ignores the distinction
+    # between the ugo exec bits because it's hard to think of a reason we
+    # should.
+    mode = 0o644
+    if stat.S_IMODE(base_stat) & 0o111:
+        # If base was executable and both left and right are, make output
+        # executable.
+        if stat.S_IMODE(right_stat) & stat.S_IMODE(left_stat) & 0o111:
+            mode |= 0o111
+    else:
+        # Alternatively, if base was not executable and either of left and right
+        # are, make output executable.
+        if (stat.S_IMODE(right_stat) | stat.S_IMODE(left_stat)) & 0o111:
+            mode |= 0o111
+
+    with open(dest, "w", mode) as output:
         status = shell.run(("diff3", "-E", "-m",
-                            "-L", left_name, "%s/%s" % (left_dir, filename),
-                            "-L", "BASE", "%s/%s" % (base_dir, filename),
-                            "-L", right_name, "%s/%s" % (right_dir, filename)),
+                            "-L", left_name, left,
+                            "-L", "BASE", base,
+                            "-L", right_name, right),
                            stdout=output, okstatus=(0,1,2))
 
     if status != 0:
         if not tree.exists(dest) or os.stat(dest).st_size == 0:
             # Probably binary
-            if same_file(os.stat("%s/%s" % (left_dir, filename)), left_dir,
-                         os.stat("%s/%s" % (right_dir, filename)), right_dir,
-                         filename):
+            if same_file(left_stat, left_dir, right_stat, right_dir, filename):
                 logging.debug("binary files are the same: %s", filename)
-                tree.copyfile("%s/%s" % (left_dir, filename),
-                              "%s/%s" % (merged_dir, filename))
-            elif same_file(os.stat("%s/%s" % (base_dir, filename)), base_dir,
-                           os.stat("%s/%s" % (left_dir, filename)), left_dir,
-                           filename):
+                tree.copyfile(left, dest)
+            elif same_file(base_stat, base_dir, left_stat, left_dir, filename):
                 logging.debug("preserving binary change in %s: %s",
                               right_distro, filename)
-                tree.copyfile("%s/%s" % (right_dir, filename),
-                              "%s/%s" % (merged_dir, filename))
-            elif same_file(os.stat("%s/%s" % (base_dir, filename)), base_dir,
-                           os.stat("%s/%s" % (right_dir, filename)), right_dir,
-                           filename):
+                tree.copyfile(right, dest)
+            elif same_file(base_stat, base_dir, right_stat, right_dir, filename):
                 logging.debug("preserving binary change in %s: %s",
                               left_distro, filename)
-                tree.copyfile("%s/%s" % (left_dir, filename),
-                              "%s/%s" % (merged_dir, filename))
+                tree.copyfile(left, dest)
             else:
                 logging.debug("binary file conflict: %s", filename)
                 conflict_file(left_dir, left_distro, right_dir, right_distro,
