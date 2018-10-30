@@ -53,7 +53,7 @@ ROOT = "/srv/patches.ubuntu.com"
 DISTROS = {
     "ubuntu": {
         "mirror": "http://archive.ubuntu.com/ubuntu",
-        "dists": [ "cosmic" ],
+        "dists": [ "disco" ],
         "components": [ "main", "restricted", "universe", "multiverse" ],
         "expire": True,
         },
@@ -91,7 +91,7 @@ DISTROS = {
 
 # Destination distribution and release
 OUR_DISTRO = "ubuntu"
-OUR_DIST   = "cosmic"
+OUR_DIST   = "disco"
 
 # Default source distribution and release
 SRC_DISTRO = "debian"
