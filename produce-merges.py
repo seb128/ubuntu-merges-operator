@@ -254,12 +254,19 @@ def produce_merge(left_source, left_distro, left_dist, base_source,
 
 
 
+def is_pruned(pruned, filename):
+    """Has a file been pruned due to a directory/symlink conflict?"""
+    return any(tree.under(p, filename) for p in pruned)
+
+
 def do_merge(left_dir, left_name, left_distro, base_dir,
              right_dir, right_name, right_distro, merged_dir):
     """Do the heavy lifting of comparing and merging."""
     logging.debug("Producing merge in %s", tree.subdir(ROOT, merged_dir))
     conflicts = []
     po_files = []
+    left_pruned = []
+    right_pruned = []
 
     # Look for files in the base and merge them if they're in both new
     # files (removed files get removed)
@@ -271,12 +278,18 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
         base_stat = os.lstat("%s/%s" % (base_dir, filename))
 
         try:
-            left_stat = os.lstat("%s/%s" % (left_dir, filename))
+            if is_pruned(left_pruned, filename):
+                left_stat = None
+            else:
+                left_stat = os.lstat("%s/%s" % (left_dir, filename))
         except OSError:
             left_stat = None
 
         try:
-            right_stat = os.lstat("%s/%s" % (right_dir, filename))
+            if is_pruned(right_pruned, filename):
+                right_stat = None
+            else:
+                right_stat = os.lstat("%s/%s" % (right_dir, filename))
         except OSError:
             right_stat = None
 
@@ -336,6 +349,18 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
                           merged_dir, filename)
             conflicts.append(filename)
 
+        # If this entry is a directory on one side but a symlink on the
+        # other, then make sure nothing under it is treated as existing on
+        # the other side, as otherwise we can crash if a new symlink to a
+        # directory and its contents are processed before its target.
+        if left_stat is not None and right_stat is not None:
+            if (stat.S_ISDIR(left_stat.st_mode) and
+                    stat.S_ISLNK(right_stat.st_mode)):
+                right_pruned.append(filename)
+            if (stat.S_ISLNK(left_stat.st_mode) and
+                    stat.S_ISDIR(right_stat.st_mode)):
+                left_pruned.append(filename)
+
     # Look for files in the left hand side that aren't in the base,
     # conflict if new on both sides or copy into the tree
     for filename in tree.walk(left_dir):
@@ -343,10 +368,14 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
             # Not interested in merging quilt metadata
             continue
 
+        if is_pruned(left_pruned, filename):
+            continue
+
         if tree.exists("%s/%s" % (base_dir, filename)):
             continue
 
-        if not tree.exists("%s/%s" % (right_dir, filename)):
+        if (is_pruned(right_pruned, filename) or
+                not tree.exists("%s/%s" % (right_dir, filename))):
             logging.debug("new in %s: %s", left_distro, filename)
             tree.copyfile("%s/%s" % (left_dir, filename),
                           "%s/%s" % (merged_dir, filename))
@@ -381,10 +410,14 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
             # Not interested in merging quilt metadata
             continue
 
+        if is_pruned(right_pruned, filename):
+            continue
+
         if tree.exists("%s/%s" % (base_dir, filename)):
             continue
 
-        if tree.exists("%s/%s" % (left_dir, filename)):
+        if (not is_pruned(left_pruned, filename) and
+                tree.exists("%s/%s" % (left_dir, filename))):
             continue
 
         logging.debug("new in %s: %s", right_distro, filename)
