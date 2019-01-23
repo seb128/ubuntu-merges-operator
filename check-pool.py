@@ -110,7 +110,6 @@ def main(options, args):
                 for source in get_sources(distro, dist, component):
                     sourcenames.add(source["Package"])
         for sourcename in sorted(sourcenames):
-            sourcename = source["Package"]
             if (options.package is not None and
                     sourcename not in options.package):
                 continue
