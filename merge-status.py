@@ -274,7 +274,8 @@ def write_status_page(component, merges, left_distro, right_distro):
         print(file=status)
         print("<head>", file=status)
         print(
-            '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">',
+            '<meta http-equiv="Content-Type" '
+            'content="text/html; charset=utf-8">',
             file=status,
         )
         print(
@@ -318,11 +319,13 @@ def write_status_page(component, merges, left_distro, right_distro):
         print("<b>Filters:</b>", file=status)
         print('<input id="query" name="query"/>', file=status)
         print(
-            '<input id="showProposed" checked="checked" type="checkbox">Show merges with something in proposed</input>',
+            '<input id="showProposed" checked="checked" type="checkbox">'
+            "Show merges with something in proposed</input>",
             file=status,
         )
         print(
-            '<input id="showMergeNeeded" checked="checked" type="checkbox">Show merges without something in proposed</input>',
+            '<input id="showMergeNeeded" checked="checked" type="checkbox">'
+            "Show merges without something in proposed</input>",
             file=status,
         )
         print("</div>", file=status)
@@ -392,7 +395,9 @@ def write_status_page(component, merges, left_distro, right_distro):
                 (function() {
                     var query = document.getElementById("query");
                     var showProposed = document.getElementById("showProposed");
-                    var showMergeNeeded = document.getElementById("showMergeNeeded");
+                    var showMergeNeeded = document.getElementById(
+                        "showMergeNeeded"
+                    );
 
                     // Function to filter stuff
                     function filterText() {
@@ -401,19 +406,35 @@ def write_status_page(component, merges, left_distro, right_distro):
                         for (var t=0; t < tables.length; t++) {
                             var rows=tables[t].getElementsByTagName("tr");
                             for (var i=2; i < rows.length; i += 2)  {
-                                var hide = (query.value && !rows[i].textContent.match(regexp)) ||
-                                           (!showProposed.checked && rows[i].bgColor === '#d0d0d0') ||
-                                           (!showMergeNeeded.checked && rows[i].bgColor !== '#d0d0d0');
+                                var hide = (
+                                    (query.value &&
+                                     !rows[i].textContent.match(regexp)) ||
+                                    (!showProposed.checked &&
+                                     rows[i].bgColor === '#d0d0d0') ||
+                                    (!showMergeNeeded.checked &&
+                                     rows[i].bgColor !== '#d0d0d0')
+                                );
                                 rows[i].hidden=rows[i+1].hidden=hide;
                             }
                         }
-                        
-                        var search = (query.value ? "query=" + encodeURIComponent(query.value) + "&": "")  + "showProposed=" + encodeURIComponent(showProposed.checked) + "&showMergeNeeded=" + encodeURIComponent(showMergeNeeded.checked);
-                        
-                        history.replaceState({"query": query.value, "showProposed": showProposed.checked, "showMergeNeeded": showMergeNeeded.checked}, "", "?" + search);
 
+                        var search = (
+                            (query.value
+                             ? "query=" + encodeURIComponent(query.value) + "&"
+                             : "") +
+                            "showProposed=" +
+                            encodeURIComponent(showProposed.checked) +
+                            "&showMergeNeeded=" +
+                            encodeURIComponent(showMergeNeeded.checked)
+                        );
+
+                        history.replaceState({
+                            "query": query.value,
+                            "showProposed": showProposed.checked,
+                            "showMergeNeeded": showMergeNeeded.checked
+                        }, "", "?" + search);
                     }
-                    
+
                     // Set initial filter state from search part of URL
                     var initState = location.search.substring(1).split("&");
                     for (var i = 0; i < initState.length; i++) {
@@ -423,10 +444,14 @@ def write_status_page(component, merges, left_distro, right_distro):
                                 query.value = decodeURIComponent(kv[1]);
                                 break;
                             case "showProposed":
-                                showProposed.checked = ("true" === decodeURIComponent(kv[1]))
+                                showProposed.checked = (
+                                    "true" === decodeURIComponent(kv[1])
+                                );
                                 break;
                             case "showMergeNeeded":
-                                showMergeNeeded.checked = ("true" === decodeURIComponent(kv[1]));
+                                showMergeNeeded.checked = (
+                                    "true" === decodeURIComponent(kv[1])
+                                );
                                 break;
                         }
                     }
@@ -500,7 +525,8 @@ def do_table(status, merges, left_distro, right_distro, component):
                     u_who = u_who.replace(">", "&gt;")
                     if upl_lp_page:
                         who = (
-                            "%s<br><small><em>Uploader:</em> <a href='%s'>%s</a></small>"
+                            "%s<br><small><em>Uploader:</em> "
+                            "<a href='%s'>%s</a></small>"
                             % (who, upl_lp_page.encode("utf-8"), u_who)
                         )
                     else:
@@ -558,14 +584,22 @@ def do_table(status, merges, left_distro, right_distro, component):
             file=status,
         )
         print(
-            '<%%\n\
-the_comment = ""\n\
-the_color = "white"\n\
-if "%s" in comment:\n\
-    the_comment = comment["%s"]\n\
-    the_color = "%s"\n\
-req.write("<input type=\\"text\\" style=\\"border-style: none; background-color: %%s\\" name=\\"comment\\" value=\\"%%s\\" title=\\"%%s\\" />" %% (the_color, the_comment, the_comment))\n\
-%%>'
+            textwrap.dedent(
+                """\
+                <%%
+                the_comment = ""
+                the_color = "white"
+                if "%s" in comment:
+                    the_comment = comment["%s"]
+                    the_color = "%s"
+                req.write(
+                    "<input type=\\"text\\" "
+                    "style=\\"border-style: none; background-color: %%s\\" "
+                    "name=\\"comment\\" value=\\"%%s\\" title=\\"%%s\\" />" %%
+                    (the_color, the_comment, the_comment)
+                )
+                %%>"""
+            )
             % (package, package, COLOURS[colour_idx]),
             file=status,
         )
@@ -590,7 +624,10 @@ else:\n\
         print("<tr bgcolor=%s>" % COLOURS[colour_idx], file=status)
         print("<td><small>%s</small></td>" % source["Binary"], file=status)
         if proposed_version:
-            excuses_url = "http://people.canonical.com/~ubuntu-archive/proposed-migration/update_excuses.html"
+            excuses_url = (
+                "http://people.canonical.com/~ubuntu-archive/"
+                "proposed-migration/update_excuses.html"
+            )
             print(
                 '<td>%s (<a href="%s#%s">%s</a>)</td>'
                 % (left_version, excuses_url, package, proposed_version),

@@ -147,8 +147,8 @@ def main(options, args):
                             )
                         ),
                         description="This feed announces new patches from "
-                        "Ubuntu to Debian for %s, each patch filename contains "
-                        "the complete difference between the two "
+                        "Ubuntu to Debian for %s, each patch filename "
+                        "contains the complete difference between the two "
                         "distributions for that package." % source["Package"],
                     )
                     this_diff_rss = read_rss(

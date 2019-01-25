@@ -27,6 +27,7 @@ import logging
 import os
 import re
 from rfc822 import parseaddr
+import textwrap
 import time
 
 from deb.controlfile import ControlFile
@@ -248,7 +249,8 @@ def write_status_page(component, merges, left_distro, right_distro):
         print(file=status)
         print("<head>", file=status)
         print(
-            '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">',
+            '<meta http-equiv="Content-Type" '
+            'content="text/html; charset=utf-8">',
             file=status,
         )
         print(
@@ -399,7 +401,8 @@ def do_table(status, merges, left_distro, right_distro, component):
                     u_who = u_who.replace(">", "&gt;")
                     if upl_lp_page:
                         who = (
-                            "%s<br><small><em>Uploader:</em> <a href='%s'>%s</a></small>"
+                            "%s<br><small><em>Uploader:</em> "
+                            "<a href='%s'>%s</a></small>"
                             % (who, upl_lp_page.encode("utf-8"), u_who)
                         )
                     else:
@@ -459,14 +462,22 @@ def do_table(status, merges, left_distro, right_distro, component):
             file=status,
         )
         print(
-            '<%%\n\
-the_comment = ""\n\
-the_color = "white"\n\
-if "%s" in comment:\n\
-    the_comment = comment["%s"]\n\
-    the_color = "%s"\n\
-req.write("<input type=\\"text\\" style=\\"border-style: none; background-color: %%s\\" name=\\"comment\\" value=\\"%%s\\" title=\\"%%s\\" />" %% (the_color, the_comment, the_comment))\n\
-%%>'
+            textwrap.dedent(
+                """\
+                <%%
+                the_comment = ""
+                the_color = "white"
+                if "%s" in comment:
+                    the_comment = comment["%s"]
+                    the_color = "%s"
+                req.write(
+                    "<input type=\\"text\\" "
+                    "style=\\"border-style: none; background-color: %%s\\" "
+                    "name=\\"comment\\" value=\\"%%s\\" title=\\"%%s\\" />" %%
+                    (the_color, the_comment, the_comment)
+                )
+                %%>"""
+            )
             % (package, package, COLOURS[colour_idx]),
             file=status,
         )
@@ -491,7 +502,10 @@ else:\n\
         print("<tr bgcolor=%s>" % COLOURS[colour_idx], file=status)
         print("<td><small>%s</small></td>" % source["Binary"], file=status)
         if proposed_version:
-            excuses_url = "http://people.canonical.com/~ubuntu-archive/proposed-migration/update_excuses.html"
+            excuses_url = (
+                "http://people.canonical.com/~ubuntu-archive/"
+                "proposed-migration/update_excuses.html"
+            )
             print(
                 '<td>%s (<a href="%s#%s">%s</a>)</td>'
                 % (left_version, excuses_url, package, proposed_version),

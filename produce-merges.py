@@ -915,8 +915,8 @@ def merge_file(
         ):
             mode |= 0o111
     else:
-        # Alternatively, if base was not executable and either of left and right
-        # are, make output executable.
+        # Alternatively, if base was not executable and either of left and
+        # right are, make output executable.
         if (
             stat.S_IMODE(right_stat.st_mode) | stat.S_IMODE(left_stat.st_mode)
         ) & 0o111:
