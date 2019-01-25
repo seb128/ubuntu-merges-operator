@@ -72,7 +72,6 @@ wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json http://people.canonical.co
 # Publish the Ubuntu patches so that Debian people can get at them
 ./publish-patches.py $QUIET
 ./syndicate.py $QUIET
-# ./mail-bugs.py $QUIET
 
 # Run the merge tool
 ./produce-merges.py $QUIET -X ../merge-blacklist.txt -X ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt
