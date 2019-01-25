@@ -286,38 +286,3 @@ def run(
         env=env,
     )
     return p.close()
-
-
-def get(
-    args,
-    stdin=None,
-    stderr=None,
-    chdir=None,
-    okstatus=(0,),
-    env=None,
-    strip=True,
-):
-    """Get process output.
-
-    Shorthand for util.shell.Process(...) with mode fixed to 'r' and
-    all output read and returned as a string.
-
-    If strip is True (the default) any final newlines will be stripped.
-    """
-    p = Process(
-        args,
-        "r",
-        stdin=stdin,
-        stderr=stderr,
-        chdir=chdir,
-        okstatus=okstatus,
-        env=env,
-    )
-    try:
-        text = p.read()
-        if strip:
-            return text.rstrip("\r\n")
-        else:
-            return text
-    finally:
-        p.close()
