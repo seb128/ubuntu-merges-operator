@@ -894,3 +894,25 @@ def proposed_package_version(package, our_version):
         if version < our_version:
             break
     return proposed_pkg
+
+def download_source(distro, source, targetdir):
+    for size, name in files(source):
+        # We compose the URL manually rather than going through launchpadlib
+        # to save several round-trips.
+        url = (
+            "https://launchpad.net/%s/+archive/primary/"
+            "+sourcefiles/%s/%s/%s" %
+            (quote(distro), quote(source["Package"]), quote(source["Version"]),
+             quote(name)))
+        filename = os.path.join(targetdir, name)
+
+        logging.debug("Downloading %s", url)
+        ensure(filename)
+        try:
+            with closing(urlopen(url)) as url_f, open(filename, "wb") as out_f:
+                for chunk in iter(lambda: url_f.read(256 * 1024), ""):
+                    out_f.write(chunk)
+        except IOError:
+            logging.warning("Downloading %s failed", url)
+            raise
+        logging.info("Saved %s", name)

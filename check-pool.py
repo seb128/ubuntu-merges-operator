@@ -19,19 +19,15 @@
 
 from __future__ import print_function
 
-from contextlib import closing
 import hashlib
 import logging
 import os.path
 import shutil
 import tempfile
-from urllib import quote
-from urllib2 import urlopen
 
 from momlib import (
     DISTROS,
-    ensure,
-    files,
+    download_source,
     get_pool_distros,
     get_pool_sources,
     get_sources,
@@ -46,29 +42,6 @@ def options(parser):
     parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
                       action="append",
                       help="Process only these packages")
-
-
-def download_source(distro, source, targetdir):
-    for size, name in files(source):
-        # We compose the URL manually rather than going through launchpadlib
-        # to save several round-trips.
-        url = (
-            "https://launchpad.net/%s/+archive/primary/"
-            "+sourcefiles/%s/%s/%s" %
-            (quote(distro), quote(source["Package"]), quote(source["Version"]),
-             quote(name)))
-        filename = os.path.join(targetdir, name)
-
-        logging.debug("Downloading %s", url)
-        ensure(filename)
-        try:
-            with closing(urlopen(url)) as url_f, open(filename, "wb") as out_f:
-                for chunk in iter(lambda: url_f.read(256 * 1024), ""):
-                    out_f.write(chunk)
-        except IOError:
-            logging.warning("Downloading %s failed", url)
-            raise
-        logging.info("Saved %s", name)
 
 
 class Mismatch(Exception):
