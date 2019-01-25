@@ -59,15 +59,6 @@ from momlib import (
 from util import tree
 
 
-# Order of priorities
-PRIORITY = [
-    "unknown",
-    "required",
-    "important",
-    "standard",
-    "optional",
-    "extra",
-]
 COLOURS = [
     "#ff8080",
     "#ffb580",
