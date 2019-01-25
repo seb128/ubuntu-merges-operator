@@ -117,9 +117,10 @@ class Version(object):
         """Compare two Version classes."""
         other = Version(other)
 
-        result = cmp(self.epoch, other.epoch)
-        if result != 0:
-            return result
+        if self.epoch < other.epoch:
+            return -1
+        if self.epoch > other.epoch:
+            return 1
 
         result = deb_cmp(self.upstream, other.upstream)
         if result != 0:
@@ -181,8 +182,9 @@ def deb_cmp(x, y):
         # Compare numbers
         (x_str, x_idx) = strcut(x, x_idx, "0123456789")
         (y_str, y_idx) = strcut(y, y_idx, "0123456789")
-        result = cmp(int(x_str or "0"), int(y_str or "0"))
-        if result != 0:
-            return result
+        if int(x_str or "0") < int(y_str or "0"):
+            return -1
+        if int(x_str or "0") > int(y_str or "0"):
+            return 1
 
     return 0
