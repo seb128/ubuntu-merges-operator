@@ -250,13 +250,20 @@ def get_uploader(distro, source):
         dsc_file,
     )
 
-    try:
-        stdout = subprocess.check_output(
-            ["gpg", "--verify", filename], universal_newlines=True
+    with open(os.devnull, "w") as devnull:
+        gpg = subprocess.Popen(
+            ["gpg", "--verify", filename],
+            stdout=devnull,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
         )
-    except subprocess.CalledProcessError:
+    stderr = gpg.communicate()[1]
+    if gpg.returncode != 0:
         return None
-    return stdout[1].split("Good signature from")[1].strip().strip('"')
+    for line in stderr.splitlines():
+        if "Good signature from" in line:
+            return line.split("Good signature from")[1].strip().strip('"')
+    return None
 
 
 def write_status_page(component, merges, left_distro, right_distro):
