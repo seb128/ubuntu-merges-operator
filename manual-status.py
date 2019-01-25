@@ -27,6 +27,7 @@ import logging
 import os
 import re
 from rfc822 import parseaddr
+import subprocess
 import textwrap
 import time
 
@@ -332,12 +333,13 @@ def get_uploader(distro, source):
         dsc_file,
     )
 
-    (a, b, c) = os.popen3("gpg --verify %s" % filename)
-    stdout = c.readlines()
     try:
-        return stdout[1].split("Good signature from")[1].strip().strip('"')
-    except IndexError:
+        stdout = subprocess.check_output(
+            ["gpg", "--verify", filename], universal_newlines=True
+        )
+    except subprocess.CalledProcessError:
         return None
+    return stdout[1].split("Good signature from")[1].strip().strip('"')
 
 
 def do_table(status, merges, left_distro, right_distro, component):
