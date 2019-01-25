@@ -588,40 +588,6 @@ def files(source):
     return [f.split(None, 2)[1:] for f in files]
 
 
-def package_list(source):
-    """Return (package, type, section, priority) for each binary."""
-    try:
-        return [
-            line.split(None, 3)
-            for line in source["Package-List"].strip().split("\n")
-        ]
-    except KeyError:
-        return []
-
-
-def only_udebs(source):
-    """Return True if a source package only contains udebs."""
-    pkglist = package_list(source)
-    if not pkglist:
-        return False
-    try:
-        return all(pkg[1] == "udeb" for pkg in pkglist)
-    except IndexError:
-        return False
-
-
-def adjusted_priority(source):
-    """Return the adjusted priority of a source package."""
-    try:
-        priority = source["Priority"]
-    except KeyError:
-        priority = "unknown"
-    if only_udebs(source):
-        if priority in ("unknown", "required", "important", "standard"):
-            priority = "optional"
-    return priority
-
-
 def read_basis(filename):
     """Read the basis version of a patch from a file."""
     basis_file = filename + "-basis"
