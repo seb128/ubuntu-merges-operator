@@ -574,7 +574,7 @@ def unpack_source(distro, source):
             pc_stat = os.lstat(pc_filename)
             if pc_stat is not None and stat.S_IMODE(pc_stat.st_mode) == 0:
                 os.chmod(pc_filename, 0o400)
-    except:
+    except Exception:
         cleanup(destdir)
         raise
 
