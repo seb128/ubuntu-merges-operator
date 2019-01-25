@@ -31,17 +31,20 @@ def as_dir(path):
     else:
         return ""
 
+
 def as_file(path):
     """Return the path without a trailing slash."""
     while path[-1:] == "/":
         path = path[:-1]
     return path
 
+
 def relative(path):
     """Return the path without a leading slash."""
     while path[:1] == "/":
         path = path[1:]
     return path
+
 
 def under(root, path):
     """Return whether a path is underneath a given root."""
@@ -52,12 +55,13 @@ def under(root, path):
     else:
         return False
 
+
 def subdir(root, path):
     """Return path relative to root."""
     if not under(root, path):
         raise ValueError("path must start with root")
 
-    return relative(path[len(root):])
+    return relative(path[len(root) :])
 
 
 def walk(path, topdown=True, relative=True):
@@ -92,6 +96,7 @@ def walk(path, topdown=True, relative=True):
         if not topdown:
             yield base
 
+
 def copytree(path, newpath, link=False, dereference=False):
     """Create a copy of the tree at path under newpath.
 
@@ -101,8 +106,13 @@ def copytree(path, newpath, link=False, dereference=False):
     retained.
     """
     for filename in walk(path):
-        copyfile(os.path.join(path, filename), os.path.join(newpath, filename),
-                 link=link, dereference=dereference)
+        copyfile(
+            os.path.join(path, filename),
+            os.path.join(newpath, filename),
+            link=link,
+            dereference=dereference,
+        )
+
 
 def copyfile(srcpath, dstpath, link=False, dereference=False):
     """Copy a file from one path to another.
@@ -131,6 +141,7 @@ def copyfile(srcpath, dstpath, link=False, dereference=False):
     else:
         shutil.copy2(srcpath, dstpath)
 
+
 def movetree(path, newpath, eat_toplevel=False):
     """Move the contents of one tree into another.
 
@@ -147,15 +158,19 @@ def movetree(path, newpath, eat_toplevel=False):
             os.makedirs(newpath)
 
     entries = os.listdir(path)
-    if eat_toplevel and len(entries) == 1 \
-           and os.path.isdir(os.path.join(path, entries[0])) \
-           and not os.path.islink(os.path.join(path, entries[0])):
+    if (
+        eat_toplevel
+        and len(entries) == 1
+        and os.path.isdir(os.path.join(path, entries[0]))
+        and not os.path.islink(os.path.join(path, entries[0]))
+    ):
         movetree(os.path.join(path, entries[0]), newpath)
     else:
         for entry in entries:
             os.rename(os.path.join(path, entry), os.path.join(newpath, entry))
 
     os.rmdir(path)
+
 
 def rmtree(path):
     """Remove the contents of a tree.
@@ -179,6 +194,7 @@ def rmtree(path):
             if e.errno != errno.ENOENT:
                 raise
 
+
 def remove(filename):
     """Remove a symlink, file or directory tree."""
     try:
@@ -191,6 +207,7 @@ def remove(filename):
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
+
 
 def exists(path):
     """Return whether a path exists."""

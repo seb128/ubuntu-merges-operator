@@ -21,9 +21,9 @@ import re
 
 
 # Regular expressions make validating things easy
-valid_epoch = re.compile(r'^[0-9]+$')
-valid_upstream = re.compile(r'^[A-Za-z0-9+:.~-]*$')
-valid_revision = re.compile(r'^[A-Za-z0-9+.~]+$')
+valid_epoch = re.compile(r"^[0-9]+$")
+valid_upstream = re.compile(r"^[A-Za-z0-9+:.~-]*$")
+valid_revision = re.compile(r"^[A-Za-z0-9+.~]+$")
 
 # Character comparison table for upstream and revision components
 cmp_table = "~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-.:"
@@ -64,12 +64,12 @@ class Version(object):
                 raise ValueError
             if not valid_epoch.search(self.epoch):
                 raise ValueError
-            ver = ver[idx+1:]
+            ver = ver[idx + 1 :]
 
         # Revision is component after last hyphen
         idx = ver.rfind("-")
         if idx != -1:
-            self.revision = ver[idx+1:]
+            self.revision = ver[idx + 1 :]
             if not len(self.revision):
                 raise ValueError
             if not valid_revision.search(self.revision):
@@ -106,22 +106,28 @@ class Version(object):
 
     def __repr__(self):
         """Return a debugging representation of the object."""
-        return "<%s epoch: %d, upstream: %r, revision: %r>" \
-               % (self.__class__.__name__, self.epoch,
-                  self.upstream, self.revision)
+        return "<%s epoch: %d, upstream: %r, revision: %r>" % (
+            self.__class__.__name__,
+            self.epoch,
+            self.upstream,
+            self.revision,
+        )
 
     def __cmp__(self, other):
         """Compare two Version classes."""
         other = Version(other)
 
         result = cmp(self.epoch, other.epoch)
-        if result != 0: return result
+        if result != 0:
+            return result
 
         result = deb_cmp(self.upstream, other.upstream)
-        if result != 0: return result
+        if result != 0:
+            return result
 
         result = deb_cmp(self.revision or "", other.revision or "")
-        if result != 0: return result
+        if result != 0:
+            return result
 
         return 0
 
@@ -135,6 +141,7 @@ def strcut(str, idx, accept):
 
     return (ret, idx)
 
+
 def deb_order(str, idx):
     """Return the comparison order of two characters."""
     if idx >= len(str):
@@ -143,6 +150,7 @@ def deb_order(str, idx):
         return -1
     else:
         return cmp_table.index(str[idx])
+
 
 def deb_cmp_str(x, y):
     """Compare two strings in a deb version."""
@@ -158,6 +166,7 @@ def deb_cmp_str(x, y):
 
     return 0
 
+
 def deb_cmp(x, y):
     """Implement the string comparison outlined by Debian policy."""
     x_idx = y_idx = 0
@@ -166,12 +175,14 @@ def deb_cmp(x, y):
         (x_str, x_idx) = strcut(x, x_idx, cmp_table)
         (y_str, y_idx) = strcut(y, y_idx, cmp_table)
         result = deb_cmp_str(x_str, y_str)
-        if result != 0: return result
+        if result != 0:
+            return result
 
         # Compare numbers
         (x_str, x_idx) = strcut(x, x_idx, "0123456789")
         (y_str, y_idx) = strcut(y, y_idx, "0123456789")
         result = cmp(int(x_str or "0"), int(y_str or "0"))
-        if result != 0: return result
+        if result != 0:
+            return result
 
     return 0

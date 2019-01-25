@@ -32,16 +32,26 @@ from momlib import (
     get_pool_sources,
     get_sources,
     run,
-    )
+)
 
 
 def options(parser):
-    parser.add_option("-d", "--distro", type="string", metavar="DISTRO",
-                      action="append",
-                      help="Process only these distros")
-    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
-                      action="append",
-                      help="Process only these packages")
+    parser.add_option(
+        "-d",
+        "--distro",
+        type="string",
+        metavar="DISTRO",
+        action="append",
+        help="Process only these distros",
+    )
+    parser.add_option(
+        "-p",
+        "--package",
+        type="string",
+        metavar="PACKAGE",
+        action="append",
+        help="Process only these packages",
+    )
 
 
 class Mismatch(Exception):
@@ -53,10 +63,11 @@ def check_source(distro, source):
     try:
         download_source(distro, source, tdir)
         for fieldname, hashname, hasher in (
-                ("Checksums-Sha512", "SHA-512", hashlib.sha512),
-                ("Checksums-Sha256", "SHA-256", hashlib.sha256),
-                ("Checksums-Sha1", "SHA-1", hashlib.sha1),
-                ("Files", "MD5", hashlib.md5)):
+            ("Checksums-Sha512", "SHA-512", hashlib.sha512),
+            ("Checksums-Sha256", "SHA-256", hashlib.sha256),
+            ("Checksums-Sha1", "SHA-1", hashlib.sha1),
+            ("Files", "MD5", hashlib.md5),
+        ):
             if fieldname not in source:
                 continue
             for entry in source[fieldname].strip("\n").split("\n"):
@@ -67,8 +78,9 @@ def check_source(distro, source):
                         h.update(chunk)
                     if h.hexdigest() != expected_hash:
                         raise Mismatch(
-                            "%s %s: LP %s != pool %s" %
-                            (name, hashname, h.hexdigest(), expected_hash))
+                            "%s %s: LP %s != pool %s"
+                            % (name, hashname, h.hexdigest(), expected_hash)
+                        )
     finally:
         shutil.rmtree(tdir)
 
@@ -83,8 +95,10 @@ def main(options, args):
                 for source in get_sources(distro, dist, component):
                     sourcenames.add(source["Package"])
         for sourcename in sorted(sourcenames):
-            if (options.package is not None and
-                    sourcename not in options.package):
+            if (
+                options.package is not None
+                and sourcename not in options.package
+            ):
                 continue
             try:
                 sources = get_pool_sources(distro, sourcename)
@@ -101,5 +115,9 @@ def main(options, args):
 
 
 if __name__ == "__main__":
-    run(main, options, usage="%prog",
-        description="check the pool against Launchpad")
+    run(
+        main,
+        options,
+        usage="%prog",
+        description="check the pool against Launchpad",
+    )

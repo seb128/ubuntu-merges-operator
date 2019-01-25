@@ -34,17 +34,28 @@ from momlib import (
     unpack_directory,
     unpack_source,
     version_sort,
-    )
+)
 from util import tree
 
 
 def options(parser):
-    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
-                      action="append",
-                      help="Process only these packages")
-    parser.add_option("-c", "--component", type="string", metavar="COMPONENT",
-                      action="append",
-                      help="Process only these components")
+    parser.add_option(
+        "-p",
+        "--package",
+        type="string",
+        metavar="PACKAGE",
+        action="append",
+        help="Process only these packages",
+    )
+    parser.add_option(
+        "-c",
+        "--component",
+        type="string",
+        metavar="COMPONENT",
+        action="append",
+        help="Process only these components",
+    )
+
 
 def main(options, args):
     if len(args):
@@ -59,13 +70,17 @@ def main(options, args):
     for distro in distros:
         for dist in DISTROS[distro]["dists"]:
             for component in DISTROS[distro]["components"]:
-                if options.component is not None \
-                       and component not in options.component:
+                if (
+                    options.component is not None
+                    and component not in options.component
+                ):
                     continue
 
                 for source in get_sources(distro, dist, component):
-                    if options.package is not None \
-                           and source["Package"] not in options.package:
+                    if (
+                        options.package is not None
+                        and source["Package"] not in options.package
+                    ):
                         continue
                     if source["Package"] in blacklist:
                         continue
@@ -76,12 +91,16 @@ def main(options, args):
                     for source in sources:
                         generate_dpatch(distro, source)
 
+
 def generate_dpatch(distro, source):
     """Generate the extracted patches."""
     logging.debug("%s: %s %s", distro, source["Package"], source["Version"])
 
-    stamp = "%s/%s/dpatch-stamp-%s" \
-        % (ROOT, source["Directory"], source["Version"])
+    stamp = "%s/%s/dpatch-stamp-%s" % (
+        ROOT,
+        source["Directory"],
+        source["Version"],
+    )
 
     if not os.path.isfile(stamp):
         open(stamp, "w").close()
@@ -94,6 +113,7 @@ def generate_dpatch(distro, source):
         finally:
             cleanup_source(source)
 
+
 def extract_dpatches(dirname, source):
     """Extract patches from debian/patches."""
     srcdir = unpack_directory(source)
@@ -104,8 +124,15 @@ def extract_dpatches(dirname, source):
         return
 
     for patch in tree.walk(patchdir):
-        if os.path.basename(patch) in ["00list", "series", "README",
-                                       ".svn", "CVS", ".bzr", ".git"]:
+        if os.path.basename(patch) in [
+            "00list",
+            "series",
+            "README",
+            ".svn",
+            "CVS",
+            ".bzr",
+            ".git",
+        ]:
             continue
         elif not len(patch):
             continue
@@ -119,5 +146,9 @@ def extract_dpatches(dirname, source):
 
 
 if __name__ == "__main__":
-    run(main, options, usage="%prog [DISTRO...]",
-        description="generate changes and diff files for new packages")
+    run(
+        main,
+        options,
+        usage="%prog [DISTRO...]",
+        description="generate changes and diff files for new packages",
+    )

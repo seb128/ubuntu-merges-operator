@@ -39,14 +39,20 @@ from momlib import (
     ROOT,
     run,
     sources_file,
-    )
+)
 from util import tree
 
 
 def options(parser):
-    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
-                      action="append",
-                      help="Process only these packages")
+    parser.add_option(
+        "-p",
+        "--package",
+        type="string",
+        metavar="PACKAGE",
+        action="append",
+        help="Process only these packages",
+    )
+
 
 def main(options, args):
     if len(args):
@@ -65,14 +71,17 @@ def main(options, args):
 
                 sources = get_sources(distro, dist, component)
                 for source in sources:
-                    if options.package is not None \
-                           and source["Package"] not in options.package:
+                    if (
+                        options.package is not None
+                        and source["Package"] not in options.package
+                    ):
                         continue
                     if source["Package"] in blacklist:
                         continue
                     changes_filename = changes_file(distro, source)
-                    if (os.path.isfile(changes_filename) or
-                        os.path.isfile(changes_filename + ".bz2")):
+                    if os.path.isfile(changes_filename) or os.path.isfile(
+                        changes_filename + ".bz2"
+                    ):
                         # It looks as though we've already processed and
                         # expired this.
                         continue
@@ -85,6 +94,7 @@ def sources_urls(distro, dist, component):
     base_url = "%s/dists/%s/%s/source/Sources" % (mirror, dist, component)
     yield "%s.xz" % base_url
     yield "%s.gz" % base_url
+
 
 def update_sources(distro, dist, component):
     """Update a Sources file."""
@@ -102,19 +112,24 @@ def update_sources(distro, dist, component):
         try:
             if url.endswith(".gz"):
                 import gzip
+
                 decompressor = gzip.GzipFile
             elif url.endswith(".xz"):
                 if sys.version >= "3.3":
                     import lzma
+
                     decompressor = lzma.LZMAFile
                 else:
+
                     @contextmanager
                     def decompressor(name):
                         proc = subprocess.Popen(
-                            ["xzcat", name], stdout=subprocess.PIPE)
+                            ["xzcat", name], stdout=subprocess.PIPE
+                        )
                         yield proc.stdout
                         proc.stdout.close()
                         proc.wait()
+
             else:
                 raise RuntimeError("Don't know how to decompress %s" % url)
             with decompressor(compfilename) as compfile:
@@ -128,7 +143,9 @@ def update_sources(distro, dist, component):
         return filename
     else:
         raise IOError(
-            "No Sources found for %s/%s/%s" % (distro, dist, component))
+            "No Sources found for %s/%s/%s" % (distro, dist, component)
+        )
+
 
 def update_pool(distro, source):
     """Download a source package into our pool."""
@@ -156,5 +173,9 @@ def update_pool(distro, source):
 
 
 if __name__ == "__main__":
-    run(main, options, usage="%prog [DISTRO...]",
-        description="update a distribution's pool")
+    run(
+        main,
+        options,
+        usage="%prog [DISTRO...]",
+        description="update a distribution's pool",
+    )

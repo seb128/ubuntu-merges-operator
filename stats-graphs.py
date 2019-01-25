@@ -37,55 +37,62 @@ from pychart import (
     range_plot,
     text_box,
     theme,
-    )
+)
 
-from momlib import (
-    DISTROS,
-    OUR_DISTRO,
-    ROOT,
-    run,
-    )
+from momlib import DISTROS, OUR_DISTRO, ROOT, run
 
 
 # Order of stats we pick out
-ORDER = [ "needs-merge", "modified", "unmodified",
-          "needs-sync", "local", "repackaged" ]
+ORDER = [
+    "needs-merge",
+    "modified",
+    "unmodified",
+    "needs-sync",
+    "local",
+    "repackaged",
+]
 
 # Labels used on the graph
 LABELS = {
-    "unmodified":  "Unmodified",
-    "needs-sync":  "Needs Sync",
-    "local":       "Local",
-    "repackaged":  "Repackaged",
-    "modified":    "Modified",
+    "unmodified": "Unmodified",
+    "needs-sync": "Needs Sync",
+    "local": "Local",
+    "repackaged": "Repackaged",
+    "modified": "Modified",
     "needs-merge": "Needs Merge",
-    }
+}
 
 # Colours (fill styles) used for each stat
 FILL_STYLES = {
-    "unmodified":  fill_style.blue,
-    "needs-sync":  fill_style.darkorchid,
-    "local":       fill_style.aquamarine1,
-    "repackaged":  fill_style.green,
-    "modified":    fill_style.yellow,
+    "unmodified": fill_style.blue,
+    "needs-sync": fill_style.darkorchid,
+    "local": fill_style.aquamarine1,
+    "repackaged": fill_style.green,
+    "modified": fill_style.yellow,
     "needs-merge": fill_style.red,
-    }
+}
 
 # Offsets of individual stats on the pie chart (for pulling out)
 ARC_OFFSETS = {
-    "unmodified":  10,
-    "needs-sync":  10,
-    "local":       0,
-    "repackaged":  5,
+    "unmodified": 10,
+    "needs-sync": 10,
+    "local": 0,
+    "repackaged": 5,
     "needs-merge": 0,
-    "modified":    0,
-    }
+    "modified": 0,
+}
 
 
 def options(parser):
-    parser.add_option("-d", "--distro", type="string", metavar="DISTRO",
-                      default=OUR_DISTRO,
-                      help="Distribution to generate stats for")
+    parser.add_option(
+        "-d",
+        "--distro",
+        type="string",
+        metavar="DISTRO",
+        default=OUR_DISTRO,
+        help="Distribution to generate stats for",
+    )
+
 
 def main(options, args):
     distro = options.distro
@@ -115,12 +122,14 @@ def main(options, args):
 
 def date_to_datetime(s):
     """Convert a date string into a datetime."""
-    (year, mon, day) = [ int(x) for x in s.split("-", 2) ]
+    (year, mon, day) = [int(x) for x in s.split("-", 2)]
     return datetime.date(year, mon, day)
+
 
 def date_to_ordinal(s):
     """Convert a date string into an ordinal."""
     return date_to_datetime(s).toordinal()
+
 
 def ordinal_to_label(o):
     """Convert an ordinal into a chart label."""
@@ -159,6 +168,7 @@ def read_stats():
 
     return stats
 
+
 def get_events(stats, start):
     """Get the list of interesting events."""
     events = []
@@ -167,6 +177,7 @@ def get_events(stats, start):
             events.append((date, info))
 
     return events
+
 
 def info_to_data(date, info):
     """Convert an optional date and information set into a data set."""
@@ -186,6 +197,7 @@ def get_current(stats):
     (date, time, info) = stats[-1]
     return info
 
+
 def get_history(stats, start):
     """Get historical information for each day since start."""
     values = {}
@@ -195,17 +207,18 @@ def get_history(stats, start):
 
     dates = sorted(values)
 
-    return [ (d, values[d]) for d in dates ]
+    return [(d, values[d]) for d in dates]
 
 
 def date_tics(min, max):
     """Return list of tics between the two ordinals."""
     intervals = []
-    for tic in range(min, max+1):
+    for tic in range(min, max + 1):
         if datetime.date.fromordinal(tic).day == 1:
             intervals.append(tic)
 
     return intervals
+
 
 def sources_intervals(max):
     """Return the standard and minimal interval for the sources axis."""
@@ -223,60 +236,82 @@ def sources_intervals(max):
 
 def pie_chart(component, current):
     """Output a pie chart for the given component and data."""
-    data = zip([ LABELS[key] for key in ORDER ],
-               info_to_data(None, current))
+    data = zip([LABELS[key] for key in ORDER], info_to_data(None, current))
 
     filename = "%s/merges/%s-now.png" % (ROOT, component)
     with closing(canvas.init(filename, format="png")) as c:
-        ar = area.T(size=(600,500), legend=None,
-                    x_grid_style=None, y_grid_style=None)
+        ar = area.T(
+            size=(600, 500), legend=None, x_grid_style=None, y_grid_style=None
+        )
 
-        plot = pie_plot.T(data=data, arrow_style=arrow.a0, label_offset=25,
-                          shadow=(2, -2, fill_style.gray50),
-                          arc_offsets=[ ARC_OFFSETS[key] for key in ORDER ],
-                          fill_styles=[ FILL_STYLES[key] for key in ORDER ])
+        plot = pie_plot.T(
+            data=data,
+            arrow_style=arrow.a0,
+            label_offset=25,
+            shadow=(2, -2, fill_style.gray50),
+            arc_offsets=[ARC_OFFSETS[key] for key in ORDER],
+            fill_styles=[FILL_STYLES[key] for key in ORDER],
+        )
         ar.add_plot(plot)
 
         ar.draw(c)
 
+
 def range_chart(component, history, start, today, events):
     """Output a range chart for the given component and data."""
-    data = chart_data.transform(lambda x: [ date_to_ordinal(x[0]),
-                                            sum(x[1:1]),
-                                            sum(x[1:2]),
-                                            sum(x[1:3]),
-                                            sum(x[1:4]),
-                                            sum(x[1:5]),
-                                            sum(x[1:6]),
-                                            sum(x[1:7]) ],
-                                [ info_to_data(date, info)
-                                        for date, info in history ])
+    data = chart_data.transform(
+        lambda x: [
+            date_to_ordinal(x[0]),
+            sum(x[1:1]),
+            sum(x[1:2]),
+            sum(x[1:3]),
+            sum(x[1:4]),
+            sum(x[1:5]),
+            sum(x[1:6]),
+            sum(x[1:7]),
+        ],
+        [info_to_data(date, info) for date, info in history],
+    )
 
-    (y_tic_interval, y_minor_tic_interval) = \
-                     sources_intervals(max(d[-1] for d in data))
+    (y_tic_interval, y_minor_tic_interval) = sources_intervals(
+        max(d[-1] for d in data)
+    )
 
     filename = "%s/merges/%s-trend.png" % (ROOT, component)
     with closing(canvas.init(filename, format="png")) as c:
-        ar = area.T(size=(900,450), legend=legend.T(),
-                    x_axis=axis.X(label="Date", format=ordinal_to_label,
-                                  tic_interval=date_tics,
-                                  tic_label_offset=(10,0)),
-                    y_axis=axis.Y(label="Sources", format="%d",
-                                  tic_interval=y_tic_interval,
-                                  minor_tic_interval=y_minor_tic_interval,
-                                  tic_label_offset=(-10,0),
-                                  label_offset=(-10,0)),
-                    x_range=(start.toordinal(), today.toordinal()))
+        ar = area.T(
+            size=(900, 450),
+            legend=legend.T(),
+            x_axis=axis.X(
+                label="Date",
+                format=ordinal_to_label,
+                tic_interval=date_tics,
+                tic_label_offset=(10, 0),
+            ),
+            y_axis=axis.Y(
+                label="Sources",
+                format="%d",
+                tic_interval=y_tic_interval,
+                minor_tic_interval=y_minor_tic_interval,
+                tic_label_offset=(-10, 0),
+                label_offset=(-10, 0),
+            ),
+            x_range=(start.toordinal(), today.toordinal()),
+        )
 
         for idx, key in enumerate(ORDER):
-            plot = range_plot.T(data=data, label=LABELS[key],
-                                min_col=idx+1, max_col=idx+2,
-                                fill_style=FILL_STYLES[key])
+            plot = range_plot.T(
+                data=data,
+                label=LABELS[key],
+                min_col=idx + 1,
+                max_col=idx + 2,
+                fill_style=FILL_STYLES[key],
+            )
             ar.add_plot(plot)
 
         ar.draw(c)
 
-        levels = [ 0, 0, 0 ]
+        levels = [0, 0, 0]
 
         for date, text in events:
             xpos = ar.x_pos(date_to_ordinal(date))
@@ -290,8 +325,9 @@ def range_chart(component, history, start, today, events):
             else:
                 continue
 
-            tb = text_box.T(loc=(xpos + 25, ypos + 45 - (20 * level)),
-                            text=text)
+            tb = text_box.T(
+                loc=(xpos + 25, ypos + 45 - (20 * level)), text=text
+            )
             tb.add_arrow((xpos, ypos))
             tb.draw()
 
@@ -299,5 +335,4 @@ def range_chart(component, history, start, today, events):
 
 
 if __name__ == "__main__":
-    run(main, options, usage="%prog",
-        description="output stats graphs")
+    run(main, options, usage="%prog", description="output stats graphs")

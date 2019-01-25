@@ -53,48 +53,96 @@ from momlib import (
     SRC_DISTRO,
     unpack_source,
     work_dir,
-    )
+)
 from util import tree, shell
 
 
 # Regular expression for top of debian/changelog
-CL_RE = re.compile(r'^(\w[-+0-9a-z.]*) \(([^\(\) \t]+)\)((\s+[-0-9a-z]+)+)\;',
-                   re.IGNORECASE)
+CL_RE = re.compile(
+    r"^(\w[-+0-9a-z.]*) \(([^\(\) \t]+)\)((\s+[-0-9a-z]+)+)\;", re.IGNORECASE
+)
 
 
 def options(parser):
-    parser.add_option("-f", "--force", action="store_true",
-                      help="Force creation of merges")
+    parser.add_option(
+        "-f", "--force", action="store_true", help="Force creation of merges"
+    )
 
-    parser.add_option("-D", "--source-distro", type="string", metavar="DISTRO",
-                      default=SRC_DISTRO,
-                      help="Source distribution")
-    parser.add_option("-S", "--source-suite", type="string", metavar="SUITE",
-                      default=SRC_DIST,
-                      help="Source suite (aka distrorelease)")
+    parser.add_option(
+        "-D",
+        "--source-distro",
+        type="string",
+        metavar="DISTRO",
+        default=SRC_DISTRO,
+        help="Source distribution",
+    )
+    parser.add_option(
+        "-S",
+        "--source-suite",
+        type="string",
+        metavar="SUITE",
+        default=SRC_DIST,
+        help="Source suite (aka distrorelease)",
+    )
 
-    parser.add_option("-d", "--dest-distro", type="string", metavar="DISTRO",
-                      default=OUR_DISTRO,
-                      help="Destination distribution")
-    parser.add_option("-s", "--dest-suite", type="string", metavar="SUITE",
-                      default=OUR_DIST,
-                      help="Destination suite (aka distrorelease)")
+    parser.add_option(
+        "-d",
+        "--dest-distro",
+        type="string",
+        metavar="DISTRO",
+        default=OUR_DISTRO,
+        help="Destination distribution",
+    )
+    parser.add_option(
+        "-s",
+        "--dest-suite",
+        type="string",
+        metavar="SUITE",
+        default=OUR_DIST,
+        help="Destination suite (aka distrorelease)",
+    )
 
-    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
-                      action="append",
-                      help="Process only these packages")
-    parser.add_option("-c", "--component", type="string", metavar="COMPONENT",
-                      action="append",
-                      help="Process only these destination components")
-    parser.add_option("-V", "--version", type="string", metavar="VER",
-                      help="Version to obtain from destination")
+    parser.add_option(
+        "-p",
+        "--package",
+        type="string",
+        metavar="PACKAGE",
+        action="append",
+        help="Process only these packages",
+    )
+    parser.add_option(
+        "-c",
+        "--component",
+        type="string",
+        metavar="COMPONENT",
+        action="append",
+        help="Process only these destination components",
+    )
+    parser.add_option(
+        "-V",
+        "--version",
+        type="string",
+        metavar="VER",
+        help="Version to obtain from destination",
+    )
 
-    parser.add_option("-X", "--exclude", type="string", metavar="FILENAME",
-                      action="append",
-                      help="Exclude packages listed in this file")
-    parser.add_option("-I", "--include", type="string", metavar="FILENAME",
-                      action="append",
-                      help="Only process packages listed in this file")
+    parser.add_option(
+        "-X",
+        "--exclude",
+        type="string",
+        metavar="FILENAME",
+        action="append",
+        help="Exclude packages listed in this file",
+    )
+    parser.add_option(
+        "-I",
+        "--include",
+        type="string",
+        metavar="FILENAME",
+        action="append",
+        help="Only process packages listed in this file",
+    )
+
 
 def main(options, args):
     src_distro = options.source_distro
@@ -119,13 +167,17 @@ def main(options, args):
     # the source distribution; calculate the base from the destination and
     # produce a merge combining both sets of changes
     for our_component in DISTROS[our_distro]["components"]:
-        if options.component is not None \
-               and our_component not in options.component:
+        if (
+            options.component is not None
+            and our_component not in options.component
+        ):
             continue
 
         for our_source in get_sources(our_distro, our_dist, our_component):
-            if options.package is not None \
-                   and our_source["Package"] not in options.package:
+            if (
+                options.package is not None
+                and our_source["Package"] not in options.package
+            ):
                 continue
             if our_source["Package"] in blacklist:
                 continue
@@ -140,15 +192,17 @@ def main(options, args):
                     our_version = Version(options.version)
                 else:
                     our_version = Version(our_source["Version"])
-                our_pool_source = get_pool_source(our_distro, package,
-                                                  our_version)
+                our_pool_source = get_pool_source(
+                    our_distro, package, our_version
+                )
                 logging.debug("%s: %s is %s", package, our_distro, our_version)
             except IndexError:
                 continue
 
             try:
-                (src_source, src_version, src_pool_source) \
-                             = get_same_source(src_distro, src_dist, package)
+                (src_source, src_version, src_pool_source) = get_same_source(
+                    src_distro, src_dist, package
+                )
                 logging.debug("%s: %s is %s", package, src_distro, src_version)
             except IndexError:
                 continue
@@ -157,17 +211,34 @@ def main(options, args):
                 base = get_base(our_pool_source)
                 base_source = get_nearest_source(package, base)
                 base_version = Version(base_source["Version"])
-                logging.debug("%s: base is %s (%s wanted)",
-                              package, base_version, base)
+                logging.debug(
+                    "%s: base is %s (%s wanted)", package, base_version, base
+                )
             except IndexError:
                 continue
 
-            produce_merge(our_pool_source, our_distro, our_dist, base_source,
-                          src_pool_source, src_distro, src_dist,
-                          force=options.force)
+            produce_merge(
+                our_pool_source,
+                our_distro,
+                our_dist,
+                base_source,
+                src_pool_source,
+                src_distro,
+                src_dist,
+                force=options.force,
+            )
 
-def produce_merge(left_source, left_distro, left_dist, base_source,
-                  right_source, right_distro, right_dist, force=False):
+
+def produce_merge(
+    left_source,
+    left_distro,
+    left_dist,
+    base_source,
+    right_source,
+    right_distro,
+    right_dist,
+    force=False,
+):
     """Produce a merge for the given two packages."""
     package = base_source["Package"]
     merged_version = Version(right_source["Version"] + "ubuntu1")
@@ -187,22 +258,32 @@ def produce_merge(left_source, left_distro, left_dist, base_source,
 
     if not force:
         try:
-            (prev_base, prev_left, prev_right) \
-                        = read_report(output_dir, left_distro, right_distro)
-            if prev_base == base_version \
-                   and prev_left == left_source["Version"] \
-                   and prev_right == right_source["Version"]:
+            (prev_base, prev_left, prev_right) = read_report(
+                output_dir, left_distro, right_distro
+            )
+            if (
+                prev_base == base_version
+                and prev_left == left_source["Version"]
+                and prev_right == right_source["Version"]
+            ):
                 return
         except ValueError:
             pass
 
-    logging.info("Trying to merge %s: %s <- %s -> %s", package,
-                 left_source["Version"], base_source["Version"],
-                 right_source["Version"])
+    logging.info(
+        "Trying to merge %s: %s <- %s -> %s",
+        package,
+        left_source["Version"],
+        base_source["Version"],
+        right_source["Version"],
+    )
 
     left_name = "%s-%s (%s)" % (package, left_source["Version"], left_distro)
-    right_name = "%s-%s (%s)" % (package, right_source["Version"],
-                                 right_distro)
+    right_name = "%s-%s (%s)" % (
+        package,
+        right_source["Version"],
+        right_distro,
+    )
 
     try:
         left_dir = unpack_source(left_distro, left_source)
@@ -211,13 +292,26 @@ def produce_merge(left_source, left_distro, left_dist, base_source,
 
         merged_dir = work_dir(package, merged_version)
         try:
-            conflicts = do_merge(left_dir, left_name, left_distro, base_dir,
-                                 right_dir, right_name, right_distro,
-                                 merged_dir)
+            conflicts = do_merge(
+                left_dir,
+                left_name,
+                left_distro,
+                base_dir,
+                right_dir,
+                right_name,
+                right_distro,
+                merged_dir,
+            )
 
-            add_changelog(package, merged_version, left_distro, left_dist,
-                          right_distro, right_dist, merged_dir)
-
+            add_changelog(
+                package,
+                merged_version,
+                left_distro,
+                left_dist,
+                right_distro,
+                right_dist,
+                merged_dir,
+            )
 
             # Now clean up the output
             cleanup(output_dir)
@@ -230,21 +324,42 @@ def produce_merge(left_source, left_distro, left_dist, base_source,
 
             patch_file = None
             if len(conflicts):
-                src_file = create_tarball(package, merged_version,
-                                          output_dir, merged_dir)
+                src_file = create_tarball(
+                    package, merged_version, output_dir, merged_dir
+                )
             else:
-                src_file = create_source(package, merged_version,
-                                         Version(left_source["Version"]),
-                                         output_dir, merged_dir)
+                src_file = create_source(
+                    package,
+                    merged_version,
+                    Version(left_source["Version"]),
+                    output_dir,
+                    merged_dir,
+                )
                 if src_file.endswith(".dsc"):
-                    patch_file = create_patch(package, merged_version,
-                                              output_dir, merged_dir,
-                                              right_source, right_dir)
+                    patch_file = create_patch(
+                        package,
+                        merged_version,
+                        output_dir,
+                        merged_dir,
+                        right_source,
+                        right_dir,
+                    )
 
-            write_report(left_source, left_distro, left_patch, base_source,
-                         right_source, right_distro, right_patch,
-                         merged_version, conflicts, src_file, patch_file,
-                         output_dir, merged_dir)
+            write_report(
+                left_source,
+                left_distro,
+                left_patch,
+                base_source,
+                right_source,
+                right_distro,
+                right_patch,
+                merged_version,
+                conflicts,
+                src_file,
+                patch_file,
+                output_dir,
+                merged_dir,
+            )
         finally:
             cleanup(merged_dir)
     finally:
@@ -253,14 +368,21 @@ def produce_merge(left_source, left_distro, left_dist, base_source,
         cleanup_source(left_source)
 
 
-
 def is_pruned(pruned, filename):
     """Has a file been pruned due to a directory/symlink conflict?"""
     return any(tree.under(p, filename) for p in pruned)
 
 
-def do_merge(left_dir, left_name, left_distro, base_dir,
-             right_dir, right_name, right_distro, merged_dir):
+def do_merge(
+    left_dir,
+    left_name,
+    left_distro,
+    base_dir,
+    right_dir,
+    right_name,
+    right_distro,
+    merged_dir,
+):
     """Do the heavy lifting of comparing and merging."""
     logging.debug("Producing merge in %s", tree.subdir(ROOT, merged_dir))
     conflicts = []
@@ -299,54 +421,94 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
 
         elif left_stat is None:
             logging.debug("removed from %s: %s", left_distro, filename)
-            if not same_file(base_stat, base_dir, right_stat, right_dir,
-                             filename):
+            if not same_file(
+                base_stat, base_dir, right_stat, right_dir, filename
+            ):
                 # Changed on RHS
-                conflict_file(left_dir, left_distro, right_dir, right_distro,
-                              merged_dir, filename)
+                conflict_file(
+                    left_dir,
+                    left_distro,
+                    right_dir,
+                    right_distro,
+                    merged_dir,
+                    filename,
+                )
                 conflicts.append(filename)
 
         elif right_stat is None:
             # Removed on RHS only
             logging.debug("removed from %s: %s", right_distro, filename)
-            if not same_file(base_stat, base_dir, left_stat, left_dir,
-                             filename):
+            if not same_file(
+                base_stat, base_dir, left_stat, left_dir, filename
+            ):
                 # Changed on LHS
-                conflict_file(left_dir, left_distro, right_dir, right_distro,
-                              merged_dir, filename)
+                conflict_file(
+                    left_dir,
+                    left_distro,
+                    right_dir,
+                    right_distro,
+                    merged_dir,
+                    filename,
+                )
                 conflicts.append(filename)
 
-        elif (stat.S_ISREG(left_stat.st_mode) and
-                stat.S_ISREG(right_stat.st_mode)):
+        elif stat.S_ISREG(left_stat.st_mode) and stat.S_ISREG(
+            right_stat.st_mode
+        ):
             # Common case: left and right are both files
-            if handle_file(left_stat, left_dir, left_name, left_distro,
-                           right_dir, right_stat, right_name, right_distro,
-                           base_stat, base_dir, merged_dir, filename,
-                           po_files):
+            if handle_file(
+                left_stat,
+                left_dir,
+                left_name,
+                left_distro,
+                right_dir,
+                right_stat,
+                right_name,
+                right_distro,
+                base_stat,
+                base_dir,
+                merged_dir,
+                filename,
+                po_files,
+            ):
                 conflicts.append(filename)
 
         elif same_file(left_stat, left_dir, right_stat, right_dir, filename):
             # left and right are the same, doesn't matter which we keep
-            tree.copyfile("%s/%s" % (right_dir, filename),
-                          "%s/%s" % (merged_dir, filename))
+            tree.copyfile(
+                "%s/%s" % (right_dir, filename),
+                "%s/%s" % (merged_dir, filename),
+            )
 
         elif same_file(base_stat, base_dir, left_stat, left_dir, filename):
             # right has changed in some way, keep that one
-            logging.debug("preserving non-file change in %s: %s",
-                          right_distro, filename)
-            tree.copyfile("%s/%s" % (right_dir, filename),
-                          "%s/%s" % (merged_dir, filename))
+            logging.debug(
+                "preserving non-file change in %s: %s", right_distro, filename
+            )
+            tree.copyfile(
+                "%s/%s" % (right_dir, filename),
+                "%s/%s" % (merged_dir, filename),
+            )
 
         elif same_file(base_stat, base_dir, right_stat, right_dir, filename):
             # left has changed in some way, keep that one
-            logging.debug("preserving non-file change in %s: %s",
-                          left_distro, filename)
-            tree.copyfile("%s/%s" % (left_dir, filename),
-                          "%s/%s" % (merged_dir, filename))
+            logging.debug(
+                "preserving non-file change in %s: %s", left_distro, filename
+            )
+            tree.copyfile(
+                "%s/%s" % (left_dir, filename),
+                "%s/%s" % (merged_dir, filename),
+            )
         else:
             # all three differ, mark a conflict
-            conflict_file(left_dir, left_distro, right_dir, right_distro,
-                          merged_dir, filename)
+            conflict_file(
+                left_dir,
+                left_distro,
+                right_dir,
+                right_distro,
+                merged_dir,
+                filename,
+            )
             conflicts.append(filename)
 
         # If this entry is a directory on one side but a symlink on the
@@ -354,11 +516,13 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
         # the other side, as otherwise we can crash if a new symlink to a
         # directory and its contents are processed before its target.
         if left_stat is not None and right_stat is not None:
-            if (stat.S_ISDIR(left_stat.st_mode) and
-                    stat.S_ISLNK(right_stat.st_mode)):
+            if stat.S_ISDIR(left_stat.st_mode) and stat.S_ISLNK(
+                right_stat.st_mode
+            ):
                 right_pruned.append(filename)
-            if (stat.S_ISLNK(left_stat.st_mode) and
-                    stat.S_ISDIR(right_stat.st_mode)):
+            if stat.S_ISLNK(left_stat.st_mode) and stat.S_ISDIR(
+                right_stat.st_mode
+            ):
                 left_pruned.append(filename)
 
     # Look for files in the left hand side that aren't in the base,
@@ -374,34 +538,57 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
         if tree.exists("%s/%s" % (base_dir, filename)):
             continue
 
-        if (is_pruned(right_pruned, filename) or
-                not tree.exists("%s/%s" % (right_dir, filename))):
+        if is_pruned(right_pruned, filename) or not tree.exists(
+            "%s/%s" % (right_dir, filename)
+        ):
             logging.debug("new in %s: %s", left_distro, filename)
-            tree.copyfile("%s/%s" % (left_dir, filename),
-                          "%s/%s" % (merged_dir, filename))
+            tree.copyfile(
+                "%s/%s" % (left_dir, filename),
+                "%s/%s" % (merged_dir, filename),
+            )
             continue
 
         left_stat = os.lstat("%s/%s" % (left_dir, filename))
         right_stat = os.lstat("%s/%s" % (right_dir, filename))
 
-        if (stat.S_ISREG(left_stat.st_mode) and
-                stat.S_ISREG(right_stat.st_mode)):
+        if stat.S_ISREG(left_stat.st_mode) and stat.S_ISREG(
+            right_stat.st_mode
+        ):
             # Common case: left and right are both files
-            if handle_file(left_stat, left_dir, left_name, left_distro,
-                           right_dir, right_stat, right_name, right_distro,
-                           None, None, merged_dir, filename,
-                           po_files):
+            if handle_file(
+                left_stat,
+                left_dir,
+                left_name,
+                left_distro,
+                right_dir,
+                right_stat,
+                right_name,
+                right_distro,
+                None,
+                None,
+                merged_dir,
+                filename,
+                po_files,
+            ):
                 conflicts.append(filename)
 
         elif same_file(left_stat, left_dir, right_stat, right_dir, filename):
             # left and right are the same, doesn't matter which we keep
-            tree.copyfile("%s/%s" % (right_dir, filename),
-                          "%s/%s" % (merged_dir, filename))
+            tree.copyfile(
+                "%s/%s" % (right_dir, filename),
+                "%s/%s" % (merged_dir, filename),
+            )
 
         else:
             # they differ, mark a conflict
-            conflict_file(left_dir, left_distro, right_dir, right_distro,
-                          merged_dir, filename)
+            conflict_file(
+                left_dir,
+                left_distro,
+                right_dir,
+                right_distro,
+                merged_dir,
+                filename,
+            )
             conflicts.append(filename)
 
     # Copy new files on the right hand side only into the tree
@@ -416,19 +603,27 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
         if tree.exists("%s/%s" % (base_dir, filename)):
             continue
 
-        if (not is_pruned(left_pruned, filename) and
-                tree.exists("%s/%s" % (left_dir, filename))):
+        if not is_pruned(left_pruned, filename) and tree.exists(
+            "%s/%s" % (left_dir, filename)
+        ):
             continue
 
         logging.debug("new in %s: %s", right_distro, filename)
-        tree.copyfile("%s/%s" % (right_dir, filename),
-                      "%s/%s" % (merged_dir, filename))
+        tree.copyfile(
+            "%s/%s" % (right_dir, filename), "%s/%s" % (merged_dir, filename)
+        )
 
     # Handle po files separately as they need special merging
     for filename in po_files:
         if merge_po(left_dir, right_dir, merged_dir, filename):
-            conflict_file(left_dir, left_distro, right_dir, right_distro,
-                          merged_dir, filename)
+            conflict_file(
+                left_dir,
+                left_distro,
+                right_dir,
+                right_distro,
+                merged_dir,
+                filename,
+            )
             conflicts.append(filename)
             continue
 
@@ -436,46 +631,87 @@ def do_merge(left_dir, left_name, left_distro, base_dir,
 
     return conflicts
 
-def handle_file(left_stat, left_dir, left_name, left_distro,
-                right_dir, right_stat, right_name, right_distro,
-                base_stat, base_dir, merged_dir, filename, po_files):
+
+def handle_file(
+    left_stat,
+    left_dir,
+    left_name,
+    left_distro,
+    right_dir,
+    right_stat,
+    right_name,
+    right_distro,
+    base_stat,
+    base_dir,
+    merged_dir,
+    filename,
+    po_files,
+):
     """Handle the common case of a file in both left and right."""
     if filename == "debian/changelog":
         # two-way merge of changelogs
         merge_changelog(left_dir, right_dir, merged_dir, filename)
-    elif filename.endswith(".po") and not \
-            same_file(left_stat, left_dir, right_stat, right_dir, filename):
+    elif filename.endswith(".po") and not same_file(
+        left_stat, left_dir, right_stat, right_dir, filename
+    ):
         # two-way merge of po contents (do later)
         po_files.append(filename)
         return False
-    elif filename.endswith(".pot") and not \
-            same_file(left_stat, left_dir, right_stat, right_dir, filename):
+    elif filename.endswith(".pot") and not same_file(
+        left_stat, left_dir, right_stat, right_dir, filename
+    ):
         # two-way merge of pot contents
         if merge_pot(left_dir, right_dir, merged_dir, filename):
-            conflict_file(left_dir, left_distro, right_dir, right_distro,
-                          merged_dir, filename)
+            conflict_file(
+                left_dir,
+                left_distro,
+                right_dir,
+                right_distro,
+                merged_dir,
+                filename,
+            )
             return True
     elif base_stat is not None and stat.S_ISREG(base_stat.st_mode):
         # was file in base: diff3 possible
-        if merge_file(left_dir, left_name, left_distro, base_dir,
-                      right_dir, right_name, right_distro, merged_dir,
-                      filename):
+        if merge_file(
+            left_dir,
+            left_name,
+            left_distro,
+            base_dir,
+            right_dir,
+            right_name,
+            right_distro,
+            merged_dir,
+            filename,
+        ):
             return True
     elif same_file(left_stat, left_dir, right_stat, right_dir, filename):
         # same file in left and right
-        logging.debug("%s and %s both turned into same file: %s",
-                      left_distro, right_distro, filename)
-        tree.copyfile("%s/%s" % (left_dir, filename),
-                      "%s/%s" % (merged_dir, filename))
+        logging.debug(
+            "%s and %s both turned into same file: %s",
+            left_distro,
+            right_distro,
+            filename,
+        )
+        tree.copyfile(
+            "%s/%s" % (left_dir, filename), "%s/%s" % (merged_dir, filename)
+        )
     else:
         # general file conflict
-        conflict_file(left_dir, left_distro, right_dir, right_distro,
-                      merged_dir, filename)
+        conflict_file(
+            left_dir,
+            left_distro,
+            right_dir,
+            right_distro,
+            merged_dir,
+            filename,
+        )
         return True
 
     # Apply permissions
     merge_attr(base_dir, left_dir, right_dir, merged_dir, filename)
     return False
+
 
 def same_file(left_stat, left_dir, right_stat, right_dir, filename):
     """Are two filesystem objects the same?"""
@@ -486,13 +722,17 @@ def same_file(left_stat, left_dir, right_stat, right_dir, filename):
         # Files with the same size and MD5sum are the same
         if left_stat.st_size != right_stat.st_size:
             return False
-        elif md5sum("%s/%s" % (left_dir, filename)) \
-                 != md5sum("%s/%s" % (right_dir, filename)):
+        elif md5sum("%s/%s" % (left_dir, filename)) != md5sum(
+            "%s/%s" % (right_dir, filename)
+        ):
             return False
         else:
             return True
-    elif stat.S_ISDIR(left_stat.st_mode) or stat.S_ISFIFO(left_stat.st_mode) \
-             or stat.S_ISSOCK(left_stat.st_mode):
+    elif (
+        stat.S_ISDIR(left_stat.st_mode)
+        or stat.S_ISFIFO(left_stat.st_mode)
+        or stat.S_ISSOCK(left_stat.st_mode)
+    ):
         # Directories, fifos and sockets are always the same
         return True
     elif stat.S_ISCHR(left_stat.st_mode) or stat.S_ISBLK(left_stat.st_mode):
@@ -503,8 +743,9 @@ def same_file(left_stat, left_dir, right_stat, right_dir, filename):
             return True
     elif stat.S_ISLNK(left_stat.st_mode):
         # Symbolic links are the same if they have the same target
-        if os.readlink("%s/%s" % (left_dir, filename)) \
-               != os.readlink("%s/%s" % (right_dir, filename)):
+        if os.readlink("%s/%s" % (left_dir, filename)) != os.readlink(
+            "%s/%s" % (right_dir, filename)
+        ):
             return False
         else:
             return True
@@ -534,6 +775,7 @@ def merge_changelog(left_dir, right_dir, merged_dir, filename):
             print(left_text, file=output)
 
     return False
+
 
 def read_changelog(filename):
     """Return a parsed changelog file."""
@@ -579,13 +821,24 @@ def merge_po(left_dir, right_dir, merged_dir, filename):
     logging.debug("Merging PO file %s", filename)
     try:
         ensure(merged_po)
-        shell.run(("msgmerge", "--force-po", "-o", merged_po,
-                   "-C", left_po, right_po, closest_pot))
+        shell.run(
+            (
+                "msgmerge",
+                "--force-po",
+                "-o",
+                merged_po,
+                "-C",
+                left_po,
+                right_po,
+                closest_pot,
+            )
+        )
     except (ValueError, OSError):
         logging.error("PO file merge failed: %s", filename)
         return True
 
     return False
+
 
 def merge_pot(left_dir, right_dir, merged_dir, filename):
     """Update a .po file using msgcat."""
@@ -597,13 +850,23 @@ def merge_pot(left_dir, right_dir, merged_dir, filename):
     logging.debug("Merging POT file %s", filename)
     try:
         ensure(merged_pot)
-        shell.run(("msgcat", "--force-po", "--use-first", "-o", merged_pot,
-                   right_pot, left_pot))
+        shell.run(
+            (
+                "msgcat",
+                "--force-po",
+                "--use-first",
+                "-o",
+                merged_pot,
+                right_pot,
+                left_pot,
+            )
+        )
     except (ValueError, OSError):
         logging.error("POT file merge failed: %s", filename)
         return True
 
     return False
+
 
 def find_closest_pot(po_file):
     """Find the closest .pot file to the po file given."""
@@ -615,8 +878,17 @@ def find_closest_pot(po_file):
         return None
 
 
-def merge_file(left_dir, left_name, left_distro, base_dir,
-               right_dir, right_name, right_distro, merged_dir, filename):
+def merge_file(
+    left_dir,
+    left_name,
+    left_distro,
+    base_dir,
+    right_dir,
+    right_name,
+    right_distro,
+    merged_dir,
+    filename,
+):
     """Merge a file using diff3."""
     dest = "%s/%s" % (merged_dir, filename)
     ensure(dest)
@@ -636,20 +908,39 @@ def merge_file(left_dir, left_name, left_distro, base_dir,
     if stat.S_IMODE(base_stat.st_mode) & 0o111:
         # If base was executable and both left and right are, make output
         # executable.
-        if stat.S_IMODE(right_stat.st_mode) & stat.S_IMODE(left_stat.st_mode) & 0o111:
+        if (
+            stat.S_IMODE(right_stat.st_mode)
+            & stat.S_IMODE(left_stat.st_mode)
+            & 0o111
+        ):
             mode |= 0o111
     else:
         # Alternatively, if base was not executable and either of left and right
         # are, make output executable.
-        if (stat.S_IMODE(right_stat.st_mode) | stat.S_IMODE(left_stat.st_mode)) & 0o111:
+        if (
+            stat.S_IMODE(right_stat.st_mode) | stat.S_IMODE(left_stat.st_mode)
+        ) & 0o111:
             mode |= 0o111
 
     with open(dest, "w", mode) as output:
-        status = shell.run(("diff3", "-E", "-m",
-                            "-L", left_name, left,
-                            "-L", "BASE", base,
-                            "-L", right_name, right),
-                           stdout=output, okstatus=(0,1,2))
+        status = shell.run(
+            (
+                "diff3",
+                "-E",
+                "-m",
+                "-L",
+                left_name,
+                left,
+                "-L",
+                "BASE",
+                base,
+                "-L",
+                right_name,
+                right,
+            ),
+            stdout=output,
+            okstatus=(0, 1, 2),
+        )
 
     if status != 0:
         if not tree.exists(dest) or os.stat(dest).st_size == 0:
@@ -658,17 +949,29 @@ def merge_file(left_dir, left_name, left_distro, base_dir,
                 logging.debug("binary files are the same: %s", filename)
                 tree.copyfile(left, dest)
             elif same_file(base_stat, base_dir, left_stat, left_dir, filename):
-                logging.debug("preserving binary change in %s: %s",
-                              right_distro, filename)
+                logging.debug(
+                    "preserving binary change in %s: %s",
+                    right_distro,
+                    filename,
+                )
                 tree.copyfile(right, dest)
-            elif same_file(base_stat, base_dir, right_stat, right_dir, filename):
-                logging.debug("preserving binary change in %s: %s",
-                              left_distro, filename)
+            elif same_file(
+                base_stat, base_dir, right_stat, right_dir, filename
+            ):
+                logging.debug(
+                    "preserving binary change in %s: %s", left_distro, filename
+                )
                 tree.copyfile(left, dest)
             else:
                 logging.debug("binary file conflict: %s", filename)
-                conflict_file(left_dir, left_distro, right_dir, right_distro,
-                              merged_dir, filename)
+                conflict_file(
+                    left_dir,
+                    left_distro,
+                    right_dir,
+                    right_distro,
+                    merged_dir,
+                    filename,
+                )
                 return True
         else:
             logging.debug("Conflict in %s", filename)
@@ -679,9 +982,11 @@ def merge_file(left_dir, left_name, left_distro, base_dir,
 
 def merge_attr(base_dir, left_dir, right_dir, merged_dir, filename):
     """Set initial and merge changed attributes."""
-    if base_dir is not None \
-           and os.path.isfile("%s/%s" % (base_dir, filename)) \
-           and not os.path.islink("%s/%s" % (base_dir, filename)):
+    if (
+        base_dir is not None
+        and os.path.isfile("%s/%s" % (base_dir, filename))
+        and not os.path.islink("%s/%s" % (base_dir, filename))
+    ):
         set_attr(base_dir, merged_dir, filename)
         apply_attr(base_dir, left_dir, merged_dir, filename)
         apply_attr(base_dir, right_dir, merged_dir, filename)
@@ -689,10 +994,12 @@ def merge_attr(base_dir, left_dir, right_dir, merged_dir, filename):
         set_attr(right_dir, merged_dir, filename)
         apply_attr(right_dir, left_dir, merged_dir, filename)
 
+
 def set_attr(src_dir, dest_dir, filename):
     """Set the initial attributes."""
     mode = os.stat("%s/%s" % (src_dir, filename)).st_mode & 0o777
     os.chmod("%s/%s" % (dest_dir, filename), mode)
+
 
 def apply_attr(base_dir, src_dir, dest_dir, filename):
     """Apply attribute changes from one side to a file."""
@@ -710,11 +1017,14 @@ def apply_attr(base_dir, src_dir, dest_dir, filename):
         if base_stat.st_mode & bit and not src_stat.st_mode & bit:
             change_attr(dest_dir, filename, bit, shift, False)
 
+
 def change_attr(dest_dir, filename, bit, shift, add):
     """Apply a single attribute change."""
-    logging.debug("Setting %s %s", filename,
-                  [ "u+r", "u+w", "u+x", "g+r", "g+w", "g+x",
-                    "o+r", "o+w", "o+x" ][shift])
+    logging.debug(
+        "Setting %s %s",
+        filename,
+        ["u+r", "u+w", "u+x", "g+r", "g+w", "g+x", "o+r", "o+w", "o+x"][shift],
+    )
 
     dest = "%s/%s" % (dest_dir, filename)
     attr = os.stat(dest).st_mode & 0o777
@@ -726,8 +1036,9 @@ def change_attr(dest_dir, filename, bit, shift, add):
     os.chmod(dest, attr)
 
 
-def conflict_file(left_dir, left_distro, right_dir, right_distro,
-                  dest_dir, filename):
+def conflict_file(
+    left_dir, left_distro, right_dir, right_distro, dest_dir, filename
+):
     """Copy both files as conflicts of each other."""
     left_src = "%s/%s" % (left_dir, filename)
     right_src = "%s/%s" % (right_dir, filename)
@@ -748,35 +1059,53 @@ def conflict_file(left_dir, left_distro, right_dir, right_distro,
     if tree.exists(left_src):
         tree.copyfile(left_src, "%s.%s" % (dest, left_distro.upper()))
     if os.path.isdir(left_src) and not os.path.islink(left_src):
-        os.symlink("%s.%s" % (os.path.basename(dest), left_distro.upper()),
-                   dest)
+        os.symlink(
+            "%s.%s" % (os.path.basename(dest), left_distro.upper()), dest
+        )
 
     if tree.exists(right_src):
         tree.copyfile(right_src, "%s.%s" % (dest, right_distro.upper()))
     if os.path.isdir(right_src) and not os.path.islink(right_src):
-        os.symlink("%s.%s" % (os.path.basename(dest), right_distro.upper()),
-                   dest)
+        os.symlink(
+            "%s.%s" % (os.path.basename(dest), right_distro.upper()), dest
+        )
 
-def add_changelog(package, merged_version, left_distro, left_dist,
-                  right_distro, right_dist, merged_dir):
+
+def add_changelog(
+    package,
+    merged_version,
+    left_distro,
+    left_dist,
+    right_distro,
+    right_dist,
+    merged_dir,
+):
     """Add a changelog entry to the package."""
     changelog_file = "%s/debian/changelog" % merged_dir
 
     with open(changelog_file) as changelog:
         with tree.AtomicFile(changelog_file) as new_changelog:
-            print("%s (%s) UNRELEASED; urgency=low"
-                  % (package, merged_version), file=new_changelog)
+            print(
+                "%s (%s) UNRELEASED; urgency=low" % (package, merged_version),
+                file=new_changelog,
+            )
             print(file=new_changelog)
-            print("  * Merge from %s %s.  Remaining changes:" \
-                  % (right_distro.title(), right_dist), file=new_changelog)
+            print(
+                "  * Merge from %s %s.  Remaining changes:"
+                % (right_distro.title(), right_dist),
+                file=new_changelog,
+            )
             print("    - SUMMARISE HERE", file=new_changelog)
             print(file=new_changelog)
-            print(" -- Ubuntu Merge-o-Matic <mom@ubuntu.com>  " +
-                  time.strftime("%a, %d %b %Y %H:%M:%S %z"),
-                  file=new_changelog)
+            print(
+                " -- Ubuntu Merge-o-Matic <mom@ubuntu.com>  "
+                + time.strftime("%a, %d %b %Y %H:%M:%S %z"),
+                file=new_changelog,
+            )
             print(file=new_changelog)
             for line in changelog:
                 print(line.rstrip("\r\n"), file=new_changelog)
+
 
 def copy_in(output_dir, source, distro=None):
     """Make a copy of the source files."""
@@ -802,8 +1131,11 @@ def copy_in(output_dir, source, distro=None):
 
 def create_tarball(package, version, output_dir, merged_dir):
     """Create a tarball of a merge with conflicts."""
-    filename = "%s/%s_%s.src.tar.gz" % (output_dir, package,
-                                        version.without_epoch)
+    filename = "%s/%s_%s.src.tar.gz" % (
+        output_dir,
+        package,
+        version.without_epoch,
+    )
     contained = "%s-%s" % (package, version.without_epoch)
 
     parent = tempfile.mkdtemp()
@@ -821,6 +1153,7 @@ def create_tarball(package, version, output_dir, merged_dir):
     finally:
         tree.remove(parent)
 
+
 def create_source(package, version, since, output_dir, merged_dir):
     """Create a source package without conflicts."""
     contained = "%s-%s" % (package, version.upstream)
@@ -832,8 +1165,10 @@ def create_source(package, version, since, output_dir, merged_dir):
 
         orig_filename = "%s_%s.orig.tar.gz" % (package, version.upstream)
         if os.path.isfile("%s/%s" % (output_dir, orig_filename)):
-            os.link("%s/%s" % (output_dir, orig_filename),
-                    "%s/%s" % (parent, orig_filename))
+            os.link(
+                "%s/%s" % (output_dir, orig_filename),
+                "%s/%s" % (parent, orig_filename),
+            )
 
         cmd = ("dpkg-source",)
         if version.revision is not None and since.upstream != version.upstream:
@@ -844,7 +1179,8 @@ def create_source(package, version, since, output_dir, merged_dir):
             shell.run(cmd, chdir=parent)
         except (ValueError, OSError):
             logging.error(
-                "'%s' to generate %s failed" % (" ".join(cmd), filename))
+                "'%s' to generate %s failed" % (" ".join(cmd), filename)
+            )
             return create_tarball(package, version, output_dir, merged_dir)
 
         if os.path.isfile("%s/%s" % (parent, filename)):
@@ -862,8 +1198,10 @@ def create_source(package, version, since, output_dir, merged_dir):
     finally:
         tree.remove(parent)
 
-def create_patch(package, version, output_dir, merged_dir,
-                 right_source, right_dir):
+
+def create_patch(
+    package, version, output_dir, merged_dir, right_source, right_dir
+):
     """Create the merged patch."""
     filename = "%s/%s_%s.patch" % (output_dir, package, version)
 
@@ -873,9 +1211,12 @@ def create_patch(package, version, output_dir, merged_dir,
         tree.copytree(right_dir, "%s/%s" % (parent, right_source["Version"]))
 
         with open(filename, "w") as diff:
-            shell.run(("diff", "-pruN",
-                       right_source["Version"], "%s" % version),
-                      chdir=parent, stdout=diff, okstatus=(0, 1, 2))
+            shell.run(
+                ("diff", "-pruN", right_source["Version"], "%s" % version),
+                chdir=parent,
+                stdout=diff,
+                okstatus=(0, 1, 2),
+            )
             logging.info("Created %s", tree.subdir(ROOT, filename))
 
         return os.path.basename(filename)
@@ -883,10 +1224,21 @@ def create_patch(package, version, output_dir, merged_dir,
         tree.remove(parent)
 
 
-def write_report(left_source, left_distro, left_patch, base_source,
-                 right_source, right_distro, right_patch,
-                 merged_version, conflicts, src_file, patch_file, output_dir,
-                 merged_dir):
+def write_report(
+    left_source,
+    left_distro,
+    left_patch,
+    base_source,
+    right_source,
+    right_distro,
+    right_patch,
+    merged_version,
+    conflicts,
+    src_file,
+    patch_file,
+    output_dir,
+    merged_dir,
+):
     """Write the merge report."""
     filename = "%s/REPORT" % output_dir
     with open(filename, "w") as report:
@@ -898,31 +1250,48 @@ def write_report(left_source, left_distro, left_patch, base_source,
         print(file=report)
 
         # General rambling
-        print(fill("Below now follows the report of the automated "
-                   "merge of the %s changes to the %s source "
-                   "package against the new %s version."
-                   % (left_distro.title(), package, right_distro.title())),
-              file=report)
+        print(
+            fill(
+                "Below now follows the report of the automated "
+                "merge of the %s changes to the %s source "
+                "package against the new %s version."
+                % (left_distro.title(), package, right_distro.title())
+            ),
+            file=report,
+        )
         print(file=report)
-        print(fill("This file is designed to be both human readable "
-                   "and machine-parseable.  Any line beginning with "
-                   "four spaces is a file that should be downloaded "
-                   "for the complete merge set."), file=report)
+        print(
+            fill(
+                "This file is designed to be both human readable "
+                "and machine-parseable.  Any line beginning with "
+                "four spaces is a file that should be downloaded "
+                "for the complete merge set."
+            ),
+            file=report,
+        )
         print(file=report)
         print(file=report)
 
-        print(fill("Here are the particulars of the three versions "
-                   "of %s that were chosen for the merge.  The base "
-                   "is the newest version that is a common ancestor "
-                   "of both the %s and %s packages.  It may be of "
-                   "a different upstream version, but that's not "
-                   "usually a problem."
-                   % (package, left_distro.title(), right_distro.title())),
-              file=report)
+        print(
+            fill(
+                "Here are the particulars of the three versions "
+                "of %s that were chosen for the merge.  The base "
+                "is the newest version that is a common ancestor "
+                "of both the %s and %s packages.  It may be of "
+                "a different upstream version, but that's not "
+                "usually a problem."
+                % (package, left_distro.title(), right_distro.title())
+            ),
+            file=report,
+        )
         print(file=report)
-        print(fill("The files are the source package itself, and "
-                   "the patch from the common base to that version."),
-              file=report)
+        print(
+            fill(
+                "The files are the source package itself, and "
+                "the patch from the common base to that version."
+            ),
+            file=report,
+        )
         print(file=report)
 
         # Base version and files
@@ -957,25 +1326,37 @@ def write_report(left_source, left_distro, left_patch, base_source,
         print("================", file=report)
         print(file=report)
         if src_file.endswith(".dsc"):
-            print(fill("No problems were encountered during the "
-                       "merge, so a source package has been "
-                       "produced along with a patch containing "
-                       "the differences from the %s version to the "
-                       "new version." % right_distro.title()), file=report)
+            print(
+                fill(
+                    "No problems were encountered during the "
+                    "merge, so a source package has been "
+                    "produced along with a patch containing "
+                    "the differences from the %s version to the "
+                    "new version." % right_distro.title()
+                ),
+                file=report,
+            )
             print(file=report)
-            print(fill("You should compare the generated patch "
-                       "against the patch for the %s version "
-                       "given above and ensure that there are no "
-                       "unexpected changes.  You should also "
-                       "sanity check the source package."
-                       % left_distro.title()), file=report)
+            print(
+                fill(
+                    "You should compare the generated patch "
+                    "against the patch for the %s version "
+                    "given above and ensure that there are no "
+                    "unexpected changes.  You should also "
+                    "sanity check the source package." % left_distro.title()
+                ),
+                file=report,
+            )
             print(file=report)
 
             print("generated: %s" % merged_version, file=report)
 
             # Files from the dsc
-            dsc = ControlFile("%s/%s" % (output_dir, src_file),
-                              multi_para=False, signed=False).para
+            dsc = ControlFile(
+                "%s/%s" % (output_dir, src_file),
+                multi_para=False,
+                signed=False,
+            ).para
             print("    %s" % src_file, file=report)
             for _, name in files(dsc):
                 print("    %s" % name, file=report)
@@ -985,13 +1366,18 @@ def write_report(left_source, left_distro, left_patch, base_source,
                 print("    %s" % patch_file, file=report)
                 print(file=report)
         else:
-            print(fill("Due to conflict or error, it was not "
-                       "possible to automatically create a source "
-                       "package.  Instead the result of the merge "
-                       "has been placed into the following tar file "
-                       "which you will need to turn into a source "
-                       "package once the problems have been "
-                       "resolved."), file=report)
+            print(
+                fill(
+                    "Due to conflict or error, it was not "
+                    "possible to automatically create a source "
+                    "package.  Instead the result of the merge "
+                    "has been placed into the following tar file "
+                    "which you will need to turn into a source "
+                    "package once the problems have been "
+                    "resolved."
+                ),
+                file=report,
+            )
             print(file=report)
             print("    %s" % src_file, file=report)
             print(file=report)
@@ -1001,26 +1387,39 @@ def write_report(left_source, left_distro, left_patch, base_source,
             print("Conflicts", file=report)
             print("=========", file=report)
             print(file=report)
-            print(fill("In one or more cases, there were different "
-                       "changes made in both %s and %s to the same "
-                       "file; these are known as conflicts."
-                       % (left_distro.title(), right_distro.title())),
-                  file=report)
+            print(
+                fill(
+                    "In one or more cases, there were different "
+                    "changes made in both %s and %s to the same "
+                    "file; these are known as conflicts."
+                    % (left_distro.title(), right_distro.title())
+                ),
+                file=report,
+            )
             print(file=report)
-            print(fill("It is not possible for these to be "
-                       "automatically resolved, so this source "
-                       "needs human attention."), file=report)
+            print(
+                fill(
+                    "It is not possible for these to be "
+                    "automatically resolved, so this source "
+                    "needs human attention."
+                ),
+                file=report,
+            )
             print(file=report)
-            print(fill("Those files marked with 'C ' contain diff3 "
-                       "conflict markers, which can be resolved "
-                       "using the text editor of your choice.  "
-                       "Those marked with 'C*' could not be merged "
-                       "that way, so you will find .%s and .%s "
-                       "files instead and should chose one of them "
-                       "or a combination of both, moving it to the "
-                       "real filename and deleting the other."
-                       % (left_distro.upper(), right_distro.upper())),
-                  file=report)
+            print(
+                fill(
+                    "Those files marked with 'C ' contain diff3 "
+                    "conflict markers, which can be resolved "
+                    "using the text editor of your choice.  "
+                    "Those marked with 'C*' could not be merged "
+                    "that way, so you will find .%s and .%s "
+                    "files instead and should chose one of them "
+                    "or a combination of both, moving it to the "
+                    "real filename and deleting the other."
+                    % (left_distro.upper(), right_distro.upper())
+                ),
+                file=report,
+            )
             print(file=report)
 
             conflicts.sort()
@@ -1031,24 +1430,38 @@ def write_report(left_source, left_distro, left_patch, base_source,
                     print("  C* %s" % name, file=report)
             print(file=report)
 
-        if merged_version.revision is not None \
-               and Version(left_source["Version"]).upstream != merged_version.upstream:
+        if (
+            merged_version.revision is not None
+            and Version(left_source["Version"]).upstream
+            != merged_version.upstream
+        ):
             sa_arg = " -sa"
         else:
             sa_arg = ""
 
         print(file=report)
-        print(fill("Once you have a source package you are happy "
-                   "to upload, you should make sure you include "
-                   "the orig.tar.gz if appropriate and information "
-                   "about all the versions included in the merge."),
-              file=report)
+        print(
+            fill(
+                "Once you have a source package you are happy "
+                "to upload, you should make sure you include "
+                "the orig.tar.gz if appropriate and information "
+                "about all the versions included in the merge."
+            ),
+            file=report,
+        )
         print(file=report)
-        print(fill("Use the following command to generate a "
-                   "correct .changes file:"), file=report)
+        print(
+            fill(
+                "Use the following command to generate a "
+                "correct .changes file:"
+            ),
+            file=report,
+        )
         print(file=report)
-        print("  $ dpkg-genchanges -S -v%s%s"
-              % (left_source["Version"], sa_arg), file=report)
+        print(
+            "  $ dpkg-genchanges -S -v%s%s" % (left_source["Version"], sa_arg),
+            file=report,
+        )
 
 
 def read_package_list(filename):
@@ -1068,5 +1481,4 @@ def read_package_list(filename):
 
 
 if __name__ == "__main__":
-    run(main, options, usage="%prog",
-        description="produce merged packages")
+    run(main, options, usage="%prog", description="produce merged packages")

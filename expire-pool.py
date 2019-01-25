@@ -36,14 +36,19 @@ from momlib import (
     run,
     update_pool_sources,
     version_sort,
-    )
+)
 from util import tree
 
 
 def options(parser):
-    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
-                      action="append",
-                      help="Process only these packages")
+    parser.add_option(
+        "-p",
+        "--package",
+        type="string",
+        metavar="PACKAGE",
+        action="append",
+        help="Process only these packages",
+    )
 
 
 def main(options, args):
@@ -58,8 +63,10 @@ def main(options, args):
     for component in DISTROS[OUR_DISTRO]["components"]:
         for source in get_sources(OUR_DISTRO, OUR_DIST, component):
             our_sources.add(source["Package"])
-            if (options.package is not None and
-                    source["Package"] not in options.package):
+            if (
+                options.package is not None
+                and source["Package"] not in options.package
+            ):
                 continue
 
             base = get_base(source)
@@ -88,12 +95,15 @@ def main(options, args):
             for package in sorted(distro_sources):
                 if package in our_sources:
                     continue
-                if (options.package is not None and
-                        package not in options.package):
+                if (
+                    options.package is not None
+                    and package not in options.package
+                ):
                     continue
 
                 distro_versions = set(
-                    source["Version"] for source in distro_sources[package])
+                    source["Version"] for source in distro_sources[package]
+                )
 
                 try:
                     pool_sources = get_pool_sources(distro, package)
@@ -101,12 +111,17 @@ def main(options, args):
                     pass
                 else:
                     remove_sources = [
-                        source for source in pool_sources
-                        if source["Version"] not in distro_versions]
+                        source
+                        for source in pool_sources
+                        if source["Version"] not in distro_versions
+                    ]
                     version_sort(remove_sources)
                     expire_sources(
-                        distro, package,
-                        distro_sources[package], remove_sources)
+                        distro,
+                        package,
+                        distro_sources[package],
+                        remove_sources,
+                    )
 
         # Any pool directories whose sources are in neither the default
         # distribution nor their own distribution are entirely obsolete, so
@@ -115,8 +130,11 @@ def main(options, args):
             name = os.path.basename(pooldir)
             if options.package is not None and name not in options.package:
                 continue
-            if (name not in our_sources and name not in distro_sources and
-                    os.path.isdir(pooldir)):
+            if (
+                name not in our_sources
+                and name not in distro_sources
+                and os.path.isdir(pooldir)
+            ):
                 tree.remove(pooldir)
                 logging.debug("Removed %s", pooldir)
 
@@ -142,11 +160,19 @@ def expire_pool_sources(distro, package, base):
         else:
             if base == source["Version"]:
                 base_found = True
-                logging.info("Leaving %s %s %s (is base)", distro, package,
-                             source["Version"])
+                logging.info(
+                    "Leaving %s %s %s (is base)",
+                    distro,
+                    package,
+                    source["Version"],
+                )
             else:
-                logging.info("Leaving %s %s %s (is newer)", distro, package,
-                             source["Version"])
+                logging.info(
+                    "Leaving %s %s %s (is newer)",
+                    distro,
+                    package,
+                    source["Version"],
+                )
 
             keep.append(source)
 
@@ -154,8 +180,12 @@ def expire_pool_sources(distro, package, base):
     if not base_found and len(bases):
         version_sort(bases)
         source = bases.pop()
-        logging.info("Leaving %s %s %s (is newest before base)",
-                     distro, package, source["Version"])
+        logging.info(
+            "Leaving %s %s %s (is newest before base)",
+            distro,
+            package,
+            source["Version"],
+        )
 
         keep.append(source)
 
@@ -190,5 +220,9 @@ def expire_sources(distro, package, keep_sources, remove_sources):
 
 
 if __name__ == "__main__":
-    run(main, options, usage="%prog [DISTRO...]",
-        description="expires packages from all pools")
+    run(
+        main,
+        options,
+        usage="%prog [DISTRO...]",
+        description="expires packages from all pools",
+    )

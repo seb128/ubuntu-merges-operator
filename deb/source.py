@@ -24,8 +24,8 @@ from deb.version import Version
 
 
 # Regular expressions make validating things easy
-valid_source = re.compile(r'^[a-z0-9][a-z0-9+.-]*$')
-valid_filename = re.compile(r'^[A-Za-z0-9][A-Za-z0-9+:.,_=-]*$')
+valid_source = re.compile(r"^[a-z0-9][a-z0-9+.-]*$")
+valid_filename = re.compile(r"^[A-Za-z0-9][A-Za-z0-9+:.,_=-]*$")
 
 
 class SourceControl(ControlFile):

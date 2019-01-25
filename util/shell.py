@@ -42,8 +42,17 @@ class Process(object):
     | p.close()
     """
 
-    def __init__(self, args, mode="x", stdin=None, stdout=None, stderr=None,
-                 chdir=None, okstatus=(0,), env=None):
+    def __init__(
+        self,
+        args,
+        mode="x",
+        stdin=None,
+        stdout=None,
+        stderr=None,
+        chdir=None,
+        okstatus=(0,),
+        env=None,
+    ):
         """Spawn a child process.
 
         The command name and its arguments should be provided as a tuple or
@@ -228,8 +237,9 @@ class Process(object):
             raise OSError("exec error: %s" % " ".join(self.args))
         elif os.WEXITSTATUS(status) not in self.okstatus:
             raise ValueError(
-                "process failed %d: %s" %
-                (os.WEXITSTATUS(status), " ".join(self.args)))
+                "process failed %d: %s"
+                % (os.WEXITSTATUS(status), " ".join(self.args))
+            )
 
         return os.WEXITSTATUS(status)
 
@@ -246,23 +256,47 @@ class Process(object):
             return getattr(self._pipe, name)
         else:
             raise AttributeError(
-                "'%s' object has no attribute '%s'" %
-                (type(self).__name__, name))
+                "'%s' object has no attribute '%s'"
+                % (type(self).__name__, name)
+            )
 
 
-def run(args, stdin=None, stdout=None, stderr=None, chdir=None, okstatus=(0,),
-        env=None):
+def run(
+    args,
+    stdin=None,
+    stdout=None,
+    stderr=None,
+    chdir=None,
+    okstatus=(0,),
+    env=None,
+):
     """Run a process without an input or output pipe.
 
     Shorthand for util.shell.Process(...) with mode fixed to 'x' and calls
     close immediately.
     """
-    p = Process(args, "x", stdin=stdin, stdout=stdout, stderr=stderr,
-                chdir=chdir, okstatus=okstatus, env=env)
+    p = Process(
+        args,
+        "x",
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
+        chdir=chdir,
+        okstatus=okstatus,
+        env=env,
+    )
     return p.close()
 
-def get(args, stdin=None, stderr=None, chdir=None, okstatus=(0,), env=None,
-        strip=True):
+
+def get(
+    args,
+    stdin=None,
+    stderr=None,
+    chdir=None,
+    okstatus=(0,),
+    env=None,
+    strip=True,
+):
     """Get process output.
 
     Shorthand for util.shell.Process(...) with mode fixed to 'r' and
@@ -270,8 +304,15 @@ def get(args, stdin=None, stderr=None, chdir=None, okstatus=(0,), env=None,
 
     If strip is True (the default) any final newlines will be stripped.
     """
-    p = Process(args, "r", stdin=stdin, stderr=stderr, chdir=chdir,
-                okstatus=okstatus, env=env)
+    p = Process(
+        args,
+        "r",
+        stdin=stdin,
+        stderr=stderr,
+        chdir=chdir,
+        okstatus=okstatus,
+        env=env,
+    )
     try:
         text = p.read()
         if strip:

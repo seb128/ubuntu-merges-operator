@@ -37,7 +37,7 @@ from momlib import (
     run,
     SRC_DIST,
     SRC_DISTRO,
-    )
+)
 
 
 def read_excluded_packages(path):
@@ -48,7 +48,7 @@ def read_excluded_packages(path):
     with open(path) as excludelist:
         for line in excludelist:
             try:
-                line = line[:line.index("#")]
+                line = line[: line.index("#")]
             except ValueError:
                 pass
 
@@ -62,30 +62,70 @@ def read_excluded_packages(path):
 
 
 def options(parser):
-    parser.add_option("-D", "--source-distro", type="string", metavar="DISTRO",
-                      default=SRC_DISTRO,
-                      help="Source distribution")
-    parser.add_option("-S", "--source-suite", type="string", metavar="SUITE",
-                      default=SRC_DIST,
-                      help="Source suite (aka distrorelease)")
+    parser.add_option(
+        "-D",
+        "--source-distro",
+        type="string",
+        metavar="DISTRO",
+        default=SRC_DISTRO,
+        help="Source distribution",
+    )
+    parser.add_option(
+        "-S",
+        "--source-suite",
+        type="string",
+        metavar="SUITE",
+        default=SRC_DIST,
+        help="Source suite (aka distrorelease)",
+    )
 
-    parser.add_option("-d", "--dest-distro", type="string", metavar="DISTRO",
-                      default=OUR_DISTRO,
-                      help="Destination distribution")
-    parser.add_option("-s", "--dest-suite", type="string", metavar="SUITE",
-                      default=OUR_DIST,
-                      help="Destination suite (aka distrorelease)")
+    parser.add_option(
+        "-d",
+        "--dest-distro",
+        type="string",
+        metavar="DISTRO",
+        default=OUR_DISTRO,
+        help="Destination distribution",
+    )
+    parser.add_option(
+        "-s",
+        "--dest-suite",
+        type="string",
+        metavar="SUITE",
+        default=OUR_DIST,
+        help="Destination suite (aka distrorelease)",
+    )
 
-    parser.add_option("-p", "--package", type="string", metavar="PACKAGE",
-                      action="append",
-                      help="Process only these packages")
-    parser.add_option("-c", "--component", type="string", metavar="COMPONENT",
-                      action="append",
-                      help="Process only these destination components")
-    parser.add_option("-t", "--team", type="string", metavar="TEAM",
-                      help="Process only packages owned by this team")
-    parser.add_option("-E", "--exclude-packages", type="string", metavar="FILE",
-                      help="Exclude packages listed in the following file")
+    parser.add_option(
+        "-p",
+        "--package",
+        type="string",
+        metavar="PACKAGE",
+        action="append",
+        help="Process only these packages",
+    )
+    parser.add_option(
+        "-c",
+        "--component",
+        type="string",
+        metavar="COMPONENT",
+        action="append",
+        help="Process only these destination components",
+    )
+    parser.add_option(
+        "-t",
+        "--team",
+        type="string",
+        metavar="TEAM",
+        help="Process only packages owned by this team",
+    )
+    parser.add_option(
+        "-E",
+        "--exclude-packages",
+        type="string",
+        metavar="FILE",
+        help="Exclude packages listed in the following file",
+    )
 
 
 def main(options, args):
@@ -113,13 +153,17 @@ def main(options, args):
         stats["modified"] = 0
         stats["excluded"] = 0
 
-        if options.component is not None \
-               and our_component not in options.component:
+        if (
+            options.component is not None
+            and our_component not in options.component
+        ):
             continue
 
         for our_source in get_sources(our_distro, our_dist, our_component):
-            if options.package is not None \
-                   and our_source["Package"] not in options.package:
+            if (
+                options.package is not None
+                and our_source["Package"] not in options.package
+            ):
                 continue
 
             package = our_source["Package"]
@@ -142,8 +186,9 @@ def main(options, args):
                 continue
 
             try:
-                (src_source, src_version, src_pool_source) \
-                             = get_same_source(src_distro, src_dist, package)
+                (src_source, src_version, src_pool_source) = get_same_source(
+                    src_distro, src_dist, package
+                )
                 logging.debug("%s: %s is %s", package, src_distro, src_version)
             except IndexError:
                 logging.debug("%s: locally packaged", package)
@@ -173,6 +218,7 @@ def main(options, args):
 
         write_stats(our_component, stats, team)
 
+
 def write_stats(component, stats, team):
     """Write out the collected stats."""
     stats_file = "%s/stats.txt" % ROOT
@@ -182,9 +228,9 @@ def write_stats(component, stats, team):
 
     with open(stats_file, "a") as stf:
         stamp = time.strftime("%Y-%m-%d %H:%M", time.gmtime())
-        text = " ".join("%s=%d" % (k, v) for k,v in stats.items())
+        text = " ".join("%s=%d" % (k, v) for k, v in stats.items())
         print("%s %s %s" % (stamp, component, text), file=stf)
 
+
 if __name__ == "__main__":
-    run(main, options, usage="%prog",
-        description="collect difference stats")
+    run(main, options, usage="%prog", description="collect difference stats")

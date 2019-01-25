@@ -22,12 +22,7 @@ from __future__ import print_function
 import os
 import sys
 
-from momlib import (
-    get_pool_distros,
-    ROOT,
-    run,
-    update_pool_sources,
-    )
+from momlib import get_pool_distros, ROOT, run, update_pool_sources
 
 
 def main(options, args):
@@ -49,5 +44,8 @@ def main(options, args):
 
 
 if __name__ == "__main__":
-    run(main, usage="%prog [DISTRO...]",
-        description="update the Sources file in a distribution's pool")
+    run(
+        main,
+        usage="%prog [DISTRO...]",
+        description="update the Sources file in a distribution's pool",
+    )
