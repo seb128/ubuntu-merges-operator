@@ -684,6 +684,7 @@ def write_status_json(component, merges, left_distro, right_distro):
                 "age": age,
                 "user": who,
                 "uploader": u_who,
+                "teams": teams,
                 "binaries": binaries,
                 "base_version": "%s" % base_version,
                 "left_version": "%s" % left_version,
