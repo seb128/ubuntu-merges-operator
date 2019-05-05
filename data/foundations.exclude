@@ -18,8 +18,11 @@ finish-install
 grub-installer
 installation-locale
 iso-scan
+kickseed
 lilo-installer
 live-installer
+localechooser
+lowmem
 lvmcfg
 main-menu
 media-retriever
@@ -50,6 +53,7 @@ partman-md
 partman-multipath
 partman-nbd
 partman-partitioning
+partman-prep
 partman-swapfile
 partman-target
 partman-uboot
@@ -59,7 +63,13 @@ preseed
 rescue
 rootskel
 rootskel-gtk
+s390-dasd
+s390-netdevice
+s390-sysconfig-writer
+s390-zfcp
 system-integrity-check
 tzsetup
 udpkg
 usb-discover
+user-setup
+zipl-installer
