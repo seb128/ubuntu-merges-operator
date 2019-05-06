@@ -230,8 +230,8 @@ def get_importance(days):
 
 
 def get_responsible_team(source_package):
-    """Return teams subscribed to a package using the package to team
-       mapping."""
+    """Return teams, as a set, subscribed to a package using the package to
+       team mapping."""
     global package_team_mapping
     if not package_team_mapping:
         package_team_mapping = defaultdict(set)
