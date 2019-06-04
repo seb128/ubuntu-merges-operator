@@ -277,7 +277,10 @@ def write_status_page(component, merges, left_distro, right_distro):
         print("    border-top: 2px solid white;", file=status)
         print("}", file=status)
         print("</style>", file=status)
-        print("<% from momlib import * %>", file=status)
+        print("<%", file=status)
+        print("import cgi", file=status)
+        print("from momlib import *", file=status)
+        print("%>", file=status)
         print("</head>", file=status)
         print("<body>", file=status)
         print('<img src=".img/ubuntulogo-100.png" id="ubuntu">', file=status)
@@ -474,7 +477,8 @@ def do_table(status, merges, left_distro, right_distro, component):
                     "<input type=\\"text\\" "
                     "style=\\"border-style: none; background-color: %%s\\" "
                     "name=\\"comment\\" value=\\"%%s\\" title=\\"%%s\\" />" %%
-                    (the_color, the_comment, the_comment)
+                    (the_color, cgi.escape(the_comment, quote=True),
+                     cgi.escape(the_comment))
                 )
                 %%>"""
             )
