@@ -853,6 +853,8 @@ def get_comments():
     with open(comments_file(), "r") as file_comments:
         fcntl.flock(file_comments, fcntl.LOCK_SH)
         for line in file_comments:
+            if ": " not in line:
+                continue
             package, comment = line.rstrip("\n").split(": ", 1)
             comments[package] = comment
 
