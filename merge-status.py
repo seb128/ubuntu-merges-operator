@@ -561,7 +561,7 @@ def do_table(status, merges, left_distro, right_distro, component):
             file=status,
         )
         print(
-            ' <sup><a href="http://tracker.debian.org/'
+            ' <sup><a href="https://tracker.debian.org/'
             '%s">PTS</a></sup>' % package,
             file=status,
         )
