@@ -53,10 +53,10 @@ cd $MOMLIB_ROOT/code
 cp addcomment.py $MOMLIB_ROOT/merges
 
 # Update the blacklist
-wget -q -O$MOMLIB_ROOT/sync-blacklist.txt http://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
+wget -q -O$MOMLIB_ROOT/sync-blacklist.txt https://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
 
 # Update the package to team mapping
-wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json http://people.canonical.com/~ubuntu-archive/package-team-mapping.json
+wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json https://people.canonical.com/~ubuntu-archive/package-team-mapping.json
 
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
