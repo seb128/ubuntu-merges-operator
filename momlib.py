@@ -907,7 +907,7 @@ def gen_buglink_from_comment(comment):
     html = ""
     if debian:
         html += '<img src=".img/debian.png" alt="Debian" />'
-        html += '<a href="http://bugs.debian.org/%s">#%s</a>' % (
+        html += '<a href="https://bugs.debian.org/%s">#%s</a>' % (
             debian.group(1),
             debian.group(1),
         )
