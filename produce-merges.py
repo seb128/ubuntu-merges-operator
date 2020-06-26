@@ -1091,7 +1091,7 @@ def add_changelog(
             )
             print(file=new_changelog)
             print(
-                "  * Merge from %s %s.  Remaining changes:"
+                "  * Merge from %s %s. Remaining changes:"
                 % (right_distro.title(), right_dist),
                 file=new_changelog,
             )
