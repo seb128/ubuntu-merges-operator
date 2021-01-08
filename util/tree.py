@@ -20,6 +20,7 @@
 import errno
 import os
 import shutil
+import stat
 
 
 def as_dir(path):
@@ -136,6 +137,8 @@ def copyfile(srcpath, dstpath, link=False, dereference=False):
         os.symlink(linkdest, dstpath)
     elif os.path.isdir(srcpath):
         os.makedirs(dstpath)
+    elif stat.S_ISFIFO(os.stat(srcpath).st_mode):
+        os.mkfifo(dstpath)
     elif link:
         os.link(srcpath, dstpath)
     else:
