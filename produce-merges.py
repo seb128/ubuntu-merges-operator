@@ -1413,7 +1413,7 @@ def write_report(
                     "using the text editor of your choice.  "
                     "Those marked with 'C*' could not be merged "
                     "that way, so you will find .%s and .%s "
-                    "files instead and should chose one of them "
+                    "files instead and should choose one of them "
                     "or a combination of both, moving it to the "
                     "real filename and deleting the other."
                     % (left_distro.upper(), right_distro.upper())
