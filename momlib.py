@@ -53,7 +53,7 @@ ROOT = "/srv/patches.ubuntu.com"
 DISTROS = {
     "ubuntu": {
         "mirror": "http://archive.ubuntu.com/ubuntu",
-        "dists": ["kinetic"],
+        "dists": ["lunar"],
         "components": ["main", "restricted", "universe", "multiverse"],
         "expire": True,
     },
@@ -96,7 +96,7 @@ DISTROS = {
 
 # Destination distribution and release
 OUR_DISTRO = "ubuntu"
-OUR_DIST = "kinetic"
+OUR_DIST = "lunar"
 
 # Default source distribution and release
 SRC_DISTRO = "debian"
