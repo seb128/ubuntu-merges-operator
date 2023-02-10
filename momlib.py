@@ -180,6 +180,10 @@ def cleanup(path):
         except OSError as e:
             if e.errno == errno.ENOTEMPTY or e.errno == errno.ENOENT:
                 break
+            # Stop if we reach a symlink, allowing the sometimes-large
+            # ROOT/unpacked to be symlinked onto a separate filesystem.
+            if e.errno == errno.ENOTDIR:
+                break
             raise
 
         (dirname, basename) = os.path.split(dirname)
