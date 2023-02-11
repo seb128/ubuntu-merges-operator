@@ -50,7 +50,7 @@ fi
 cd $MOMLIB_ROOT/code
 #bzr update
 
-cp addcomment.py $MOMLIB_ROOT/merges
+cp -a addcomment.py $MOMLIB_ROOT/merges
 
 # Update the blacklist
 wget -q -O$MOMLIB_ROOT/sync-blacklist.txt https://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
