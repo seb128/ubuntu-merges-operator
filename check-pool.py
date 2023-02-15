@@ -74,7 +74,7 @@ def check_source(distro, source):
                 expected_hash, expected_size, name = entry.split(None, 2)
                 with open(os.path.join(tdir, name), "rb") as f:
                     h = hasher()
-                    for chunk in iter(lambda: f.read(256 * 1024), ""):
+                    for chunk in iter(lambda: f.read(256 * 1024), b""):
                         h.update(chunk)
                     if h.hexdigest() != expected_hash:
                         raise Mismatch(
