@@ -22,10 +22,10 @@ from __future__ import print_function, with_statement
 
 import bz2
 import datetime
+from email.utils import parseaddr
 import json
 import os
 import re
-from rfc822 import parseaddr
 import subprocess
 import textwrap
 import time
@@ -518,7 +518,7 @@ def do_table(status, merges, left_distro, right_distro, component):
                 (upl_name, upl_mail) = parseaddr(uploader)
                 upl_lp_page = get_person_lp_page(upl_mail)
 
-                if len(usr_name) and usr_name != upl_name:
+                if usr_name and usr_name != upl_name:
                     u_who = uploader
                     u_who = u_who.replace("&", "&amp;")
                     u_who = u_who.replace("<", "&lt;")
@@ -668,7 +668,7 @@ def write_status_json(component, merges, left_distro, right_distro):
             if uploader is not None:
                 (usr_name, usr_mail) = parseaddr(user)
                 (upl_name, upl_mail) = parseaddr(uploader)
-                if len(usr_name) and usr_name != upl_name:
+                if usr_name and usr_name != upl_name:
                     u_who = uploader
                     u_who = u_who.replace("\\", "\\\\")
                     u_who = u_who.replace('"', '\\"')
