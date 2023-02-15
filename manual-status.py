@@ -386,10 +386,7 @@ def do_table(status, merges, left_distro, right_distro, component):
             user = user.replace("<", "&lt;")
             user = user.replace(">", "&gt;")
             if user_lp_page:
-                who = "<a href='%s'>%s</a>" % (
-                    user_lp_page.encode("utf-8"),
-                    user,
-                )
+                who = "<a href='%s'>%s</a>" % (user_lp_page, user)
             else:
                 who = user
 
@@ -406,7 +403,7 @@ def do_table(status, merges, left_distro, right_distro, component):
                         who = (
                             "%s<br><small><em>Uploader:</em> "
                             "<a href='%s'>%s</a></small>"
-                            % (who, upl_lp_page.encode("utf-8"), u_who)
+                            % (who, upl_lp_page, u_who)
                         )
                     else:
                         who = "%s<br><small><em>Uploader:</em> %s</small>" % (
