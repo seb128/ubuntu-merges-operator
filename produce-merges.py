@@ -22,6 +22,7 @@ from __future__ import print_function, with_statement
 import logging
 import os
 import re
+import shutil
 import stat
 import tempfile
 from textwrap import fill
@@ -1165,7 +1166,7 @@ def create_source(package, version, since, output_dir, merged_dir):
 
         orig_filename = "%s_%s.orig.tar.gz" % (package, version.upstream)
         if os.path.isfile("%s/%s" % (output_dir, orig_filename)):
-            os.link(
+            shutil.copy2(
                 "%s/%s" % (output_dir, orig_filename),
                 "%s/%s" % (parent, orig_filename),
             )
@@ -1189,7 +1190,7 @@ def create_source(package, version, since, output_dir, merged_dir):
                 src = "%s/%s" % (parent, name)
                 dest = "%s/%s" % (output_dir, name)
                 if os.path.isfile(src) and not os.path.isfile(dest):
-                    os.link(src, dest)
+                    shutil.copy2(src, dest)
 
             return os.path.basename(filename)
         else:
