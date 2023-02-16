@@ -537,10 +537,10 @@ def do_merge(
         if is_pruned(left_pruned, filename):
             continue
 
-        if tree.exists("%s/%s" % (base_dir, filename)):
+        if os.path.lexists("%s/%s" % (base_dir, filename)):
             continue
 
-        if is_pruned(right_pruned, filename) or not tree.exists(
+        if is_pruned(right_pruned, filename) or not os.path.lexists(
             "%s/%s" % (right_dir, filename)
         ):
             logging.debug("new in %s: %s", left_distro, filename)
@@ -602,10 +602,10 @@ def do_merge(
         if is_pruned(right_pruned, filename):
             continue
 
-        if tree.exists("%s/%s" % (base_dir, filename)):
+        if os.path.lexists("%s/%s" % (base_dir, filename)):
             continue
 
-        if not is_pruned(left_pruned, filename) and tree.exists(
+        if not is_pruned(left_pruned, filename) and os.path.lexists(
             "%s/%s" % (left_dir, filename)
         ):
             continue
@@ -944,7 +944,7 @@ def merge_file(
             raise subprocess.CalledProcessError(status, diff3_args)
 
     if status != 0:
-        if not tree.exists(dest) or os.stat(dest).st_size == 0:
+        if not os.path.lexists(dest) or os.stat(dest).st_size == 0:
             # Probably binary
             if same_file(left_stat, left_dir, right_stat, right_dir, filename):
                 logging.debug("binary files are the same: %s", filename)
@@ -1057,14 +1057,14 @@ def conflict_file(
     #
     # Fortunately this is so rare it may never happen!
 
-    if tree.exists(left_src):
+    if os.path.lexists(left_src):
         tree.copyfile(left_src, "%s.%s" % (dest, left_distro.upper()))
     if os.path.isdir(left_src) and not os.path.islink(left_src):
         os.symlink(
             "%s.%s" % (os.path.basename(dest), left_distro.upper()), dest
         )
 
-    if tree.exists(right_src):
+    if os.path.lexists(right_src):
         tree.copyfile(right_src, "%s.%s" % (dest, right_distro.upper()))
     if os.path.isdir(right_src) and not os.path.islink(right_src):
         os.symlink(

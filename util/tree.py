@@ -122,14 +122,14 @@ def copyfile(srcpath, dstpath, link=False, dereference=False):
     destination one.
     """
     dstpath = as_file(dstpath)
-    if exists(dstpath):
+    if os.path.lexists(dstpath):
         if os.path.isdir(dstpath) and not os.path.islink(dstpath):
             os.rmdir(dstpath)
         else:
             os.unlink(dstpath)
 
     parent = os.path.dirname(dstpath)
-    if not exists(parent):
+    if not os.path.lexists(parent):
         os.makedirs(parent)
 
     if os.path.islink(srcpath) and not dereference:
@@ -155,7 +155,7 @@ def movetree(path, newpath, eat_toplevel=False):
     a directory, that is eaten and the contents of that moved into newpath.
     """
     if not os.path.isdir(newpath) or os.path.islink(newpath):
-        if exists(newpath):
+        if os.path.lexists(newpath):
             raise OSError("Not a directory: %s" % newpath)
         else:
             os.makedirs(newpath)
@@ -182,7 +182,7 @@ def rmtree(path):
     to call this function if you don't know whether the destination exists
     or not.
     """
-    if not exists(path):
+    if not os.path.lexists(path):
         return
 
     for filename in walk(path, topdown=False, relative=False):
@@ -210,16 +210,6 @@ def remove(filename):
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
-
-
-def exists(path):
-    """Return whether a path exists."""
-    if os.path.exists(path):
-        return True
-    elif os.path.islink(path):
-        return True
-    else:
-        return False
 
 
 class AtomicFile(object):
