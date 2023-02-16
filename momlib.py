@@ -461,7 +461,7 @@ def get_pool_distros():
 
 def pool_sources_already_updated(pooldir, filename):
     try:
-        mtime = os.stat(filename).st_mtime
+        ctime = os.stat(filename).st_ctime
     except OSError:
         return False
 
@@ -471,7 +471,7 @@ def pool_sources_already_updated(pooldir, filename):
             continue
         try:
             st = os.stat(os.path.join(poolpath, otherfile))
-            if st.st_mtime > mtime or st.st_ctime > mtime:
+            if st.st_mtime > ctime or st.st_ctime > ctime:
                 return False
         except OSError:
             pass
