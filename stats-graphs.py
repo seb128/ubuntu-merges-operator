@@ -236,7 +236,9 @@ def sources_intervals(max):
 
 def pie_chart(component, current):
     """Output a pie chart for the given component and data."""
-    data = zip([LABELS[key] for key in ORDER], info_to_data(None, current))
+    data = list(
+        zip([LABELS[key] for key in ORDER], info_to_data(None, current))
+    )
 
     filename = "%s/merges/%s-now.png" % (ROOT, component)
     with closing(canvas.init(filename, format="png")) as c:
