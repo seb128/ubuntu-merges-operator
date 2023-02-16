@@ -16,9 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Uncomment if you have an account on casey
-#RSYNC=y
-
 # Uncomment if you know that this deletes all the files in the CWD
 #EXPERT=y
 
@@ -47,18 +44,13 @@ else
     HASH=${MERGE%${MERGE#?}}
 fi
 
-if [ "$RSYNC" = "y" ]; then
-    rsync --verbose --archive --progress --compress --delete \
-	casey.ubuntu.com:/srv/patches.ubuntu.com/merges/$HASH/$MERGE/ .
-else
-    rm -rf  *
-    wget -q https://merges.ubuntu.com/$HASH/$MERGE/REPORT
+rm -rf  *
+wget -q https://merges.ubuntu.com/$HASH/$MERGE/REPORT
 
-    for NAME in $(sed -n -e "/^    /p" REPORT); do
-	echo "Getting $NAME..."
-	[ -f $NAME ] || wget -q https://merges.ubuntu.com/$HASH/$MERGE/$NAME
-    done
-fi
+for NAME in $(sed -n -e "/^    /p" REPORT); do
+    echo "Getting $NAME..."
+    [ -f $NAME ] || wget -q https://merges.ubuntu.com/$HASH/$MERGE/$NAME
+done
 echo
 
 if grep "^generated: " REPORT >/dev/null; then
