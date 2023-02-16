@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 import stat
+import subprocess
 import tempfile
 from textwrap import fill
 import time
@@ -55,7 +56,7 @@ from momlib import (
     unpack_source,
     work_dir,
 )
-from util import tree, shell
+from util import tree
 
 
 # Regular expression for top of debian/changelog
@@ -822,7 +823,7 @@ def merge_po(left_dir, right_dir, merged_dir, filename):
     logging.debug("Merging PO file %s", filename)
     try:
         ensure(merged_po)
-        shell.run(
+        subprocess.check_call(
             (
                 "msgmerge",
                 "--force-po",
@@ -851,7 +852,7 @@ def merge_pot(left_dir, right_dir, merged_dir, filename):
     logging.debug("Merging POT file %s", filename)
     try:
         ensure(merged_pot)
-        shell.run(
+        subprocess.check_call(
             (
                 "msgcat",
                 "--force-po",
@@ -924,24 +925,23 @@ def merge_file(
             mode |= 0o111
 
     with open(dest, "w", mode) as output:
-        status = shell.run(
-            (
-                "diff3",
-                "-E",
-                "-m",
-                "-L",
-                left_name,
-                left,
-                "-L",
-                "BASE",
-                base,
-                "-L",
-                right_name,
-                right,
-            ),
-            stdout=output,
-            okstatus=(0, 1, 2),
+        diff3_args = (
+            "diff3",
+            "-E",
+            "-m",
+            "-L",
+            left_name,
+            left,
+            "-L",
+            "BASE",
+            base,
+            "-L",
+            right_name,
+            right,
         )
+        status = subprocess.call(diff3_args, stdout=output)
+        if status not in {0, 1, 2}:
+            raise subprocess.CalledProcessError(status, diff3_args)
 
     if status != 0:
         if not tree.exists(dest) or os.stat(dest).st_size == 0:
@@ -1147,7 +1147,7 @@ def create_tarball(package, version, output_dir, merged_dir):
         if os.path.isfile(debian_rules):
             os.chmod(debian_rules, os.stat(debian_rules).st_mode | 0o111)
 
-        shell.run(("tar", "czf", filename, contained), chdir=parent)
+        subprocess.check_call(("tar", "czf", filename, contained), cwd=parent)
 
         logging.info("Created %s", tree.subdir(ROOT, filename))
         return os.path.basename(filename)
@@ -1177,7 +1177,7 @@ def create_source(package, version, since, output_dir, merged_dir):
         cmd += ("-b", contained)
 
         try:
-            shell.run(cmd, chdir=parent)
+            subprocess.check_call(cmd, cwd=parent)
         except (ValueError, OSError):
             logging.error(
                 "'%s' to generate %s failed" % (" ".join(cmd), filename)
@@ -1212,12 +1212,15 @@ def create_patch(
         tree.copytree(right_dir, "%s/%s" % (parent, right_source["Version"]))
 
         with open(filename, "w") as diff:
-            shell.run(
-                ("diff", "-pruN", right_source["Version"], "%s" % version),
-                chdir=parent,
-                stdout=diff,
-                okstatus=(0, 1, 2),
+            diff_cmd = (
+                "diff",
+                "-pruN",
+                right_source["Version"],
+                "%s" % version,
             )
+            status = subprocess.call(diff_cmd, cwd=parent, stdout=diff)
+            if status not in {0, 1, 2}:
+                raise subprocess.CalledProcessError(status, diff_cmd)
             logging.info("Created %s", tree.subdir(ROOT, filename))
 
         return os.path.basename(filename)

@@ -33,6 +33,7 @@ from optparse import OptionParser
 import os
 import re
 import stat
+import subprocess
 import sys
 import time
 from xml.etree import ElementTree
@@ -48,7 +49,7 @@ from launchpadlib.launchpad import Launchpad
 
 from deb.controlfile import ControlFile
 from deb.version import Version
-from util import shell, tree
+from util import tree
 
 
 # Output root
@@ -486,8 +487,8 @@ def update_pool_sources(distro, package):
 
     logging.info("Updating %s", tree.subdir(ROOT, filename))
     with tree.AtomicFile(filename) as sources:
-        shell.run(
-            ("apt-ftparchive", "sources", pooldir), chdir=ROOT, stdout=sources
+        subprocess.check_call(
+            ("apt-ftparchive", "sources", pooldir), cwd=ROOT, stdout=sources
         )
 
 
@@ -642,9 +643,9 @@ def unpack_source(distro, source):
     try:
         env = dict(os.environ)
         env["DEB_VENDOR"] = distro
-        shell.run(
+        subprocess.check_call(
             ("dpkg-source", "--skip-patches", "-x", dsc_file, destdir),
-            chdir=srcdir,
+            cwd=srcdir,
             env=env,
         )
         # Make sure we can at least read everything under .pc, which isn't
@@ -681,9 +682,9 @@ def save_changes_file(filename, source, previous=None):
             cmd += ("-v%s" % previous["Version"],)
 
         try:
-            shell.run(cmd, chdir=srcdir, stdout=changes)
+            subprocess.check_call(cmd, cwd=srcdir, stdout=changes)
         except (ValueError, OSError):
-            shell.run(orig_cmd, chdir=srcdir, stdout=changes)
+            subprocess.check_call(orig_cmd, cwd=srcdir, stdout=changes)
 
     return filename
 
@@ -701,12 +702,10 @@ def save_patch_file(filename, last, this):
 
     ensure(filename)
     with open(filename, "w") as diff:
-        shell.run(
-            ("diff", "-pruN", lastdir, thisdir),
-            chdir=diffdir,
-            stdout=diff,
-            okstatus=(0, 1, 2),
-        )
+        diff_args = ("diff", "-pruN", lastdir, thisdir)
+        status = subprocess.call(diff_args, cwd=diffdir, stdout=diff)
+        if status not in {0, 1, 2}:
+            raise subprocess.CalledProcessError(status, diff_args)
 
 
 # --------------------------------------------------------------------------- #
