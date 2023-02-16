@@ -145,36 +145,6 @@ def copyfile(srcpath, dstpath, link=False, dereference=False):
         shutil.copy2(srcpath, dstpath)
 
 
-def movetree(path, newpath, eat_toplevel=False):
-    """Move the contents of one tree into another.
-
-    The newpath must either not exist in which case it is created, or
-    be a directory.
-
-    If eat_toplevel is True then if path contains only one item which is
-    a directory, that is eaten and the contents of that moved into newpath.
-    """
-    if not os.path.isdir(newpath) or os.path.islink(newpath):
-        if os.path.lexists(newpath):
-            raise OSError("Not a directory: %s" % newpath)
-        else:
-            os.makedirs(newpath)
-
-    entries = os.listdir(path)
-    if (
-        eat_toplevel
-        and len(entries) == 1
-        and os.path.isdir(os.path.join(path, entries[0]))
-        and not os.path.islink(os.path.join(path, entries[0]))
-    ):
-        movetree(os.path.join(path, entries[0]), newpath)
-    else:
-        for entry in entries:
-            os.rename(os.path.join(path, entry), os.path.join(newpath, entry))
-
-    os.rmdir(path)
-
-
 def remove(filename):
     """Remove a symlink, file or directory tree."""
     try:
