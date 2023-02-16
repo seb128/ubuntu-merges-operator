@@ -35,9 +35,14 @@ import re
 import stat
 import sys
 import time
-from urllib import quote
-from urllib2 import urlopen
 from xml.etree import ElementTree
+
+try:
+    from urllib.parse import quote
+    from urllib.request import urlopen
+except ImportError:
+    from urllib import quote
+    from urllib2 import urlopen
 
 from launchpadlib.launchpad import Launchpad
 

@@ -25,7 +25,11 @@ import os
 import subprocess
 import sys
 import tempfile
-import urllib
+
+try:
+    from urllib.request import URLopener
+except ImportError:
+    from urllib import URLopener
 
 from momlib import (
     changes_file,
@@ -105,7 +109,7 @@ def update_sources(distro, dist, component):
 
         compfilename = tempfile.mktemp()
         try:
-            urllib.URLopener().retrieve(url, compfilename)
+            URLopener().retrieve(url, compfilename)
         except IOError:
             logging.error("Downloading %s failed", url)
             continue
@@ -165,7 +169,7 @@ def update_pool(distro, source):
         logging.debug("Downloading %s", url)
         ensure(filename)
         try:
-            urllib.URLopener().retrieve(url, filename)
+            URLopener().retrieve(url, filename)
         except IOError:
             logging.error("Downloading %s failed", url)
             raise
