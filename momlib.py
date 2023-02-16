@@ -219,7 +219,12 @@ def get_person_lp_page(person_email):
     if len(data) != 1:
         person_lp_page_mapping[person_email] = None
     else:
-        person_lp_page_mapping[person_email] = data[0]["web_link"]
+        person_lp_page = data[0]["web_link"]
+        # This will only ever consist of ASCII, and on Python 2 it makes
+        # life easier if we return str rather than unicode.
+        if not isinstance(person_lp_page, str):
+            person_lp_page = person_lp_page.encode("UTF-8")
+        person_lp_page_mapping[person_email] = person_lp_page
     return person_lp_page_mapping[person_email]
 
 
