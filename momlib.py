@@ -456,7 +456,7 @@ def pool_sources_already_updated(pooldir, filename):
 
     poolpath = os.path.join(ROOT, pooldir)
     for otherfile in ["."] + os.listdir(poolpath):
-        if otherfile == "watermark":
+        if otherfile in {"Sources", "watermark"}:
             continue
         try:
             st = os.stat(os.path.join(poolpath, otherfile))
