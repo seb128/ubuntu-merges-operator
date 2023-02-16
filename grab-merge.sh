@@ -28,14 +28,14 @@ set -e
 MERGE=$1
 
 if [ "$SUBDIR" = "y" ]; then
-    [ -d "$MERGE" ] || mkdir $MERGE
-    cd $MERGE
+    [ -d "$MERGE" ] || mkdir "$MERGE"
+    cd "$MERGE"
 fi
 
 if [ "$EXPERT" != "y" ] && [ -n "$(ls)" ]; then
     echo -n "Sure you want to delete all the files in $(pwd) [yn]? "
     read ANSWER
-    [ $ANSWER = y ]
+    [ "$ANSWER" = y ]
 fi
 
 if [ "${MERGE#lib}" != "${MERGE}" ]; then
@@ -45,23 +45,23 @@ else
 fi
 
 rm -rf  *
-wget -q https://merges.ubuntu.com/$HASH/$MERGE/REPORT
+wget -q "https://merges.ubuntu.com/$HASH/$MERGE/REPORT"
 
 for NAME in $(sed -n -e "/^    /p" REPORT); do
     echo "Getting $NAME..."
-    [ -f $NAME ] || wget -q https://merges.ubuntu.com/$HASH/$MERGE/$NAME
+    [ -f "$NAME" ] || wget -q "https://merges.ubuntu.com/$HASH/$MERGE/$NAME"
 done
 echo
 
 if grep "^generated: " REPORT >/dev/null; then
     VERSION=$(sed -n -e "/^generated:/s/^generated: *//p" REPORT)
-    dpkg-source -x ${MERGE}_${VERSION#*:}.dsc
+    dpkg-source -x "${MERGE}_${VERSION#*:}.dsc"
     echo
 else
     TARBALL=$(sed -n -e "/\.src\.tar\.gz$/p" REPORT)
 
-    echo unpacking $TARBALL
-    tar xf $TARBALL
+    echo "unpacking $TARBALL"
+    tar xf "$TARBALL"
     echo
 fi
 
