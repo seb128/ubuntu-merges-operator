@@ -175,36 +175,13 @@ def movetree(path, newpath, eat_toplevel=False):
     os.rmdir(path)
 
 
-def rmtree(path):
-    """Remove the contents of a tree.
-
-    A tree and all of its contents are removed if it exists.  It is safe
-    to call this function if you don't know whether the destination exists
-    or not.
-    """
-    if not os.path.lexists(path):
-        return
-
-    for filename in walk(path, topdown=False, relative=False):
-        try:
-            if os.path.islink(filename):
-                os.unlink(filename)
-            elif os.path.isdir(filename):
-                os.rmdir(filename)
-            else:
-                os.unlink(filename)
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
-
-
 def remove(filename):
     """Remove a symlink, file or directory tree."""
     try:
         if os.path.islink(filename):
             os.unlink(filename)
         elif os.path.isdir(filename):
-            rmtree(filename)
+            shutil.rmtree(filename)
         elif os.path.exists(filename):
             os.unlink(filename)
     except OSError as e:
