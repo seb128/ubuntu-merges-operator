@@ -826,6 +826,7 @@ def merge_po(left_dir, right_dir, merged_dir, filename):
         subprocess.check_call(
             (
                 "msgmerge",
+                "--quiet",
                 "--force-po",
                 "-o",
                 merged_po,
@@ -939,7 +940,8 @@ def merge_file(
             right_name,
             right,
         )
-        status = subprocess.call(diff3_args, stdout=output)
+        with open(os.devnull, "wb") as devnull:
+            status = subprocess.call(diff3_args, stdout=output, stderr=devnull)
         if status not in {0, 1, 2}:
             raise subprocess.CalledProcessError(status, diff3_args)
 
@@ -1177,7 +1179,10 @@ def create_source(package, version, since, output_dir, merged_dir):
         cmd += ("-b", contained)
 
         try:
-            subprocess.check_call(cmd, cwd=parent)
+            with open(os.devnull, "wb") as devnull:
+                subprocess.check_call(
+                    cmd, cwd=parent, stdout=devnull, stderr=devnull
+                )
         except (ValueError, OSError):
             logging.error(
                 "'%s' to generate %s failed" % (" ".join(cmd), filename)
@@ -1218,7 +1223,10 @@ def create_patch(
                 right_source["Version"],
                 "%s" % version,
             )
-            status = subprocess.call(diff_cmd, cwd=parent, stdout=diff)
+            with open(os.devnull, "wb") as devnull:
+                status = subprocess.call(
+                    diff_cmd, cwd=parent, stdout=diff, stderr=devnull
+                )
             if status not in {0, 1, 2}:
                 raise subprocess.CalledProcessError(status, diff_cmd)
             logging.info("Created %s", tree.subdir(ROOT, filename))

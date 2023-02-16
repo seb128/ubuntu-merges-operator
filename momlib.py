@@ -487,9 +487,13 @@ def update_pool_sources(distro, package):
 
     logging.info("Updating %s", tree.subdir(ROOT, filename))
     with tree.AtomicFile(filename) as sources:
-        subprocess.check_call(
-            ("apt-ftparchive", "sources", pooldir), cwd=ROOT, stdout=sources
-        )
+        with open(os.devnull, "wb") as devnull:
+            subprocess.check_call(
+                ("apt-ftparchive", "sources", pooldir),
+                cwd=ROOT,
+                stdout=sources,
+                stderr=devnull,
+            )
 
 
 def get_pool_sources(distro, package):
@@ -643,11 +647,14 @@ def unpack_source(distro, source):
     try:
         env = dict(os.environ)
         env["DEB_VENDOR"] = distro
-        subprocess.check_call(
-            ("dpkg-source", "--skip-patches", "-x", dsc_file, destdir),
-            cwd=srcdir,
-            env=env,
-        )
+        with open(os.devnull, "wb") as devnull:
+            subprocess.check_call(
+                ("dpkg-source", "--skip-patches", "-x", dsc_file, destdir),
+                cwd=srcdir,
+                env=env,
+                stdout=devnull,
+                stderr=devnull,
+            )
         # Make sure we can at least read everything under .pc, which isn't
         # automatically true with dpkg-dev 1.15.4.
         pc_dir = os.path.join(destdir, ".pc")
@@ -681,10 +688,15 @@ def save_changes_file(filename, source, previous=None):
         if previous is not None:
             cmd += ("-v%s" % previous["Version"],)
 
-        try:
-            subprocess.check_call(cmd, cwd=srcdir, stdout=changes)
-        except (ValueError, OSError):
-            subprocess.check_call(orig_cmd, cwd=srcdir, stdout=changes)
+        with open(os.devnull, "wb") as devnull:
+            try:
+                subprocess.check_call(
+                    cmd, cwd=srcdir, stdout=changes, stderr=devnull
+                )
+            except (ValueError, OSError):
+                subprocess.check_call(
+                    orig_cmd, cwd=srcdir, stdout=changes, stderr=devnull
+                )
 
     return filename
 
@@ -703,7 +715,10 @@ def save_patch_file(filename, last, this):
     ensure(filename)
     with open(filename, "w") as diff:
         diff_args = ("diff", "-pruN", lastdir, thisdir)
-        status = subprocess.call(diff_args, cwd=diffdir, stdout=diff)
+        with open(os.devnull, "wb") as devnull:
+            status = subprocess.call(
+                diff_args, cwd=diffdir, stdout=diff, stderr=devnull
+            )
         if status not in {0, 1, 2}:
             raise subprocess.CalledProcessError(status, diff_args)
 
