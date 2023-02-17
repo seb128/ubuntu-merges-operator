@@ -1464,7 +1464,7 @@ def write_report(
             fill(
                 "Once you have a source package you are happy "
                 "to upload, you should make sure you include "
-                "the orig.tar.gz if appropriate and information "
+                "the orig.tar.* if appropriate and information "
                 "about all the versions included in the merge."
             ),
             file=report,
