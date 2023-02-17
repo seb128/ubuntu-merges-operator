@@ -1166,12 +1166,20 @@ def create_source(package, version, since, output_dir, merged_dir):
     try:
         tree.copytree(merged_dir, "%s/%s" % (parent, contained))
 
-        orig_filename = "%s_%s.orig.tar.gz" % (package, version.upstream)
-        if os.path.isfile("%s/%s" % (output_dir, orig_filename)):
-            shutil.copy2(
-                "%s/%s" % (output_dir, orig_filename),
-                "%s/%s" % (parent, orig_filename),
+        # XXX cjwatson 2023-02-17: This is potentially ambiguous; in the
+        # case where more than one exists, we should probably have some way
+        # to figure out which one is the best orig to copy.
+        for ext in ("gz", "bz2", "lzma", "xz"):
+            orig_filename = "%s_%s.orig.tar.%s" % (
+                package,
+                version.upstream,
+                ext,
             )
+            if os.path.isfile("%s/%s" % (output_dir, orig_filename)):
+                shutil.copy2(
+                    "%s/%s" % (output_dir, orig_filename),
+                    "%s/%s" % (parent, orig_filename),
+                )
 
         cmd = ("dpkg-source",)
         if version.revision is not None and since.upstream != version.upstream:
