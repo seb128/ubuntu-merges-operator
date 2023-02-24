@@ -458,7 +458,13 @@ def do_merge(
             right_stat.st_mode
         ):
             # Common case: left and right are both files
-            if handle_file(
+            if same_file(base_stat, base_dir, left_stat, left_dir, filename):
+                # No change on LHS, so keep RHS
+                tree.copyfile(
+                    "%s/%s" % (right_dir, filename),
+                    "%s/%s" % (merged_dir, filename),
+                )
+            elif handle_file(
                 left_stat,
                 left_dir,
                 left_name,
