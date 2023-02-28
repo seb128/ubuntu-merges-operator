@@ -843,7 +843,7 @@ def merge_po(left_dir, right_dir, merged_dir, filename):
                 closest_pot,
             )
         )
-    except (ValueError, OSError):
+    except subprocess.CalledProcessError:
         logging.error("PO file merge failed: %s", filename)
         return True
 
@@ -871,7 +871,7 @@ def merge_pot(left_dir, right_dir, merged_dir, filename):
                 left_pot,
             )
         )
-    except (ValueError, OSError):
+    except subprocess.CalledProcessError:
         logging.error("POT file merge failed: %s", filename)
         return True
 
@@ -1194,7 +1194,7 @@ def create_source(package, version, since, output_dir, merged_dir):
                 subprocess.check_call(
                     cmd, cwd=parent, stdout=devnull, stderr=devnull
                 )
-        except (ValueError, OSError):
+        except subprocess.CalledProcessError:
             logging.error(
                 "'%s' to generate %s failed" % (" ".join(cmd), filename)
             )

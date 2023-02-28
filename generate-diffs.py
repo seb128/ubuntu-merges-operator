@@ -19,6 +19,7 @@
 
 import logging
 import os
+import subprocess
 
 from momlib import (
     changes_file,
@@ -119,7 +120,7 @@ def generate_diff(distro, last, this):
             logging.info(
                 "Saved changes file: %s", tree.subdir(ROOT, changes_filename)
             )
-        except (ValueError, OSError):
+        except subprocess.CalledProcessError:
             logging.error(
                 "dpkg-genchanges for %s failed",
                 tree.subdir(ROOT, changes_filename),

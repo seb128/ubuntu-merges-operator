@@ -693,7 +693,7 @@ def save_changes_file(filename, source, previous=None):
                 subprocess.check_call(
                     cmd, cwd=srcdir, stdout=changes, stderr=devnull
                 )
-            except (ValueError, OSError):
+            except subprocess.CalledProcessError:
                 subprocess.check_call(
                     orig_cmd, cwd=srcdir, stdout=changes, stderr=devnull
                 )
