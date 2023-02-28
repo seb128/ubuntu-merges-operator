@@ -19,6 +19,7 @@
 
 from __future__ import print_function, with_statement
 
+import glob
 import logging
 import os
 import re
@@ -1175,17 +1176,13 @@ def create_source(package, version, since, output_dir, merged_dir):
         # XXX cjwatson 2023-02-17: This is potentially ambiguous; in the
         # case where more than one exists, we should probably have some way
         # to figure out which one is the best orig to copy.
-        for ext in ("gz", "bz2", "lzma", "xz"):
-            orig_filename = "%s_%s.orig.tar.%s" % (
-                package,
-                version.upstream,
-                ext,
+        for orig_filename in glob.glob(
+            "%s/%s_%s.orig*.tar.*" % (output_dir, package, version.upstream)
+        ):
+            shutil.copy2(
+                orig_filename,
+                "%s/%s" % (parent, os.path.basename(orig_filename)),
             )
-            if os.path.isfile("%s/%s" % (output_dir, orig_filename)):
-                shutil.copy2(
-                    "%s/%s" % (output_dir, orig_filename),
-                    "%s/%s" % (parent, orig_filename),
-                )
 
         cmd = ("dpkg-source",)
         if version.revision is not None and since.upstream != version.upstream:
