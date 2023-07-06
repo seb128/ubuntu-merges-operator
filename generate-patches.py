@@ -141,7 +141,7 @@ def main(options, args):
                     our_distro, package, our_version
                 )
                 logging.debug("%s: %s is %s", package, our_distro, our_version)
-            except IndexError:
+            except (IOError, IndexError):
                 continue
 
             try:
