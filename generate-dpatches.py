@@ -85,7 +85,10 @@ def main(options, args):
                     if source["Package"] in blacklist:
                         continue
 
-                    sources = get_pool_sources(distro, source["Package"])
+                    try:
+                        sources = get_pool_sources(distro, source["Package"])
+                    except IOError:
+                        continue  # already expired
                     version_sort(sources)
 
                     for source in sources:
