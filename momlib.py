@@ -71,7 +71,7 @@ DISTROS = {
             "testing-proposed-updates",
             "experimental",
         ],
-        "components": ["main", "contrib", "non-free"],
+        "components": ["main", "contrib", "non-free", "non-free-firmware"],
         "expire": True,
     },
     #    "dapper-security": {
