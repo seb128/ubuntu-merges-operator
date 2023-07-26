@@ -626,7 +626,7 @@ else:\n\
         print("<td><small>%s</small></td>" % source["Binary"], file=status)
         if proposed_version:
             excuses_url = (
-                "https://people.canonical.com/~ubuntu-archive/"
+                "https://ubuntu-archive-team.ubuntu.com/"
                 "proposed-migration/update_excuses.html"
             )
             print(
