@@ -47,7 +47,7 @@ from momlib import (
     OUR_DIST,
     OUR_DISTRO,
     patch_file,
-    read_blacklist,
+    read_blocklist,
     read_report,
     result_dir,
     ROOT,
@@ -164,7 +164,7 @@ def main(options, args):
         for filename in options.include:
             includes.extend(read_package_list(filename))
 
-    blacklist = read_blacklist()
+    blocklist = read_blocklist()
 
     # For each package in the destination distribution, locate the latest in
     # the source distribution; calculate the base from the destination and
@@ -182,7 +182,7 @@ def main(options, args):
                 and our_source["Package"] not in options.package
             ):
                 continue
-            if our_source["Package"] in blacklist:
+            if our_source["Package"] in blocklist:
                 continue
             if len(includes) and our_source["Package"] not in includes:
                 continue

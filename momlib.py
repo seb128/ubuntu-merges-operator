@@ -758,15 +758,15 @@ def read_report(output_dir, left_distro, right_distro):
 # --------------------------------------------------------------------------- #
 
 
-def read_blacklist():
-    """Read the blacklist file."""
-    filename = "%s/sync-blacklist.txt" % ROOT
+def read_blocklist():
+    """Read the blocklist file."""
+    filename = "%s/sync-blocklist.txt" % ROOT
     if not os.path.isfile(filename):
         return []
 
     bl = []
-    with open(filename) as blacklist:
-        for line in blacklist:
+    with open(filename) as blocklist:
+        for line in blocklist:
             try:
                 line = line[: line.index("#")]
             except ValueError:

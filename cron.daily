@@ -52,8 +52,8 @@ cd $MOMLIB_ROOT/code
 
 cp -a addcomment.py $MOMLIB_ROOT/merges
 
-# Update the blacklist
-wget -q -O$MOMLIB_ROOT/sync-blacklist.txt https://people.canonical.com/~ubuntu-archive/sync-blacklist.txt
+# Update the blocklist
+wget -q -O$MOMLIB_ROOT/sync-blocklist.txt https://people.canonical.com/~ubuntu-archive/sync-blocklist.txt
 
 # Update the package to team mapping
 wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json https://people.canonical.com/~ubuntu-archive/package-team-mapping.json
@@ -74,10 +74,10 @@ wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json https://people.canonical.c
 ./syndicate.py $QUIET
 
 # Run the merge tool
-./produce-merges.py $QUIET -X ../merge-blacklist.txt -X ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt
-./produce-merges.py $QUIET -X ../merge-blacklist.txt -I ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt -S experimental
-./produce-merges.py $QUIET -X ../merge-blacklist.txt -X ../experimental.txt -I ../unstable.txt -X ../testing-proposed-updates.txt -S unstable
-./produce-merges.py $QUIET -X ../merge-blacklist.txt -X ../experimental.txt -X ../unstable.txt -I ../testing-proposed-updates.txt -S testing-proposed-updates
+./produce-merges.py $QUIET -X ../merge-blocklist.txt -X ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt
+./produce-merges.py $QUIET -X ../merge-blocklist.txt -I ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt -S experimental
+./produce-merges.py $QUIET -X ../merge-blocklist.txt -X ../experimental.txt -I ../unstable.txt -X ../testing-proposed-updates.txt -S unstable
+./produce-merges.py $QUIET -X ../merge-blocklist.txt -X ../experimental.txt -X ../unstable.txt -I ../testing-proposed-updates.txt -S testing-proposed-updates
 
 # Produce pretty reports
 ./stats.py $QUIET

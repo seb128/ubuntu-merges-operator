@@ -32,7 +32,7 @@ from momlib import (
     get_team_packages,
     OUR_DIST,
     OUR_DISTRO,
-    read_blacklist,
+    read_blocklist,
     ROOT,
     run,
     SRC_DIST,
@@ -138,7 +138,7 @@ def main(options, args):
     team = options.team
     team_package_list = get_team_packages(team)
     exclude_packages = read_excluded_packages(options.exclude_packages)
-    blacklist = read_blacklist()
+    blocklist = read_blocklist()
 
     # For each package in the destination distribution, locate the latest in
     # the source distribution; calculate the base from the destination
@@ -180,8 +180,8 @@ def main(options, args):
 
             stats["total"] += 1
 
-            if package in blacklist:
-                logging.debug("%s: blacklisted (locally packaged)", package)
+            if package in blocklist:
+                logging.debug("%s: blocklisted (locally packaged)", package)
                 stats["local"] += 1
                 continue
 

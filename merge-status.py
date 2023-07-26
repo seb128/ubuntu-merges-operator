@@ -44,7 +44,7 @@ from momlib import (
     OUR_DISTRO,
     pathhash,
     proposed_package_version,
-    read_blacklist,
+    read_blocklist,
     read_report,
     remove_old_comments,
     result_dir,
@@ -121,7 +121,7 @@ def main(options, args):
     our_distro = options.dest_distro
     our_dist = options.dest_suite
 
-    blacklist = read_blacklist()
+    blocklist = read_blocklist()
 
     outstanding = []
     if os.path.isfile("%s/outstanding-merges.txt" % ROOT):
@@ -146,7 +146,7 @@ def main(options, args):
         merges = []
 
         for source in get_sources(our_distro, our_dist, our_component):
-            if source["Package"] in blacklist:
+            if source["Package"] in blocklist:
                 continue
             try:
                 output_dir = result_dir(source["Package"])

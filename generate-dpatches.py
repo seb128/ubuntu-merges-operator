@@ -28,7 +28,7 @@ from momlib import (
     get_pool_distros,
     get_pool_sources,
     get_sources,
-    read_blacklist,
+    read_blocklist,
     ROOT,
     run,
     unpack_directory,
@@ -63,7 +63,7 @@ def main(options, args):
     else:
         distros = get_pool_distros()
 
-    blacklist = read_blacklist()
+    blocklist = read_blocklist()
 
     # For each package in the given distributions, iterate the pool in order
     # and extract patches from debian/patches
@@ -82,7 +82,7 @@ def main(options, args):
                         and source["Package"] not in options.package
                     ):
                         continue
-                    if source["Package"] in blacklist:
+                    if source["Package"] in blocklist:
                         continue
 
                     try:

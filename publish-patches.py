@@ -33,7 +33,7 @@ from momlib import (
     patch_file,
     patch_list_file,
     published_file,
-    read_blacklist,
+    read_blocklist,
     ROOT,
     run,
 )
@@ -63,7 +63,7 @@ def main(options, args):
     distro = options.distro
     dist = options.suite
 
-    blacklist = read_blacklist()
+    blocklist = read_blocklist()
 
     # Write to a new list
     with tree.AtomicFile(patch_list_file()) as list_file:
@@ -73,7 +73,7 @@ def main(options, args):
             for source in get_sources(distro, dist, component):
                 package = source["Package"]
 
-                if package in blacklist:
+                if package in blocklist:
                     continue
 
                 # Publish slipped patches in preference to true-base ones

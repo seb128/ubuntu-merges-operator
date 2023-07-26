@@ -39,7 +39,7 @@ from momlib import (
     get_pool_distros,
     get_sources,
     pool_directory,
-    read_blacklist,
+    read_blocklist,
     ROOT,
     run,
     sources_file,
@@ -64,7 +64,7 @@ def main(options, args):
     else:
         distros = get_pool_distros()
 
-    blacklist = read_blacklist()
+    blocklist = read_blocklist()
 
     # Download the current sources for the given distributions and download
     # any new contents into our pool
@@ -80,7 +80,7 @@ def main(options, args):
                         and source["Package"] not in options.package
                     ):
                         continue
-                    if source["Package"] in blacklist:
+                    if source["Package"] in blocklist:
                         continue
                     changes_filename = changes_file(distro, source)
                     if os.path.isfile(changes_filename) or os.path.isfile(

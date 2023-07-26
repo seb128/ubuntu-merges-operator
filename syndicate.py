@@ -47,7 +47,7 @@ from momlib import (
     patch_file,
     patch_rss_file,
     pool_directory,
-    read_blacklist,
+    read_blocklist,
     read_rss,
     ROOT,
     run,
@@ -83,7 +83,7 @@ def main(options, args):
     else:
         distros = get_pool_distros()
 
-    blacklist = read_blacklist()
+    blocklist = read_blocklist()
     subscriptions = read_subscriptions()
 
     patch_rss = read_rss(
@@ -122,7 +122,7 @@ def main(options, args):
                         and source["Package"] not in options.package
                     ):
                         continue
-                    if source["Package"] in blacklist:
+                    if source["Package"] in blocklist:
                         continue
 
                     watermark = read_watermark(distro, source)
