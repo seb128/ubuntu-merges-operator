@@ -331,6 +331,11 @@ def write_status_page(component, merges, left_distro, right_distro):
             "Show merges without something in proposed</input>",
             file=status,
         )
+        print(
+            '<input id="showLongBinaries" checked="checked" type="checkbox">'
+            "Show long lists of binaries (10+)</input>",
+            file=status,
+        )
         print("</div>", file=status)
 
         for section in SECTIONS:
@@ -401,6 +406,9 @@ def write_status_page(component, merges, left_distro, right_distro):
                     var showMergeNeeded = document.getElementById(
                         "showMergeNeeded"
                     );
+                    var showLongBinaries = document.getElementById(
+                        "showLongBinaries"
+                    );
 
                     // Function to filter stuff
                     function filterText() {
@@ -421,6 +429,16 @@ def write_status_page(component, merges, left_distro, right_distro):
                             }
                         }
 
+                        var long_lines = document.getElementsByClassName("expanded");
+                        if (!showLongBinaries.checked) {
+                            var show_binaries = "none";
+                        } else {
+                            var show_binaries = "initial";
+                        }
+                        for (var i=0; i < long_lines.length; i++) {
+                            long_lines[i].style.display = "none";
+                        }
+
                         var search = (
                             (query.value
                              ? "query=" + encodeURIComponent(query.value) + "&"
@@ -428,13 +446,16 @@ def write_status_page(component, merges, left_distro, right_distro):
                             "showProposed=" +
                             encodeURIComponent(showProposed.checked) +
                             "&showMergeNeeded=" +
-                            encodeURIComponent(showMergeNeeded.checked)
+                            encodeURIComponent(showMergeNeeded.checked) +
+                            "&showLongBinaries=" +
+                            encodeURIComponent(showLongBinaries.checked)
                         );
 
                         history.replaceState({
                             "query": query.value,
                             "showProposed": showProposed.checked,
                             "showMergeNeeded": showMergeNeeded.checked
+                            "showLongBinaries": showLongBinaries.checked
                         }, "", "?" + search);
                     }
 
@@ -456,6 +477,11 @@ def write_status_page(component, merges, left_distro, right_distro):
                                     "true" === decodeURIComponent(kv[1])
                                 );
                                 break;
+                            case "showLongBinaries":
+                                showLongBinaries.checked = (
+                                    "true" === decodeURIComponent(kv[1])
+                                );
+                                break;
                         }
                     }
 
@@ -465,6 +491,7 @@ def write_status_page(component, merges, left_distro, right_distro):
                     query.addEventListener('input', filterText);
                     showProposed.addEventListener('change', filterText);
                     showMergeNeeded.addEventListener('change', filterText);
+                    showLongBinaries.addEventListener('change', filterText);
                 })();
             </script>"""
             ),
@@ -623,6 +650,9 @@ else:\n\
         print("</td>", file=status)
         print("</tr>", file=status)
         print("<tr bgcolor=%s>" % COLOURS[colour_idx], file=status)
+        # If the given package list is more than 10, hide it
+        if len(source["Binary"].strip().split(", ")) > 10:
+            print("<td><small class='expanded'>%s</small></td>" % source["Binary"], file=status)
         print("<td><small>%s</small></td>" % source["Binary"], file=status)
         if proposed_version:
             excuses_url = (
