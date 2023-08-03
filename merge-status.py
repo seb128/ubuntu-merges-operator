@@ -454,7 +454,7 @@ def write_status_page(component, merges, left_distro, right_distro):
                         history.replaceState({
                             "query": query.value,
                             "showProposed": showProposed.checked,
-                            "showMergeNeeded": showMergeNeeded.checked
+                            "showMergeNeeded": showMergeNeeded.checked,
                             "showLongBinaries": showLongBinaries.checked
                         }, "", "?" + search);
                     }
