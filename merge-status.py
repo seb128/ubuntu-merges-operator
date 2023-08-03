@@ -436,7 +436,7 @@ def write_status_page(component, merges, left_distro, right_distro):
                             var show_binaries = "initial";
                         }
                         for (var i=0; i < long_lines.length; i++) {
-                            long_lines[i].style.display = "none";
+                            long_lines[i].style.display = show_binaries;
                         }
 
                         var search = (
