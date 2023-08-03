@@ -653,7 +653,8 @@ else:\n\
         # If the given package list is more than 10, hide it
         if len(source["Binary"].strip().split(", ")) > 10:
             print("<td><small class='expanded'>%s</small></td>" % source["Binary"], file=status)
-        print("<td><small>%s</small></td>" % source["Binary"], file=status)
+        else:
+            print("<td><small>%s</small></td>" % source["Binary"], file=status)
         if proposed_version:
             excuses_url = (
                 "https://ubuntu-archive-team.ubuntu.com/"
