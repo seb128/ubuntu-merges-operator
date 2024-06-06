@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # stats-graphs.py - output stats graphs
 #
 # Copyright © 2008 Canonical Ltd.
@@ -17,11 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
 
 import calendar
-from contextlib import closing
 import datetime
+from contextlib import closing
 
 from pychart import (
     area,
@@ -40,7 +38,6 @@ from pychart import (
 )
 
 from momlib import DISTROS, OUR_DISTRO, ROOT, run
-
 
 # Order of stats we pick out
 ORDER = [
@@ -122,7 +119,7 @@ def main(options, args):
 
 def date_to_datetime(s):
     """Convert a date string into a datetime."""
-    (year, mon, day) = [int(x) for x in s.split("-", 2)]
+    (year, mon, day) = (int(x) for x in s.split("-", 2))
     return datetime.date(year, mon, day)
 
 
@@ -157,7 +154,7 @@ def read_stats():
     stats = {}
 
     stats_file = "%s/stats.txt" % ROOT
-    with open(stats_file, "r") as stf:
+    with open(stats_file) as stf:
         for line in stf:
             (date, time, component, info) = line.strip().split(" ", 3)
 
@@ -237,13 +234,13 @@ def sources_intervals(max):
 def pie_chart(component, current):
     """Output a pie chart for the given component and data."""
     data = list(
-        zip([LABELS[key] for key in ORDER], info_to_data(None, current))
+        zip([LABELS[key] for key in ORDER], info_to_data(None, current)),
     )
 
     filename = "%s/merges/%s-now.png" % (ROOT, component)
     with closing(canvas.init(filename, format="png")) as c:
         ar = area.T(
-            size=(600, 500), legend=None, x_grid_style=None, y_grid_style=None
+            size=(600, 500), legend=None, x_grid_style=None, y_grid_style=None,
         )
 
         plot = pie_plot.T(
@@ -276,7 +273,7 @@ def range_chart(component, history, start, today, events):
     )
 
     (y_tic_interval, y_minor_tic_interval) = sources_intervals(
-        max(d[-1] for d in data)
+        max(d[-1] for d in data),
     )
 
     filename = "%s/merges/%s-trend.png" % (ROOT, component)
@@ -328,7 +325,7 @@ def range_chart(component, history, start, today, events):
                 continue
 
             tb = text_box.T(
-                loc=(xpos + 25, ypos + 45 - (20 * level)), text=text
+                loc=(xpos + 25, ypos + 45 - (20 * level)), text=text,
             )
             tb.add_arrow((xpos, ypos))
             tb.draw()

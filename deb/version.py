@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # deb/version.py - parse and compare Debian version strings.
 #
 # Copyright © 2008 Canonical Ltd.
@@ -19,7 +18,6 @@
 
 import re
 
-
 # Regular expressions make validating things easy
 valid_epoch = re.compile(r"^[0-9]+$")
 valid_upstream = re.compile(r"^[A-Za-z0-9+:.~-]*$")
@@ -29,7 +27,7 @@ valid_revision = re.compile(r"^[A-Za-z0-9+.~]+$")
 cmp_table = "~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-.:"
 
 
-class Version(object):
+class Version:
     """Debian version number.
 
     This class is designed to be reasonably transparent and allow you

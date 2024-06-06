@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # check-pool.py - check the pool against Launchpad
 #
 # Copyright © 2016 Canonical Ltd.
@@ -17,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
 
 import hashlib
 import logging
@@ -79,7 +77,7 @@ def check_source(distro, source):
                     if h.hexdigest() != expected_hash:
                         raise Mismatch(
                             "%s %s: LP %s != pool %s"
-                            % (name, hashname, h.hexdigest(), expected_hash)
+                            % (name, hashname, h.hexdigest(), expected_hash),
                         )
     finally:
         shutil.rmtree(tdir)
@@ -102,12 +100,12 @@ def main(options, args):
                 continue
             try:
                 sources = get_pool_sources(distro, sourcename)
-            except IOError:
+            except OSError:
                 continue
             for source_entry in sources:
                 try:
                     check_source(distro, source_entry)
-                except IOError:
+                except OSError:
                     # Already logged above.
                     pass
                 except Mismatch as e:

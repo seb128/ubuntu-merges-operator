@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # generate-dpatches.py - generate extracted debian patches for new packages
 #
 # Copyright © 2008 Canonical Ltd.
@@ -21,15 +20,15 @@ import logging
 import os
 
 from momlib import (
-    cleanup_source,
     DISTROS,
+    ROOT,
+    cleanup_source,
     dpatch_directory,
     ensure,
     get_pool_distros,
     get_pool_sources,
     get_sources,
     read_blocklist,
-    ROOT,
     run,
     unpack_directory,
     unpack_source,
@@ -87,7 +86,7 @@ def main(options, args):
 
                     try:
                         sources = get_pool_sources(distro, source["Package"])
-                    except IOError:
+                    except OSError:
                         continue  # already expired
                     version_sort(sources)
 
@@ -135,9 +134,7 @@ def extract_dpatches(dirname, source):
             "CVS",
             ".bzr",
             ".git",
-        ]:
-            continue
-        elif not len(patch):
+        ] or not len(patch):
             continue
 
         logging.debug("%s", patch)

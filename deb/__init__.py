@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # Copyright © 2008 Canonical Ltd.
 # Author: Scott James Remnant <scott@ubuntu.com>.
@@ -18,5 +17,4 @@
 
 __all__ = ["controlfile", "version"]
 
-from deb import controlfile
-from deb import version
+from deb import controlfile, version

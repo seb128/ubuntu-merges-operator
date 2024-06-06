@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # util/tree.py - useful functions for dealing with trees of files
 #
 # Copyright © 2008 Canonical Ltd.
@@ -49,9 +48,7 @@ def relative(path):
 
 def under(root, path):
     """Return whether a path is underneath a given root."""
-    if as_dir(root) == as_dir(path):
-        return True
-    elif path.startswith(as_dir(root)):
+    if as_dir(root) == as_dir(path) or path.startswith(as_dir(root)):
         return True
     else:
         return False
@@ -159,7 +156,7 @@ def remove(filename):
             raise
 
 
-class AtomicFile(object):
+class AtomicFile:
     """Facilitate atomic writing of files."""
 
     def __init__(self, filename):

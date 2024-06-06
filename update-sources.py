@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # update-sources.py - update the Sources files in a distribution's pool
 #
 # Copyright © 2008 Canonical Ltd.
@@ -17,12 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
 
 import os
 import sys
 
-from momlib import get_pool_distros, ROOT, run, update_pool_sources
+from momlib import ROOT, get_pool_distros, run, update_pool_sources
 
 
 def main(options, args):

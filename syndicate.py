@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # syndicate.py - send out e-mails and update rss feeds
 #
 # Copyright © 2008 Canonical Ltd.
@@ -17,41 +16,40 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function, with_statement
 
 import bz2
+import fcntl
+import logging
+import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid, parseaddr
-import fcntl
 from fnmatch import fnmatch
-import logging
-import os
-from smtplib import SMTP, SMTPSenderRefused, SMTPDataError
+from smtplib import SMTP, SMTPDataError, SMTPSenderRefused
 
 from deb.controlfile import ControlFile
 from deb.version import Version
 from momlib import (
+    DISTROS,
+    OUR_DISTRO,
+    ROOT,
+    SRC_DISTRO,
     append_rss,
     changes_file,
     diff_directory,
     diff_file,
     diff_rss_file,
-    DISTROS,
     get_base,
     get_pool_distros,
     get_pool_sources,
     get_sources,
-    OUR_DISTRO,
     patch_directory,
     patch_file,
     patch_rss_file,
     pool_directory,
     read_blocklist,
     read_rss,
-    ROOT,
     run,
-    SRC_DISTRO,
     version_sort,
     write_rss,
 )
@@ -128,7 +126,7 @@ def main(options, args):
                     watermark = read_watermark(distro, source)
                     try:
                         sources = get_pool_sources(distro, source["Package"])
-                    except IOError:
+                    except OSError:
                         continue  # already expired
                     version_sort(sources)
 
@@ -190,14 +188,14 @@ def main(options, args):
                             changes = bz2.BZ2File(changes_filename + ".bz2")
                         else:
                             logging.warning(
-                                "Missing changes file %s" % changes_filename
+                                "Missing changes file %s" % changes_filename,
                             )
                             continue
 
                         # Extract the author's e-mail from the changes file
                         try:
                             info = ControlFile(
-                                fileobj=changes, multi_para=False, signed=False
+                                fileobj=changes, multi_para=False, signed=False,
                             ).para
                             if "Changed-By" not in info:
                                 uploader = None
@@ -219,10 +217,10 @@ def main(options, args):
 
                         try:
                             mail_diff(
-                                distro, last, this, uploader, subscriptions
+                                distro, last, this, uploader, subscriptions,
                             )
                         except MemoryError:
-                            logging.error("Ran out of memory")
+                            logging.exception("Ran out of memory")
 
                         last = this
 
@@ -237,7 +235,7 @@ def main(options, args):
 def mail_diff(distro, last, this, uploader, subscriptions):
     """Mail a diff out to the subscribers."""
     recipients = get_recipients(
-        distro, this["Package"], uploader, subscriptions
+        distro, this["Package"], uploader, subscriptions,
     )
     if not len(recipients):
         return
@@ -248,7 +246,7 @@ def mail_diff(distro, last, this, uploader, subscriptions):
         intro = MIMEText(
             """\
 This e-mail has been sent due to an upload to Debian, and contains the
-difference between the new version and the previous one."""
+difference between the new version and the previous one.""",
         )
         payload = diff_part(distro, this)
     elif distro != OUR_DISTRO:
@@ -258,7 +256,7 @@ difference between the new version and the previous one."""
             """\
 This e-mail has been sent due to an upload to %s, and contains the
 difference between the new version and the previous one."""
-            % distro
+            % distro,
         )
         payload = diff_part(distro, this)
     elif get_base(this) == this["Version"]:
@@ -271,7 +269,7 @@ difference between the new version and the previous one."""
             """\
 This e-mail has been sent due to an upload to Ubuntu of a new source package
 which already contains Ubuntu changes.  It contains the difference between
-the Ubuntu version and the equivalent base version in Debian."""
+the Ubuntu version and the equivalent base version in Debian.""",
         )
         payload = patch_part(distro, this)
     elif get_base(last) != get_base(this):
@@ -285,7 +283,7 @@ the Ubuntu version and the equivalent base version in Debian."""
 This e-mail has been sent due to an upload to Ubuntu of a new upstream
 version which still contains Ubuntu changes.  It contains the difference
 between the Ubuntu version and the equivalent base version in Debian, note
-that this difference may include the upstream changes."""
+that this difference may include the upstream changes.""",
         )
         payload = patch_part(distro, this)
     else:
@@ -295,7 +293,7 @@ that this difference may include the upstream changes."""
             """\
 This e-mail has been sent due to an upload to Ubuntu that contains Ubuntu
 changes.  It contains the difference between the new version and the
-previous version of the same source package in Ubuntu."""
+previous version of the same source package in Ubuntu.""",
         )
         payload = diff_part(distro, this)
 

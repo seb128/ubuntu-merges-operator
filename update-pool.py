@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # update-pool.py - update a distribution's pool
 #
 # Copyright © 2008 Canonical Ltd.
@@ -17,27 +16,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
 
-from contextlib import contextmanager
 import logging
 import os
 import subprocess
 import sys
 import tempfile
-
+from contextlib import contextmanager
 from urllib.request import URLopener
 
 from momlib import (
-    changes_file,
     DISTROS,
+    ROOT,
+    changes_file,
     ensure,
     files,
     get_pool_distros,
     get_sources,
     pool_directory,
     read_blocklist,
-    ROOT,
     run,
     sources_file,
 )
@@ -81,7 +78,7 @@ def main(options, args):
                         continue
                     changes_filename = changes_file(distro, source)
                     if os.path.isfile(changes_filename) or os.path.isfile(
-                        changes_filename + ".bz2"
+                        changes_filename + ".bz2",
                     ):
                         # It looks as though we've already processed and
                         # expired this.
@@ -107,8 +104,8 @@ def update_sources(distro, dist, component):
         compfilename = tempfile.mktemp()
         try:
             URLopener().retrieve(url, compfilename)
-        except IOError:
-            logging.error("Downloading %s failed", url)
+        except OSError:
+            logging.exception("Downloading %s failed", url)
             continue
         try:
             if url.endswith(".gz"):
@@ -125,7 +122,7 @@ def update_sources(distro, dist, component):
                     @contextmanager
                     def decompressor(name):
                         proc = subprocess.Popen(
-                            ["xzcat", name], stdout=subprocess.PIPE
+                            ["xzcat", name], stdout=subprocess.PIPE,
                         )
                         yield proc.stdout
                         proc.stdout.close()
@@ -142,10 +139,9 @@ def update_sources(distro, dist, component):
 
         logging.info("Saved %s", tree.subdir(ROOT, filename))
         return filename
-    else:
-        raise IOError(
-            "No Sources found for %s/%s/%s" % (distro, dist, component)
-        )
+    raise OSError(
+        "No Sources found for %s/%s/%s" % (distro, dist, component),
+    )
 
 
 def update_pool(distro, source):
@@ -167,8 +163,8 @@ def update_pool(distro, source):
         ensure(filename)
         try:
             URLopener().retrieve(url, filename)
-        except IOError:
-            logging.error("Downloading %s failed", url)
+        except OSError:
+            logging.exception("Downloading %s failed", url)
             raise
         logging.info("Saved %s", tree.subdir(ROOT, filename))
 

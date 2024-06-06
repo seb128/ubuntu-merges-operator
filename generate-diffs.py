@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # generate-diffs.py - generate changes and diff files for new packages
 #
 # Copyright © 2008 Canonical Ltd.
@@ -22,15 +21,15 @@ import os
 import subprocess
 
 from momlib import (
+    DISTROS,
+    ROOT,
     changes_file,
     cleanup_source,
     diff_file,
-    DISTROS,
     get_pool_distros,
     get_pool_sources,
     get_sources,
     read_blocklist,
-    ROOT,
     run,
     save_basis,
     save_changes_file,
@@ -90,7 +89,7 @@ def main(options, args):
 
                     try:
                         sources = get_pool_sources(distro, source["Package"])
-                    except IOError:
+                    except OSError:
                         continue  # already expired
                     version_sort(sources)
 
@@ -115,16 +114,16 @@ def generate_diff(distro, last, this):
 
     changes_filename = changes_file(distro, this)
     if not os.path.isfile(changes_filename) and not os.path.isfile(
-        changes_filename + ".bz2"
+        changes_filename + ".bz2",
     ):
         unpack_source(distro, this)
         try:
             save_changes_file(changes_filename, this, last)
             logging.info(
-                "Saved changes file: %s", tree.subdir(ROOT, changes_filename)
+                "Saved changes file: %s", tree.subdir(ROOT, changes_filename),
             )
         except subprocess.CalledProcessError:
-            logging.error(
+            logging.exception(
                 "dpkg-genchanges for %s failed",
                 tree.subdir(ROOT, changes_filename),
             )
@@ -134,7 +133,7 @@ def generate_diff(distro, last, this):
 
     diff_filename = diff_file(distro, this)
     if not os.path.isfile(diff_filename) and not os.path.isfile(
-        diff_filename + ".bz2"
+        diff_filename + ".bz2",
     ):
         unpack_source(distro, this)
         unpack_source(distro, last)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # merge-status.py - output merge status
 #
 # Copyright © 2008 - 2015 Canonical Ltd.
@@ -18,43 +17,41 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function, with_statement
 
 import bz2
 import datetime
-from email.utils import parseaddr
 import json
 import os
 import re
 import subprocess
 import textwrap
 import time
+from email.utils import parseaddr
 
 from deb.controlfile import ControlFile
 from momlib import (
-    changes_file,
     DISTROS,
+    OUR_DIST,
+    OUR_DISTRO,
+    ROOT,
+    SRC_DIST,
+    SRC_DISTRO,
+    changes_file,
     files,
     get_date_superseded,
     get_importance,
     get_person_lp_page,
     get_responsible_team,
     get_sources,
-    OUR_DIST,
-    OUR_DISTRO,
     pathhash,
     proposed_package_version,
     read_blocklist,
     read_report,
     remove_old_comments,
     result_dir,
-    ROOT,
     run,
-    SRC_DIST,
-    SRC_DISTRO,
 )
 from util import tree
-
 
 COLOURS = [
     "#ff8080",
@@ -151,19 +148,19 @@ def main(options, args):
             try:
                 output_dir = result_dir(source["Package"])
                 (base_version, left_version, right_version) = read_report(
-                    output_dir, our_distro, src_distro
+                    output_dir, our_distro, src_distro,
                 )
             except ValueError:
                 continue
             teams = get_responsible_team(source["Package"])
             date_superseded = get_date_superseded(
-                source["Package"], base_version
+                source["Package"], base_version,
             )
             if not date_superseded:
                 age = datetime.timedelta(0)
             else:
                 age = datetime.datetime.utcnow() - date_superseded.replace(
-                    tzinfo=None
+                    tzinfo=None,
                 )
             days_old = age.days
 
@@ -177,7 +174,7 @@ def main(options, args):
 
             if changes is not None:
                 info = ControlFile(
-                    fileobj=changes, multi_para=False, signed=False
+                    fileobj=changes, multi_para=False, signed=False,
                 ).para
 
                 try:
@@ -202,9 +199,7 @@ def main(options, args):
 
             if uploaded:
                 section = "updated"
-            elif not after_uvf:
-                section = "outstanding"
-            elif source["Package"] in outstanding:
+            elif not after_uvf or source["Package"] in outstanding:
                 section = "outstanding"
             else:
                 section = "new"
@@ -221,7 +216,7 @@ def main(options, args):
                     left_version,
                     right_version,
                     teams,
-                )
+                ),
             )
         merges.sort(reverse=True)
 
@@ -279,7 +274,7 @@ def write_status_page(component, merges, left_distro, right_distro):
             file=status,
         )
         print(
-            "<title>Ubuntu Merge-o-Matic: %s</title>" % component, file=status
+            "<title>Ubuntu Merge-o-Matic: %s</title>" % component, file=status,
         )
         print("<style>", file=status)
         print("img#ubuntu {", file=status)
@@ -378,7 +373,7 @@ def write_status_page(component, merges, left_distro, right_distro):
             )
 
             do_table(
-                status, section_merges, left_distro, right_distro, component
+                status, section_merges, left_distro, right_distro, component,
             )
 
         print("<h2 id=stats>Statistics</h2>", file=status)
@@ -493,7 +488,7 @@ def write_status_page(component, merges, left_distro, right_distro):
                     showMergeNeeded.addEventListener('change', filterText);
                     showLongBinaries.addEventListener('change', filterText);
                 })();
-            </script>"""
+            </script>""",
             ),
             file=status,
         )
@@ -626,7 +621,7 @@ def do_table(status, merges, left_distro, right_distro, component):
                     (the_color, cgi.escape(the_comment, quote=True),
                      cgi.escape(the_comment))
                 )
-                %%>"""
+                %%>""",
             )
             % (package, package, COLOURS[colour_idx]),
             file=status,
@@ -721,7 +716,7 @@ def write_status_json(component, merges, left_distro, right_distro):
                 "base_version": "%s" % base_version,
                 "left_version": "%s" % left_version,
                 "right_version": "%s" % right_version,
-            }
+            },
         )
     with tree.AtomicFile(status_file) as status:
         status.write(json.dumps(data, indent=4))

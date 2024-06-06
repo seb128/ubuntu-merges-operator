@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # deb/controlfile.py - parse debian control files
 #
 # Copyright © 2008 Canonical Ltd.
@@ -20,7 +19,7 @@
 from typing import List
 
 
-class ControlFile(object):
+class ControlFile:
     """Debian control file.
 
     This can be used directly by calling the parse() function or
@@ -102,21 +101,21 @@ class ControlFile(object):
 
             if line[:1].isspace():
                 if last_field is None:
-                    raise IOError
+                    raise OSError
 
                 self.para[last_field] += "\n" + line.lstrip()
 
             elif ":" in line:
                 (field, value) = line.split(":", 1)
                 if len(field.rstrip().split(None)) > 1:
-                    raise IOError
+                    raise OSError
 
                 last_field = self.capitaliseField(field)
                 self.para[last_field] = value.lstrip()
 
             elif line.startswith("-----BEGIN PGP") and signed:
                 if is_signed:
-                    raise IOError
+                    raise OSError
                 for line in file:
                     if not len(line) or line.startswith("\n"):
                         break
@@ -133,24 +132,24 @@ class ControlFile(object):
                     try:
                         pgpsig = next(file)
                         if not len(pgpsig):
-                            raise IOError
+                            raise OSError
                     except StopIteration:
-                        raise IOError
+                        raise OSError
 
                     if not pgpsig.startswith("-----BEGIN PGP"):
-                        raise IOError
+                        raise OSError
 
                     self.signed = True
                     break
 
                 else:
-                    raise IOError
+                    raise OSError
 
             else:
-                raise IOError
+                raise OSError
 
         if is_signed and not self.signed:
-            raise IOError
+            raise OSError
 
         if last_field:
             self.paras.append(self.para)

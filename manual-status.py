@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # manual-status.py - output status of manual merges
 #
 # Copyright © 2008 - 2015 Canonical Ltd.
@@ -18,11 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function, with_statement
 
 import bz2
 import datetime
-from email.utils import parseaddr
 import json
 import logging
 import os
@@ -30,12 +27,18 @@ import re
 import subprocess
 import textwrap
 import time
+from email.utils import parseaddr
 
 from deb.controlfile import ControlFile
 from deb.version import Version
 from momlib import (
-    changes_file,
     DISTROS,
+    OUR_DIST,
+    OUR_DISTRO,
+    ROOT,
+    SRC_DIST,
+    SRC_DISTRO,
+    changes_file,
     files,
     get_base,
     get_date_superseded,
@@ -46,19 +49,13 @@ from momlib import (
     get_responsible_team,
     get_same_source,
     get_sources,
-    OUR_DIST,
-    OUR_DISTRO,
     pathhash,
     proposed_package_version,
     read_blocklist,
     remove_old_comments,
-    ROOT,
     run,
-    SRC_DIST,
-    SRC_DISTRO,
 )
 from util import tree
-
 
 COLOURS = [
     "#ff8080",
@@ -146,15 +143,15 @@ def main(options, args):
                 package = our_source["Package"]
                 our_version = Version(our_source["Version"])
                 our_pool_source = get_pool_source(
-                    our_distro, package, our_version
+                    our_distro, package, our_version,
                 )
                 logging.debug("%s: %s is %s", package, our_distro, our_version)
-            except (IOError, IndexError):
+            except (OSError, IndexError):
                 continue
 
             try:
                 (src_source, src_version, src_pool_source) = get_same_source(
-                    src_distro, src_dist, package
+                    src_distro, src_dist, package,
                 )
                 logging.debug("%s: %s is %s", package, src_distro, src_version)
             except IndexError:
@@ -165,7 +162,7 @@ def main(options, args):
                 base_source = get_nearest_source(package, base)
                 base_version = Version(base_source["Version"])
                 logging.debug(
-                    "%s: base is %s (%s wanted)", package, base_version, base
+                    "%s: base is %s (%s wanted)", package, base_version, base,
                 )
                 continue
             except IndexError:
@@ -177,7 +174,7 @@ def main(options, args):
                 age = datetime.timedelta(0)
             else:
                 age = datetime.datetime.utcnow() - date_superseded.replace(
-                    tzinfo=None
+                    tzinfo=None,
                 )
             days_old = age.days
 
@@ -191,7 +188,7 @@ def main(options, args):
 
             if changes is not None:
                 info = ControlFile(
-                    fileobj=changes, multi_para=False, signed=False
+                    fileobj=changes, multi_para=False, signed=False,
                 ).para
 
                 user = info["Changed-By"]
@@ -220,7 +217,7 @@ def main(options, args):
                     our_version,
                     src_version,
                     teams,
-                )
+                ),
             )
 
         write_status_page(our_component, merges, our_distro, src_distro)
@@ -285,7 +282,7 @@ def write_status_page(component, merges, left_distro, right_distro):
         print("<body>", file=status)
         print('<img src=".img/ubuntulogo-100.png" id="ubuntu">', file=status)
         print(
-            "<h1>Ubuntu Merge-o-Matic: %s manual</h1>" % component, file=status
+            "<h1>Ubuntu Merge-o-Matic: %s manual</h1>" % component, file=status,
         )
 
         for section in SECTIONS:
@@ -307,7 +304,7 @@ def write_status_page(component, merges, left_distro, right_distro):
             )
 
             do_table(
-                status, section_merges, left_distro, right_distro, component
+                status, section_merges, left_distro, right_distro, component,
             )
 
         print(
@@ -477,7 +474,7 @@ def do_table(status, merges, left_distro, right_distro, component):
                     (the_color, cgi.escape(the_comment, quote=True),
                      cgi.escape(the_comment))
                 )
-                %%>"""
+                %%>""",
             )
             % (package, package, COLOURS[colour_idx]),
             file=status,
@@ -564,7 +561,7 @@ def write_status_json(component, merges, left_distro, right_distro):
                 "binaries": binaries,
                 "left_version": "%s" % left_version,
                 "right_version": "%s" % right_version,
-            }
+            },
         )
     with tree.AtomicFile(status_file) as status:
         status.write(json.dumps(data, indent=4))

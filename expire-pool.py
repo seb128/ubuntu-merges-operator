@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # expire-pool.py - expires packages from all pools
 #
 # Copyright © 2008 Canonical Ltd.
@@ -17,22 +16,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
 import glob
 import logging
 import os.path
+from collections import defaultdict
 
 from momlib import (
     DISTROS,
+    OUR_DIST,
+    OUR_DISTRO,
+    ROOT,
     files,
     get_base,
     get_pool_distros,
     get_pool_sources,
     get_sources,
-    OUR_DIST,
-    OUR_DISTRO,
     pool_directory,
-    ROOT,
     run,
     update_pool_sources,
     version_sort,
@@ -107,7 +106,7 @@ def main(options, args):
 
                 try:
                     pool_sources = get_pool_sources(distro, package)
-                except IOError:
+                except OSError:
                     pass
                 else:
                     remove_sources = [
@@ -147,7 +146,7 @@ def expire_pool_sources(distro, package, base):
     """
     try:
         sources = get_pool_sources(distro, package)
-    except IOError:
+    except OSError:
         return
 
     # Find sources older than the base, record the filenames of newer ones

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # Copyright © 2008 Canonical Ltd.
 # Author: Scott James Remnant <scott@ubuntu.com>.

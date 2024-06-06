@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # momlib.py - common utility functions
 #
 # Copyright © 2008 - 2015 Canonical Ltd.
@@ -18,35 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict
-
-from html import escape
-from collections import defaultdict
-from contextlib import closing
 import datetime
 import errno
 import fcntl
-from hashlib import md5
 import json
 import logging
-from optparse import OptionParser
 import os
 import re
 import stat
 import subprocess
 import sys
 import time
-from xml.etree import ElementTree
-
+from collections import defaultdict
+from contextlib import closing
+from hashlib import md5
+from html import escape
+from optparse import OptionParser
+from typing import Dict
 from urllib.parse import quote
 from urllib.request import urlopen
+from xml.etree import ElementTree
 
 from launchpadlib.launchpad import Launchpad
 
 from deb.controlfile import ControlFile
 from deb.version import Version
 from util import tree
-
 
 # Output root
 ROOT = "/srv/patches.ubuntu.com"
@@ -208,7 +204,7 @@ def get_person_lp_page(person_email):
     try:
         with closing(urlopen(find_person)) as response:
             content = response.read()
-    except IOError:
+    except OSError:
         return None
     data = json.loads(content)["entries"]
     # findPerson does a startswith match so could return multiple entries, if
@@ -226,7 +222,7 @@ def get_person_lp_page(person_email):
 
 
 def get_importance(days):
-    "Return an int representing the importance of an item."
+    """Return an int representing the importance of an item."""
     if days <= 30:
         return 5
     elif days <= 60:
@@ -242,7 +238,8 @@ def get_importance(days):
 
 def get_responsible_team(source_package):
     """Return teams, as a set, subscribed to a package using the package to
-       team mapping."""
+    team mapping.
+    """
     global package_team_mapping
     if not package_team_mapping:
         package_team_mapping = defaultdict(set)
@@ -425,7 +422,7 @@ def get_sources(distro, dist, component):
     filename = sources_file(distro, dist, component)
     if filename not in SOURCES_CACHE:
         SOURCES_CACHE[filename] = ControlFile(
-            filename, multi_para=True, signed=False
+            filename, multi_para=True, signed=False,
         )
 
     return SOURCES_CACHE[filename].paras
@@ -509,15 +506,14 @@ def get_pool_source(distro, package, version=None):
     for source in sources:
         if version == source["Version"]:
             return source
-    else:
-        raise IndexError
+    raise IndexError
 
 
 def get_nearest_source(package, base):
     """Return the base source or nearest to it."""
     try:
         sources = get_pool_sources(SRC_DISTRO, package)
-    except IOError:
+    except OSError:
         sources = []
 
     bases = []
@@ -526,12 +522,11 @@ def get_nearest_source(package, base):
             return source
         elif base > source["Version"]:
             bases.append(source)
-    else:
-        try:
-            return get_pool_source(OUR_DISTRO, package, base)
-        except (IOError, IndexError):
-            version_sort(bases)
-            return bases.pop()
+    try:
+        return get_pool_source(OUR_DISTRO, package, base)
+    except (OSError, IndexError):
+        version_sort(bases)
+        return bases.pop()
 
 
 def get_same_source(distro, dist, package):
@@ -545,8 +540,7 @@ def get_same_source(distro, dist, package):
             return (source, version, pool_source)
         except IndexError:
             pass
-    else:
-        raise IndexError("%s not found in %s %s" % (package, distro, dist))
+    raise IndexError("%s not found in %s %s" % (package, distro, dist))
 
 
 # --------------------------------------------------------------------------- #
@@ -687,11 +681,11 @@ def save_changes_file(filename, source, previous=None):
         with open(os.devnull, "wb") as devnull:
             try:
                 subprocess.check_call(
-                    cmd, cwd=srcdir, stdout=changes, stderr=devnull
+                    cmd, cwd=srcdir, stdout=changes, stderr=devnull,
                 )
             except subprocess.CalledProcessError:
                 subprocess.check_call(
-                    orig_cmd, cwd=srcdir, stdout=changes, stderr=devnull
+                    orig_cmd, cwd=srcdir, stdout=changes, stderr=devnull,
                 )
 
     return filename
@@ -713,7 +707,7 @@ def save_patch_file(filename, last, this):
         diff_args = ("diff", "-pruN", lastdir, thisdir)
         with open(os.devnull, "wb") as devnull:
             status = subprocess.call(
-                diff_args, cwd=diffdir, stdout=diff, stderr=devnull
+                diff_args, cwd=diffdir, stdout=diff, stderr=devnull,
             )
         if status not in {0, 1, 2}:
             raise subprocess.CalledProcessError(status, diff_args)
@@ -814,7 +808,7 @@ def read_rss(filename, title, link, description):
         tree = ElementTree.parse(filename)
         for i, item in enumerate(tree.find("channel").findall("item")):
             dt = datetime.datetime(
-                *time.strptime(item.findtext("pubDate"), RSS_TIME_FORMAT)[:6]
+                *time.strptime(item.findtext("pubDate"), RSS_TIME_FORMAT)[:6],
             )
             if dt > cutoff or i < 10:
                 channel.append(item)
@@ -847,7 +841,7 @@ def append_rss(rss, title, link, author=None, filename=None):
     if filename is not None:
         e = ElementTree.SubElement(item, "pubDate")
         e.text = time.strftime(
-            RSS_TIME_FORMAT, time.gmtime(os.stat(filename).st_mtime)
+            RSS_TIME_FORMAT, time.gmtime(os.stat(filename).st_mtime),
         )
 
     channel = rss.find("channel")
@@ -871,10 +865,11 @@ def comments_file():
 
 def get_comments():
     """Extract the comments from file, and return a dictionary
-       containing comments corresponding to packages"""
+    containing comments corresponding to packages
+    """
     comments = {}
 
-    with open(comments_file(), "r") as file_comments:
+    with open(comments_file()) as file_comments:
         fcntl.flock(file_comments, fcntl.LOCK_SH)
         for line in file_comments:
             if ": " not in line:
@@ -896,14 +891,15 @@ def add_comment(package, comment):
 
 def remove_old_comments(status_file, merges):
     """Remove old comments from the comments file using
-       component's existing status file and merges"""
+    component's existing status file and merges
+    """
     if not os.path.exists(status_file):
         return
 
     packages = [m[2] for m in merges]
     toremove = []
 
-    with open(status_file, "r") as file_status:
+    with open(status_file) as file_status:
         for line in file_status:
             package = line.split(" ")[0]
             if package not in packages:
@@ -991,7 +987,7 @@ def get_date_superseded(package, base_version):
         if False:
             print(
                 "Base version %s of %s never published in Debian %s."
-                % (base_version, package, SRC_DIST)
+                % (base_version, package, SRC_DIST),
             )
     return date_superseded
 
@@ -1045,7 +1041,7 @@ def download_source(distro, source, targetdir):
             with closing(urlopen(url)) as url_f, open(filename, "wb") as out_f:
                 for chunk in iter(lambda: url_f.read(256 * 1024), ""):
                     out_f.write(chunk)
-        except IOError:
+        except OSError:
             logging.warning("Downloading %s failed", url)
             raise
         logging.info("Saved %s", name)

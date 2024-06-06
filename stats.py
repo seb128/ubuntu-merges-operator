@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # stats.py - collect difference stats
 #
 # Copyright © 2008 Canonical Ltd.
@@ -17,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function, with_statement
 
 import logging
 import os
@@ -26,17 +24,17 @@ import time
 from deb.version import Version
 from momlib import (
     DISTROS,
+    OUR_DIST,
+    OUR_DISTRO,
+    ROOT,
+    SRC_DIST,
+    SRC_DISTRO,
     get_base,
     get_same_source,
     get_sources,
     get_team_packages,
-    OUR_DIST,
-    OUR_DISTRO,
     read_blocklist,
-    ROOT,
     run,
-    SRC_DIST,
-    SRC_DISTRO,
 )
 
 
@@ -187,7 +185,7 @@ def main(options, args):
 
             try:
                 (src_source, src_version, src_pool_source) = get_same_source(
-                    src_distro, src_dist, package
+                    src_distro, src_dist, package,
                 )
                 logging.debug("%s: %s is %s", package, src_distro, src_version)
             except IndexError:

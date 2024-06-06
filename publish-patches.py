@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # publish-patches.py - publish patches for the given distribution
 #
 # Copyright © 2008 Canonical Ltd.
@@ -17,24 +16,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
 
 import logging
 import os
 
 from momlib import (
-    cleanup,
     DISTROS,
+    OUR_DIST,
+    OUR_DISTRO,
+    ROOT,
+    cleanup,
     dpatch_directory,
     ensure,
     get_sources,
-    OUR_DIST,
-    OUR_DISTRO,
     patch_file,
     patch_list_file,
     published_file,
     read_blocklist,
-    ROOT,
     run,
 )
 from util import tree
@@ -111,7 +109,7 @@ def publish_patch(distro, source, filename, list_file):
     for junk in os.listdir(os.path.dirname(publish_filename)):
         junkpath = "%s/%s" % (os.path.dirname(publish_filename), junk)
         if os.path.isfile(junkpath) and junk != os.path.basename(
-            publish_filename
+            publish_filename,
         ):
             os.unlink(junkpath)
 
