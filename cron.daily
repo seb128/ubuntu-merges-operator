@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash -e
 # cron.daily - crontab script to run mom
 #
 # Copyright © 2008 Canonical Ltd.
