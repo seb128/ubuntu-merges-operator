@@ -20,9 +20,9 @@
 from __future__ import print_function, with_statement
 
 import bz2
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
-from email.Utils import formatdate, make_msgid, parseaddr
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid, parseaddr
 import fcntl
 from fnmatch import fnmatch
 import logging

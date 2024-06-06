@@ -26,10 +26,7 @@ import subprocess
 import sys
 import tempfile
 
-try:
-    from urllib.request import URLopener
-except ImportError:
-    from urllib import URLopener
+from urllib.request import URLopener
 
 from momlib import (
     changes_file,

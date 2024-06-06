@@ -18,9 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function, with_statement
+from typing import Dict
 
-from cgi import escape
+from html import escape
 from collections import defaultdict
 from contextlib import closing
 import datetime
@@ -38,12 +38,8 @@ import sys
 import time
 from xml.etree import ElementTree
 
-try:
-    from urllib.parse import quote
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import quote
-    from urllib2 import urlopen
+from urllib.parse import quote
+from urllib.request import urlopen
 
 from launchpadlib.launchpad import Launchpad
 
@@ -117,7 +113,7 @@ RSS_TIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"
 SOURCES_CACHE = {}
 
 # mapping of uploader emails to Launchpad pages
-person_lp_page_mapping = {}
+person_lp_page_mapping: Dict[str, str] = {}
 
 # mapping of packages to teams
 package_team_mapping = ""

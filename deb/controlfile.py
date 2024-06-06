@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
+from typing import List
 
 
 class ControlFile(object):
@@ -35,7 +35,7 @@ class ControlFile(object):
       signed      True if the paragraph was PGP signed
     """
 
-    FieldNames = []
+    FieldNames: List[str] = []
 
     def __init__(self, filename=None, fileobj=None, *args, **kwds):
         self.paras = []
@@ -131,7 +131,7 @@ class ControlFile(object):
 
                 elif is_signed:
                     try:
-                        pgpsig = file.next()
+                        pgpsig = next(file)
                         if not len(pgpsig):
                             raise IOError
                     except StopIteration:

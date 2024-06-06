@@ -1,3 +1,29 @@
 [tool.black]
 line-length = 79
 exclude = '(\.bzr|addcomment\.py)'
+
+[tool.ruff]
+line-length = 80
+exclude = ["addcomment.py"]
+
+[project]
+name = "merge-o-matic"
+version = "0.0.0"
+license = {file = "COPYING"}
+description = "Ubuntu Merge-o-Matic"
+requires-python = ">=3.8"
+dependencies = [
+    "launchpadlib",
+    "pychart @ git+https://git.launchpad.net/~liushuyu-011/+git/pychart"
+]
+urls = { "Homepage" = "https://wiki.ubuntu.com/MergeOMatic" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Environment :: Console",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: System :: Archiving :: Packaging",
+    "Topic :: System :: Software Distribution"
+]
