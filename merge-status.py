@@ -305,7 +305,7 @@ def write_status_page(component, merges, left_distro, right_distro):
         print("}", file=status)
         print("</style>", file=status)
         print("<%", file=status)
-        print("import cgi", file=status)
+        print("import html", file=status)
         print("from momlib import *", file=status)
         print("%>", file=status)
         print("</head>", file=status)
@@ -618,8 +618,8 @@ def do_table(status, merges, left_distro, right_distro, component):
                     "<input type=\\"text\\" "
                     "style=\\"border-style: none; background-color: %%s\\" "
                     "name=\\"comment\\" value=\\"%%s\\" title=\\"%%s\\" />" %%
-                    (the_color, cgi.escape(the_comment, quote=True),
-                     cgi.escape(the_comment))
+                    (the_color, html.escape(the_comment, quote=True),
+                     html.escape(the_comment))
                 )
                 %%>""",
             )
