@@ -1083,8 +1083,8 @@ def add_changelog(
     """Add a changelog entry to the package."""
     changelog_file = "%s/debian/changelog" % merged_dir
 
-    with open(changelog_file) as changelog:
-        with tree.AtomicFile(changelog_file) as new_changelog:
+    with open(changelog_file, "rt") as changelog:
+        with tree.AtomicFile(changelog_file, "wt") as new_changelog:
             print(
                 "%s (%s) UNRELEASED; urgency=low" % (package, merged_version),
                 file=new_changelog,
@@ -1254,7 +1254,7 @@ def write_report(
 ):
     """Write the merge report."""
     filename = "%s/REPORT" % output_dir
-    with open(filename, "w") as report:
+    with open(filename, "wt") as report:
         package = base_source["Package"]
 
         # Package and time

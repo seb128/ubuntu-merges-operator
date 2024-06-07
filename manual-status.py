@@ -233,7 +233,7 @@ def write_status_page(component, merges, left_distro, right_distro):
     merges.sort(reverse=True)
 
     status_file = "%s/merges/%s-manual.html" % (ROOT, component)
-    with tree.AtomicFile(status_file) as status:
+    with tree.AtomicFile(status_file, "wt") as status:
         print("<html>", file=status)
         print(file=status)
         print("<head>", file=status)
@@ -563,13 +563,13 @@ def write_status_json(component, merges, left_distro, right_distro):
                 "right_version": "%s" % right_version,
             },
         )
-    with tree.AtomicFile(status_file) as status:
+    with tree.AtomicFile(status_file, "wt") as status:
         status.write(json.dumps(data, indent=4))
 
 
 def write_status_file(status_file, merges):
     """Write out the merge status file."""
-    with tree.AtomicFile(status_file) as status:
+    with tree.AtomicFile(status_file, "wt") as status:
         for (
             uploaded,
             age,

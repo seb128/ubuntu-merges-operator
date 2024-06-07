@@ -131,7 +131,7 @@ def main(options, args):
                     version_sort(sources)
 
                     for this in sources:
-                        if watermark < this["Version"]:
+                        if watermark < Version(this["Version"]):
                             break
                     else:
                         continue
@@ -170,7 +170,7 @@ def main(options, args):
 
                     last = None
                     for this in sources:
-                        if watermark >= this["Version"]:
+                        if watermark >= Version(this["Version"]):
                             last = this
                             continue
 

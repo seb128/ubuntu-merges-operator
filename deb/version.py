@@ -111,10 +111,23 @@ class Version:
             self.revision,
         )
 
+    def __lt__(self, other):
+        return self.__cmp__(other) == -1
+
+    def __gt__(self, other):
+        return self.__cmp__(other) == 1
+
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
+
+    def __le__(self, other):
+        return self.__cmp__(other) <= 0
+
+    def __ge__(self, other):
+        return self.__cmp__(other) >= 0
+
     def __cmp__(self, other):
         """Compare two Version classes."""
-        other = Version(other)
-
         if self.epoch < other.epoch:
             return -1
         if self.epoch > other.epoch:

@@ -23,7 +23,7 @@ import subprocess
 import sys
 import tempfile
 from contextlib import contextmanager
-from urllib.request import URLopener
+from urllib.request import urlretrieve
 
 from momlib import (
     DISTROS,
@@ -132,7 +132,7 @@ def update_sources(distro, dist, component):
                 raise RuntimeError("Don't know how to decompress %s" % url)
             with decompressor(compfilename) as compfile:
                 ensure(filename)
-                with open(filename, "w") as local:
+                with open(filename, "wb") as local:
                     local.write(compfile.read())
         finally:
             os.unlink(compfilename)
@@ -162,7 +162,7 @@ def update_pool(distro, source):
         logging.debug("Downloading %s", url)
         ensure(filename)
         try:
-            URLopener().retrieve(url, filename)
+            urlretrieve(url, filename)
         except OSError:
             logging.exception("Downloading %s failed", url)
             raise

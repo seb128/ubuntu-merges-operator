@@ -159,11 +159,12 @@ def remove(filename):
 class AtomicFile:
     """Facilitate atomic writing of files."""
 
-    def __init__(self, filename):
+    def __init__(self, filename, mode="wb"):
         self.filename = filename
+        self.mode = mode
 
     def __enter__(self):
-        self.fd = open("%s.new" % self.filename, "w")
+        self.fd = open("%s.new" % self.filename, self.mode)
         return self.fd
 
     def __exit__(self, exc_type, unused_exc_value, unused_exc_tb):
