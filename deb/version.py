@@ -128,6 +128,7 @@ class Version:
 
     def __cmp__(self, other):
         """Compare two Version classes."""
+        other = Version(other)
         if self.epoch < other.epoch:
             return -1
         if self.epoch > other.epoch:

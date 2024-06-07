@@ -157,6 +157,7 @@ def main(options, args):
             except IndexError:
                 continue
 
+            base_version = None
             try:
                 base = get_base(our_pool_source)
                 base_source = get_nearest_source(package, base)

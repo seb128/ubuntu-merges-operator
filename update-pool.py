@@ -103,7 +103,7 @@ def update_sources(distro, dist, component):
 
         compfilename = tempfile.mktemp()
         try:
-            URLopener().retrieve(url, compfilename)
+            urlretrieve(url, compfilename)
         except OSError:
             logging.exception("Downloading %s failed", url)
             continue
