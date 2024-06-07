@@ -14,6 +14,7 @@ description = "Ubuntu Merge-o-Matic"
 requires-python = ">=3.8"
 dependencies = [
     "launchpadlib",
+    "python-debian",
     "pychart @ git+https://git.launchpad.net/~liushuyu-011/+git/pychart"
 ]
 urls = { "Homepage" = "https://wiki.ubuntu.com/MergeOMatic" }

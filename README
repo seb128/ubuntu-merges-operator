@@ -8,4 +8,7 @@ Dependencies
 
  * Python 3.8 or higher
  * python-pychart
+ * python-debian
  * ghostscript
+ * apt-utils
+ * xz-utils
