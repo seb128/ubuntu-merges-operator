@@ -12,3 +12,4 @@ Dependencies
  * ghostscript
  * apt-utils
  * xz-utils
+ * gettext
