@@ -177,10 +177,7 @@ def main(options, args):
                     fileobj=changes, multi_para=False, signed=False,
                 ).para
 
-                try:
-                    user = info["Changed-By"]
-                except KeyError:
-                    user = None
+                user = info.get("Changed-By") if info else None
                 try:
                     uploaded = False
                     # not enough to determine if it is updated LP: #1474139

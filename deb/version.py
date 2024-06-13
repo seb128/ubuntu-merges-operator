@@ -47,7 +47,6 @@ class Version:
     def __init__(self, ver):
         """Parse a string or number into the three components."""
         self.epoch = 0
-        self.upstream = None
         self.revision = None
 
         ver = str(ver)
@@ -56,11 +55,12 @@ class Version:
 
         # Epoch is component before first colon
         idx = ver.find(":")
+        epoch_str = "0"
         if idx != -1:
-            self.epoch = ver[:idx]
-            if not len(self.epoch):
+            epoch_str = ver[:idx]
+            if not len(epoch_str):
                 raise ValueError
-            if not valid_epoch.search(self.epoch):
+            if not valid_epoch.search(epoch_str):
                 raise ValueError
             ver = ver[idx + 1 :]
 
@@ -81,7 +81,7 @@ class Version:
         if not valid_upstream.search(self.upstream):
             raise ValueError
 
-        self.epoch = int(self.epoch)
+        self.epoch = int(epoch_str)
 
     def getWithoutEpoch(self):
         """Return the version without the epoch."""

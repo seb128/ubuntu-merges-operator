@@ -103,13 +103,14 @@ SRC_DIST = "unstable"
 
 # Time format for RSS feeds
 RSS_TIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"
+RSS_FALLBACK_TIME = "Thu, 01 Jan 1970 00:00:00 GMT"
 
 
 # Cache of parsed sources files
 SOURCES_CACHE = {}
 
 # mapping of uploader emails to Launchpad pages
-person_lp_page_mapping: Dict[str, str] = {}
+person_lp_page_mapping: Dict[str, str | None] = {}
 
 # mapping of packages to teams
 package_team_mapping = ""
@@ -806,9 +807,10 @@ def read_rss(filename, title, link, description):
         cutoff = datetime.datetime.utcnow() - datetime.timedelta(days=7)
 
         tree = ElementTree.parse(filename)
-        for i, item in enumerate(tree.find("channel").findall("item")):
+        channel_elem = tree.find("channel") or ElementTree.Element("channel")
+        for i, item in enumerate(channel_elem.findall("item")):
             dt = datetime.datetime(
-                *time.strptime(item.findtext("pubDate"), RSS_TIME_FORMAT)[:6],
+                *time.strptime(item.findtext("pubDate") or RSS_FALLBACK_TIME, RSS_TIME_FORMAT)[:6],
             )
             if dt > cutoff or i < 10:
                 channel.append(item)

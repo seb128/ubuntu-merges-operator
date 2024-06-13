@@ -192,7 +192,7 @@ def main(options, args):
                     fileobj=changes, multi_para=False, signed=False,
                 ).para
 
-                user = info["Changed-By"]
+                user = info.get("Changed-By") if info else None
                 # not enough to determine if it is updated LP: #1474139
                 # uploaded = info["Distribution"] == OUR_DIST
                 uploaded = False

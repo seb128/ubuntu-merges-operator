@@ -67,8 +67,8 @@ class ControlFile:
         with open(file) as f:
             try:
                 self.parse(f, *args, **kwds)
-            except Exception as e:
-                e.path = file
+            except OSError as e:
+                e.filename = file
                 raise e
 
     def parse(self, file, multi_para=False, signed=False):

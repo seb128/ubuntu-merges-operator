@@ -107,6 +107,17 @@ def sources_urls(distro, dist, component):
     yield "%s.gz" % base_url
 
 
+@contextmanager
+def external_lzma_decompressor(filename):
+    proc = subprocess.Popen(
+        ["xzcat", filename], stdout=subprocess.PIPE,
+    )
+    assert proc.stdout
+    yield proc.stdout
+    proc.stdout.close()
+    proc.wait()
+
+
 def update_sources(distro, dist, component):
     """Update a Sources file."""
     for url in sources_urls(distro, dist, component):
@@ -121,6 +132,7 @@ def update_sources(distro, dist, component):
             logging.exception("Downloading %s failed", url)
             continue
         try:
+            decompressor = None
             if url.endswith(".gz"):
                 import gzip
 
@@ -132,17 +144,11 @@ def update_sources(distro, dist, component):
                     decompressor = lzma.LZMAFile
                 else:
 
-                    @contextmanager
-                    def decompressor(name):
-                        proc = subprocess.Popen(
-                            ["xzcat", name], stdout=subprocess.PIPE,
-                        )
-                        yield proc.stdout
-                        proc.stdout.close()
-                        proc.wait()
+                    decompressor = external_lzma_decompressor
 
             else:
                 raise RuntimeError("Don't know how to decompress %s" % url)
+            assert decompressor
             with decompressor(compfilename) as compfile:
                 ensure(filename)
                 with open(filename, "wb") as local:

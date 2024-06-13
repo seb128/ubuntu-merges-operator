@@ -197,7 +197,7 @@ def main(options, args):
                             info = ControlFile(
                                 fileobj=changes, multi_para=False, signed=False,
                             ).para
-                            if "Changed-By" not in info:
+                            if not info or "Changed-By" not in info:
                                 uploader = None
                             else:
                                 uploader = parseaddr(info["Changed-By"])[-1]
@@ -303,15 +303,21 @@ previous version of the same source package in Ubuntu.""",
 
     # Extract the changes file
     changes_filename = changes_file(distro, this)
+    changes = None
     if os.path.isfile(changes_filename):
-        changes = MIMEText(open(changes_filename).read())
+        changes = MIMEText(open(changes_filename, "rt").read())
     elif os.path.isfile(changes_filename + ".bz2"):
-        changes = MIMEText(bz2.BZ2File(changes_filename + ".bz2").read())
-    changes.add_header(
-        "Content-Disposition",
-        "inline",
-        filename="%s" % os.path.basename(changes_filename),
-    )
+        changes = MIMEText(bz2.BZ2File(changes_filename + ".bz2").read().decode("utf-8", errors="replace"))
+    else:
+        logging.warning(
+            "Missing changes file %s" % changes_filename,
+        )
+    if changes:
+        changes.add_header(
+            "Content-Disposition",
+            "inline",
+            filename="%s" % os.path.basename(changes_filename),
+        )
 
     # Build up the message
     message = MIMEMultipart()
@@ -325,7 +331,8 @@ previous version of the same source package in Ubuntu.""",
     message.add_header("X-Distro-Tracker-Package", this["Package"])
     message.add_header("X-Distro-Tracker-Keyword", "derivatives")
     message.attach(intro)
-    message.attach(changes)
+    if changes:
+        message.attach(changes)
     message.attach(payload)
 
     send_message(message, recipients)
@@ -335,15 +342,15 @@ def patch_part(distro, this):
     """Construct an e-mail part containing the current patch."""
     patch_filename = patch_file(distro, this, True)
     if os.path.isfile(patch_filename):
-        part = MIMEText(open(patch_filename).read())
+        part = MIMEText(open(patch_filename, "rt").read())
     elif os.path.isfile(patch_filename + ".bz2"):
-        part = MIMEText(bz2.BZ2File(patch_filename + ".bz2").read())
+        part = MIMEText(bz2.BZ2File(patch_filename + ".bz2").read().decode("utf-8", errors="replace"))
     else:
         patch_filename = patch_file(distro, this, False)
         if os.path.isfile(patch_filename):
-            part = MIMEText(open(patch_filename).read())
+            part = MIMEText(open(patch_filename, "rt").read())
         elif os.path.isfile(patch_filename + ".bz2"):
-            part = MIMEText(bz2.BZ2File(patch_filename + ".bz2").read())
+            part = MIMEText(bz2.BZ2File(patch_filename + ".bz2").read().decode("utf-8", errors="replace"))
         else:
             return None
 
@@ -361,7 +368,7 @@ def diff_part(distro, this):
     if os.path.isfile(diff_filename):
         part = MIMEText(open(diff_filename).read())
     elif os.path.isfile(diff_filename + ".bz2"):
-        part = MIMEText(bz2.BZ2File(diff_filename + ".bz2").read())
+        part = MIMEText(bz2.BZ2File(diff_filename + ".bz2").read().decode("utf-8", errors="replace"))
     else:
         return None
 
