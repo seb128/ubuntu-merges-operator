@@ -189,7 +189,7 @@ def cleanup(path):
 
 def md5sum(filename):
     """Return an md5sum."""
-    return md5(open(filename).read()).hexdigest()
+    return md5(open(filename, "rb").read()).hexdigest()
 
 
 def get_person_lp_page(person_email):

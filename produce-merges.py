@@ -761,8 +761,10 @@ def merge_changelog(left_dir, right_dir, merged_dir, filename):
     left_cl = read_changelog("%s/%s" % (left_dir, filename))
     right_cl = read_changelog("%s/%s" % (right_dir, filename))
 
-    with open("%s/%s" % (merged_dir, filename), "w") as output:
+    with open("%s/%s" % (merged_dir, filename), "wt") as output:
         for right_ver, right_text in right_cl:
+            left_ver = left_cl[0][0] or Version("0")
+            right_ver = right_ver or Version("0")
             while len(left_cl) and left_cl[0][0] > right_ver:
                 (left_ver, left_text) = left_cl.pop(0)
                 print(left_text, file=output)
@@ -782,7 +784,7 @@ def read_changelog(filename):
     """Return a parsed changelog file."""
     entries = []
 
-    with open(filename) as cl:
+    with open(filename, "rt") as cl:
         (ver, text) = (None, "")
         for line in cl:
             match = CL_RE.search(line)

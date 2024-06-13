@@ -22,6 +22,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import multiprocessing
 from contextlib import contextmanager
 from urllib.request import urlretrieve
 
@@ -50,6 +51,14 @@ def options(parser):
         action="append",
         help="Process only these packages",
     )
+    parser.add_option(
+        "-j",
+        "--jobs",
+        type="int",
+        metavar="JOBS",
+        help="Number of download jobs to run in parallel",
+        default=4,
+    )
 
 
 def main(options, args):
@@ -59,6 +68,7 @@ def main(options, args):
         distros = get_pool_distros()
 
     blocklist = read_blocklist()
+    jobs = int(options.jobs)
 
     # Download the current sources for the given distributions and download
     # any new contents into our pool
@@ -67,8 +77,8 @@ def main(options, args):
             for component in DISTROS[distro]["components"]:
                 update_sources(distro, dist, component)
 
-                sources = get_sources(distro, dist, component)
-                for source in sources:
+                sources = []
+                for source in get_sources(distro, dist, component):
                     if (
                         options.package is not None
                         and source["Package"] not in options.package
@@ -83,7 +93,10 @@ def main(options, args):
                         # It looks as though we've already processed and
                         # expired this.
                         continue
-                    update_pool(distro, source)
+                    sources.append((distro, source))
+
+                with multiprocessing.Pool(jobs) as pool:
+                    pool.map(_update_pool_wrapper, sources)
 
 
 def sources_urls(distro, dist, component):
@@ -144,6 +157,10 @@ def update_sources(distro, dist, component):
     )
 
 
+def _update_pool_wrapper(args):
+    return update_pool(*args)
+
+
 def update_pool(distro, source):
     """Download a source package into our pool."""
     mirror = DISTROS[distro]["mirror"]
@@ -163,9 +180,9 @@ def update_pool(distro, source):
         ensure(filename)
         try:
             urlretrieve(url, filename)
-        except OSError:
+        except OSError as ex:
             logging.exception("Downloading %s failed", url)
-            raise
+            raise RuntimeError("Download failed") from ex
         logging.info("Saved %s", tree.subdir(ROOT, filename))
 
 

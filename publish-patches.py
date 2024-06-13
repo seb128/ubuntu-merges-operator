@@ -64,7 +64,7 @@ def main(options, args):
     blocklist = read_blocklist()
 
     # Write to a new list
-    with tree.AtomicFile(patch_list_file()) as list_file:
+    with tree.AtomicFile(patch_list_file(), "wt") as list_file:
         # For each package in the distribution, check for a patch for the
         # current version; publish if it exists, clean up if not
         for component in DISTROS[distro]["components"]:
