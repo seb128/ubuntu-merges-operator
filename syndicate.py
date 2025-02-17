@@ -510,15 +510,18 @@ def read_subscriptions():
     """Read the subscriptions file."""
     subscriptions = []
 
-    with open("%s/subscriptions.txt" % ROOT) as f:
-        fcntl.flock(f.fileno(), fcntl.LOCK_SH)
+    if os.path.exists("%s/subscriptions.txt" % ROOT):
+        with open("%s/subscriptions.txt" % ROOT) as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_SH)
 
-        for line in f:
-            if line.startswith("#"):
-                continue
+            for line in f:
+                if line.startswith("#"):
+                    continue
 
-            (addr, distro, filter) = line.strip().split()
-            subscriptions.append((addr, distro, filter))
+                (addr, distro, filter) = line.strip().split()
+                subscriptions.append((addr, distro, filter))
+    else:
+        logging.warning("Missing subscriptions.txt file")
 
     return subscriptions
 
