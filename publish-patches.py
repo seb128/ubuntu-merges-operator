@@ -63,6 +63,7 @@ def main(options, args):
 
     blocklist = read_blocklist()
 
+    os.makedirs(os.path.dirname(patch_list_file()), exist_ok=True)
     # Write to a new list
     with tree.AtomicFile(patch_list_file(), "wt") as list_file:
         # For each package in the distribution, check for a patch for the
