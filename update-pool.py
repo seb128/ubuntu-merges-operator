@@ -121,6 +121,7 @@ def external_lzma_decompressor(filename):
 
 def update_sources(distro, dist, component):
     """Update a Sources file."""
+    print(f"Updating {distro}/{dist}/{component}")
     for url in sources_urls(distro, dist, component):
         filename = sources_file(distro, dist, component)
 
