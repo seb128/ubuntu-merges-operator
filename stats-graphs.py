@@ -240,7 +240,10 @@ def pie_chart(component, current):
     filename = "%s/merges/%s-now.png" % (ROOT, component)
     with closing(canvas.init(filename, format="png")) as c:
         ar = area.T(
-            size=(600, 500), legend=None, x_grid_style=None, y_grid_style=None,
+            size=(600, 500),
+            legend=None,
+            x_grid_style=None,
+            y_grid_style=None,
         )
 
         plot = pie_plot.T(
@@ -325,7 +328,8 @@ def range_chart(component, history, start, today, events):
                 continue
 
             tb = text_box.T(
-                loc=(xpos + 25, ypos + 45 - (20 * level)), text=text,
+                loc=(xpos + 25, ypos + 45 - (20 * level)),
+                text=text,
             )
             tb.add_arrow((xpos, ypos))
             tb.draw()

@@ -148,13 +148,16 @@ def main(options, args):
             try:
                 output_dir = result_dir(source["Package"])
                 (base_version, left_version, right_version) = read_report(
-                    output_dir, our_distro, src_distro,
+                    output_dir,
+                    our_distro,
+                    src_distro,
                 )
             except ValueError:
                 continue
             teams = get_responsible_team(source["Package"])
             date_superseded = get_date_superseded(
-                source["Package"], base_version,
+                source["Package"],
+                base_version,
             )
             if not date_superseded:
                 age = datetime.timedelta(0)
@@ -174,7 +177,9 @@ def main(options, args):
 
             if changes is not None:
                 info = ControlFile(
-                    fileobj=changes, multi_para=False, signed=False,
+                    fileobj=changes,
+                    multi_para=False,
+                    signed=False,
                 ).para
 
                 user = info.get("Changed-By") if info else None
@@ -271,7 +276,8 @@ def write_status_page(component, merges, left_distro, right_distro):
             file=status,
         )
         print(
-            "<title>Ubuntu Merge-o-Matic: %s</title>" % component, file=status,
+            "<title>Ubuntu Merge-o-Matic: %s</title>" % component,
+            file=status,
         )
         print("<style>", file=status)
         print("img#ubuntu {", file=status)
@@ -370,7 +376,11 @@ def write_status_page(component, merges, left_distro, right_distro):
             )
 
             do_table(
-                status, section_merges, left_distro, right_distro, component,
+                status,
+                section_merges,
+                left_distro,
+                right_distro,
+                component,
             )
 
         print("<h2 id=stats>Statistics</h2>", file=status)
@@ -644,7 +654,11 @@ else:\n\
         print("<tr bgcolor=%s>" % COLOURS[colour_idx], file=status)
         # If the given package list is more than 10, hide it
         if len(source["Binary"].strip().split(", ")) > 10:
-            print("<td><small class='expanded'>%s</small></td>" % source["Binary"], file=status)
+            print(
+                "<td><small class='expanded'>%s</small></td>"
+                % source["Binary"],
+                file=status,
+            )
         else:
             print("<td><small>%s</small></td>" % source["Binary"], file=status)
         if proposed_version:

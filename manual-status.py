@@ -143,7 +143,9 @@ def main(options, args):
                 package = our_source["Package"]
                 our_version = Version(our_source["Version"])
                 our_pool_source = get_pool_source(
-                    our_distro, package, our_version,
+                    our_distro,
+                    package,
+                    our_version,
                 )
                 logging.debug("%s: %s is %s", package, our_distro, our_version)
             except (OSError, IndexError):
@@ -151,7 +153,9 @@ def main(options, args):
 
             try:
                 (src_source, src_version, src_pool_source) = get_same_source(
-                    src_distro, src_dist, package,
+                    src_distro,
+                    src_dist,
+                    package,
                 )
                 logging.debug("%s: %s is %s", package, src_distro, src_version)
             except IndexError:
@@ -163,7 +167,10 @@ def main(options, args):
                 base_source = get_nearest_source(package, base)
                 base_version = Version(base_source["Version"])
                 logging.debug(
-                    "%s: base is %s (%s wanted)", package, base_version, base,
+                    "%s: base is %s (%s wanted)",
+                    package,
+                    base_version,
+                    base,
                 )
                 continue
             except IndexError:
@@ -189,7 +196,9 @@ def main(options, args):
 
             if changes is not None:
                 info = ControlFile(
-                    fileobj=changes, multi_para=False, signed=False,
+                    fileobj=changes,
+                    multi_para=False,
+                    signed=False,
                 ).para
 
                 user = info.get("Changed-By") if info else None
@@ -283,7 +292,8 @@ def write_status_page(component, merges, left_distro, right_distro):
         print("<body>", file=status)
         print('<img src=".img/ubuntulogo-100.png" id="ubuntu">', file=status)
         print(
-            "<h1>Ubuntu Merge-o-Matic: %s manual</h1>" % component, file=status,
+            "<h1>Ubuntu Merge-o-Matic: %s manual</h1>" % component,
+            file=status,
         )
 
         for section in SECTIONS:
@@ -305,7 +315,11 @@ def write_status_page(component, merges, left_distro, right_distro):
             )
 
             do_table(
-                status, section_merges, left_distro, right_distro, component,
+                status,
+                section_merges,
+                left_distro,
+                right_distro,
+                component,
             )
 
         print(

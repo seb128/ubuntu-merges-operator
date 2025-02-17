@@ -110,7 +110,8 @@ def sources_urls(distro, dist, component):
 @contextmanager
 def external_lzma_decompressor(filename):
     proc = subprocess.Popen(
-        ["xzcat", filename], stdout=subprocess.PIPE,
+        ["xzcat", filename],
+        stdout=subprocess.PIPE,
     )
     assert proc.stdout
     yield proc.stdout

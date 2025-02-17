@@ -195,7 +195,9 @@ def main(options, args):
                         # Extract the author's e-mail from the changes file
                         try:
                             info = ControlFile(
-                                fileobj=changes, multi_para=False, signed=False,
+                                fileobj=changes,
+                                multi_para=False,
+                                signed=False,
                             ).para
                             if not info or "Changed-By" not in info:
                                 uploader = None
@@ -217,7 +219,11 @@ def main(options, args):
 
                         try:
                             mail_diff(
-                                distro, last, this, uploader, subscriptions,
+                                distro,
+                                last,
+                                this,
+                                uploader,
+                                subscriptions,
                             )
                         except MemoryError:
                             logging.exception("Ran out of memory")
@@ -235,7 +241,10 @@ def main(options, args):
 def mail_diff(distro, last, this, uploader, subscriptions):
     """Mail a diff out to the subscribers."""
     recipients = get_recipients(
-        distro, this["Package"], uploader, subscriptions,
+        distro,
+        this["Package"],
+        uploader,
+        subscriptions,
     )
     if not len(recipients):
         return
@@ -307,7 +316,11 @@ previous version of the same source package in Ubuntu.""",
     if os.path.isfile(changes_filename):
         changes = MIMEText(open(changes_filename, "rt").read())
     elif os.path.isfile(changes_filename + ".bz2"):
-        changes = MIMEText(bz2.BZ2File(changes_filename + ".bz2").read().decode("utf-8", errors="replace"))
+        changes = MIMEText(
+            bz2.BZ2File(changes_filename + ".bz2")
+            .read()
+            .decode("utf-8", errors="replace")
+        )
     else:
         logging.warning(
             "Missing changes file %s" % changes_filename,
@@ -344,13 +357,21 @@ def patch_part(distro, this):
     if os.path.isfile(patch_filename):
         part = MIMEText(open(patch_filename, "rt").read())
     elif os.path.isfile(patch_filename + ".bz2"):
-        part = MIMEText(bz2.BZ2File(patch_filename + ".bz2").read().decode("utf-8", errors="replace"))
+        part = MIMEText(
+            bz2.BZ2File(patch_filename + ".bz2")
+            .read()
+            .decode("utf-8", errors="replace")
+        )
     else:
         patch_filename = patch_file(distro, this, False)
         if os.path.isfile(patch_filename):
             part = MIMEText(open(patch_filename, "rt").read())
         elif os.path.isfile(patch_filename + ".bz2"):
-            part = MIMEText(bz2.BZ2File(patch_filename + ".bz2").read().decode("utf-8", errors="replace"))
+            part = MIMEText(
+                bz2.BZ2File(patch_filename + ".bz2")
+                .read()
+                .decode("utf-8", errors="replace")
+            )
         else:
             return None
 
@@ -368,7 +389,11 @@ def diff_part(distro, this):
     if os.path.isfile(diff_filename):
         part = MIMEText(open(diff_filename).read())
     elif os.path.isfile(diff_filename + ".bz2"):
-        part = MIMEText(bz2.BZ2File(diff_filename + ".bz2").read().decode("utf-8", errors="replace"))
+        part = MIMEText(
+            bz2.BZ2File(diff_filename + ".bz2")
+            .read()
+            .decode("utf-8", errors="replace")
+        )
     else:
         return None
 

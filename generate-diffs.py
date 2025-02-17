@@ -120,7 +120,8 @@ def generate_diff(distro, last, this):
         try:
             save_changes_file(changes_filename, this, last)
             logging.info(
-                "Saved changes file: %s", tree.subdir(ROOT, changes_filename),
+                "Saved changes file: %s",
+                tree.subdir(ROOT, changes_filename),
             )
         except subprocess.CalledProcessError:
             logging.exception(

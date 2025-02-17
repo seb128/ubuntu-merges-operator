@@ -185,7 +185,9 @@ def main(options, args):
 
             try:
                 (src_source, src_version, src_pool_source) = get_same_source(
-                    src_distro, src_dist, package,
+                    src_distro,
+                    src_dist,
+                    package,
                 )
                 logging.debug("%s: %s is %s", package, src_distro, src_version)
             except IndexError:

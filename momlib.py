@@ -423,7 +423,9 @@ def get_sources(distro, dist, component):
     filename = sources_file(distro, dist, component)
     if filename not in SOURCES_CACHE:
         SOURCES_CACHE[filename] = ControlFile(
-            filename, multi_para=True, signed=False,
+            filename,
+            multi_para=True,
+            signed=False,
         )
 
     return SOURCES_CACHE[filename].paras
@@ -682,11 +684,17 @@ def save_changes_file(filename, source, previous=None):
         with open(os.devnull, "wb") as devnull:
             try:
                 subprocess.check_call(
-                    cmd, cwd=srcdir, stdout=changes, stderr=devnull,
+                    cmd,
+                    cwd=srcdir,
+                    stdout=changes,
+                    stderr=devnull,
                 )
             except subprocess.CalledProcessError:
                 subprocess.check_call(
-                    orig_cmd, cwd=srcdir, stdout=changes, stderr=devnull,
+                    orig_cmd,
+                    cwd=srcdir,
+                    stdout=changes,
+                    stderr=devnull,
                 )
 
     return filename
@@ -708,7 +716,10 @@ def save_patch_file(filename, last, this):
         diff_args = ("diff", "-pruN", lastdir, thisdir)
         with open(os.devnull, "wb") as devnull:
             status = subprocess.call(
-                diff_args, cwd=diffdir, stdout=diff, stderr=devnull,
+                diff_args,
+                cwd=diffdir,
+                stdout=diff,
+                stderr=devnull,
             )
         if status not in {0, 1, 2}:
             raise subprocess.CalledProcessError(status, diff_args)
@@ -810,7 +821,10 @@ def read_rss(filename, title, link, description):
         channel_elem = tree.find("channel") or ElementTree.Element("channel")
         for i, item in enumerate(channel_elem.findall("item")):
             dt = datetime.datetime(
-                *time.strptime(item.findtext("pubDate") or RSS_FALLBACK_TIME, RSS_TIME_FORMAT)[:6],
+                *time.strptime(
+                    item.findtext("pubDate") or RSS_FALLBACK_TIME,
+                    RSS_TIME_FORMAT,
+                )[:6],
             )
             if dt > cutoff or i < 10:
                 channel.append(item)
@@ -843,7 +857,8 @@ def append_rss(rss, title, link, author=None, filename=None):
     if filename is not None:
         e = ElementTree.SubElement(item, "pubDate")
         e.text = time.strftime(
-            RSS_TIME_FORMAT, time.gmtime(os.stat(filename).st_mtime),
+            RSS_TIME_FORMAT,
+            time.gmtime(os.stat(filename).st_mtime),
         )
 
     channel = rss.find("channel")

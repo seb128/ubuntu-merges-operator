@@ -47,7 +47,10 @@ from util import tree
 
 def options(parser):
     parser.add_option(
-        "-f", "--force", action="store_true", help="Force creation of patches",
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force creation of patches",
     )
 
     parser.add_option(
@@ -137,7 +140,9 @@ def main(options, args):
                 package = our_source["Package"]
                 our_version = Version(our_source["Version"])
                 our_pool_source = get_pool_source(
-                    our_distro, package, our_version,
+                    our_distro,
+                    package,
+                    our_version,
                 )
                 logging.debug("%s: %s is %s", package, our_distro, our_version)
             except (OSError, IndexError):
@@ -145,7 +150,9 @@ def main(options, args):
 
             try:
                 (src_source, src_version, src_pool_source) = get_same_source(
-                    src_distro, src_dist, package,
+                    src_distro,
+                    src_dist,
+                    package,
                 )
                 logging.debug("%s: %s is %s", package, src_distro, src_version)
             except IndexError:
@@ -193,24 +200,42 @@ def make_patches(
         base_source = get_nearest_source(package, base)
         base_version = Version(base_source["Version"])
         logging.debug(
-            "%s: base is %s (%s wanted)", package, base_version, base,
+            "%s: base is %s (%s wanted)",
+            package,
+            base_version,
+            base,
         )
     except IndexError:
         return
 
     try:
         generate_patch(
-            src_distro, base_source, our_distro, our_source, slipped, force,
+            src_distro,
+            base_source,
+            our_distro,
+            our_source,
+            slipped,
+            force,
         )
         generate_patch(
-            src_distro, base_source, src_distro, src_source, slipped, force,
+            src_distro,
+            base_source,
+            src_distro,
+            src_source,
+            slipped,
+            force,
         )
     finally:
         cleanup_source(base_source)
 
 
 def generate_patch(
-    base_distro, base_source, distro, our_source, slipped=False, force=False,
+    base_distro,
+    base_source,
+    distro,
+    our_source,
+    slipped=False,
+    force=False,
 ):
     """Generate a patch file for the given comparison."""
     our_version = Version(our_source["Version"])
@@ -218,7 +243,18 @@ def generate_patch(
 
     if base_version > our_version:
         # Allow comparison of source -1 against our -0ubuntuX (slipped)
-        if not slipped or our_version.revision is None or (not our_version.revision.startswith("0ubuntu") or base_version.revision != "1") or (base_version.upstream != our_version.upstream or base_version.epoch != our_version.epoch):
+        if (
+            not slipped
+            or our_version.revision is None
+            or (
+                not our_version.revision.startswith("0ubuntu")
+                or base_version.revision != "1"
+            )
+            or (
+                base_version.upstream != our_version.upstream
+                or base_version.epoch != our_version.epoch
+            )
+        ):
             return
 
         logging.debug("Allowing comparison of -1 against -0ubuntuX")
