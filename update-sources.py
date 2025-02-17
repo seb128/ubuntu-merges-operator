@@ -37,6 +37,7 @@ def main(options, args):
             print(e, "(continuing)", file=sys.stderr)
             continue
         for hpart in hparts:
+            print(f"Updating pool for {distro}/{hpart}")
             for package in os.listdir("%s/pool/%s/%s" % (ROOT, distro, hpart)):
                 update_pool_sources(distro, package)
 
