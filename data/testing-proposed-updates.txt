@@ -1,0 +1,4 @@
+# Packages to be syncd from testing-proposed-updates
+# 2025-02-17 - Skia - I've found no recent reference to
+# testing-proposed-updates. Is this a thing anymore? On the deployed server, that
+# file's timestamp was 2009-10-30.

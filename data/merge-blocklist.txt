@@ -1,0 +1,3 @@
+# cjwatson 2019-12-24: crashes due to symlink confusion; exclude until we
+# have time to fix it
+ceph

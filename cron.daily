@@ -74,10 +74,10 @@ wget -q -O"$MOMLIB_ROOT"/code/package-team-mapping.json https://people.canonical
 ./syndicate.py $QUIET
 
 # Run the merge tool
-./produce-merges.py $QUIET -X ../merge-blocklist.txt -X ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt
-./produce-merges.py $QUIET -X ../merge-blocklist.txt -I ../experimental.txt -X ../unstable.txt -X ../testing-proposed-updates.txt -S experimental
-./produce-merges.py $QUIET -X ../merge-blocklist.txt -X ../experimental.txt -I ../unstable.txt -X ../testing-proposed-updates.txt -S unstable
-./produce-merges.py $QUIET -X ../merge-blocklist.txt -X ../experimental.txt -X ../unstable.txt -I ../testing-proposed-updates.txt -S testing-proposed-updates
+./produce-merges.py $QUIET -X data/merge-blocklist.txt -X data/experimental.txt -X data/unstable.txt -X data/testing-proposed-updates.txt
+./produce-merges.py $QUIET -X data/merge-blocklist.txt -I data/experimental.txt -X data/unstable.txt -X data/testing-proposed-updates.txt -S experimental
+./produce-merges.py $QUIET -X data/merge-blocklist.txt -X data/experimental.txt -I data/unstable.txt -X data/testing-proposed-updates.txt -S unstable
+./produce-merges.py $QUIET -X data/merge-blocklist.txt -X data/experimental.txt -X data/unstable.txt -I data/testing-proposed-updates.txt -S testing-proposed-updates
 
 # Produce pretty reports
 ./stats.py $QUIET
