@@ -3,7 +3,7 @@
 set -e
 umask 002
 
-MOMLIB_ROOT=/srv/patches.ubuntu.com
+MOMLIB_ROOT="$HOME"/data
 
 cd "$MOMLIB_ROOT"
 

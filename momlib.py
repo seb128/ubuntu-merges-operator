@@ -45,7 +45,7 @@ from deb.version import Version
 from util import tree
 
 # Output root
-ROOT = "/srv/patches.ubuntu.com"
+ROOT = os.path.expanduser("~/data")
 
 # Distribution definitions
 DISTROS = {
