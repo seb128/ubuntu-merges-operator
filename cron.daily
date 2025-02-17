@@ -26,7 +26,7 @@ if [ "$DEBUG" = "y" ]; then
 else
 	QUIET="-q"
 
-	if ! mkdir $MOMLIB_ROOT/.lock 2>/dev/null; then
+	if ! mkdir "$MOMLIB_ROOT"/.lock 2>/dev/null; then
 		# Only produce cronspam if running from a terminal or the
 		# lock has been held for more than three hours.
 		age () {
@@ -36,7 +36,7 @@ else
 			echo "$(($now - $mtime))"
 		}
 		if [ -t 0 ] || \
-		   [ "$(age $MOMLIB_ROOT/.lock)" -gt \
+		   [ "$(age "$MOMLIB_ROOT"/.lock)" -gt \
 		     $((3 * 60 * 60)) ]; then
 			echo "LOCKED (another one running?)"
 			exit 1
@@ -44,19 +44,19 @@ else
 			exit 0
 		fi
 	fi
-	trap "rmdir $MOMLIB_ROOT/.lock" 0
+	trap 'rmdir $MOMLIB_ROOT/.lock' 0
 fi
 
-cd $MOMLIB_ROOT/code
+cd "$MOMLIB_ROOT"/code
 #bzr update
 
-cp -a addcomment.py $MOMLIB_ROOT/merges
+cp -a addcomment.py "$MOMLIB_ROOT"/merges
 
 # Update the blocklist
-wget -q -O$MOMLIB_ROOT/sync-blocklist.txt https://people.canonical.com/~ubuntu-archive/sync-blocklist.txt
+wget -q -O"$MOMLIB_ROOT"/sync-blocklist.txt https://people.canonical.com/~ubuntu-archive/sync-blocklist.txt
 
 # Update the package to team mapping
-wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json https://people.canonical.com/~ubuntu-archive/package-team-mapping.json
+wget -q -O"$MOMLIB_ROOT"/code/package-team-mapping.json https://people.canonical.com/~ubuntu-archive/package-team-mapping.json
 
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
@@ -92,4 +92,4 @@ wget -q -O$MOMLIB_ROOT/code/package-team-mapping.json https://people.canonical.c
 ./expire-pool.py $QUIET
 
 # ?! untidy
-rm -rf $MOMLIB_ROOT/unpacked/*
+rm -rf "$MOMLIB_ROOT"/unpacked/*
