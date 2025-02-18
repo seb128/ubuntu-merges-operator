@@ -50,7 +50,8 @@ fi
 cd "$MOMLIB_ROOT"/code
 #bzr update
 
-mkdir -p "$MOMLIB_ROOT"/merges
+mkdir -p "$MOMLIB_ROOT"/merges/.static
+cp -a static/* "$MOMLIB_ROOT"/merges/.static
 cp -a addcomment.py "$MOMLIB_ROOT"/merges
 
 # Update the blocklist

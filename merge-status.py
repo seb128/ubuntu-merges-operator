@@ -307,7 +307,7 @@ from momlib import *
 %>
 </head>
 <body>
-<img src=".img/ubuntulogo-100.png" id="ubuntu">
+<img src="./.static/img/ubuntulogo-100.png" id="ubuntu">
 <h1>Ubuntu Merge-o-Matic: {component}</h1>
 <div id="filters">
 <b>Filters:</b>

@@ -919,13 +919,13 @@ def gen_buglink_from_comment(comment):
 
     html = ""
     if debian:
-        html += '<img src=".img/debian.png" alt="Debian" />'
+        html += '<img src="./.static/img/debian.png" alt="Debian" />'
         html += '<a href="https://bugs.debian.org/%s">#%s</a>' % (
             debian.group(1),
             debian.group(1),
         )
     elif ubuntu:
-        html += '<img src=".img/ubuntu.png" alt="Ubuntu" />'
+        html += '<img src="./.static/img/ubuntu.png" alt="Ubuntu" />'
         html += '<a href="https://launchpad.net/bugs/%s">#%s</a>' % (
             ubuntu.group(1),
             ubuntu.group(1),
