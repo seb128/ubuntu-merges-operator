@@ -267,111 +267,83 @@ def write_status_page(component, merges, left_distro, right_distro):
     """Write out the merge status page."""
     status_file = "%s/merges/%s.html" % (ROOT, component)
     with tree.AtomicFile(status_file, "wt") as status:
-        print("<html>", file=status)
-        print(file=status)
-        print("<head>", file=status)
         print(
-            '<meta http-equiv="Content-Type" '
-            'content="text/html; charset=utf-8">',
+            f"""
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Ubuntu Merge-o-Matic: {component}</title>
+<style>
+img#ubuntu {{
+    border: 0;
+}}
+h1 {{
+    padding-top: 0.5em;
+    font-family: sans-serif;
+    font-size: 2.0em;
+    font-weight: bold;
+}}
+h2 {{
+    padding-top: 0.5em;
+    font-family: sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+}}
+p, td {{
+    font-family: sans-serif;
+    margin-bottom: 0;
+}}
+li {{
+    font-family: sans-serif;
+    margin-bottom: 1em;
+}}
+tr.first td {{
+    border-top: 2px solid white;
+}}
+</style>
+<%
+import html
+from momlib import *
+%>
+</head>
+<body>
+<img src=".img/ubuntulogo-100.png" id="ubuntu">
+<h1>Ubuntu Merge-o-Matic: {component}</h1>
+<div id="filters">
+<b>Filters:</b>
+<input id="query" name="query"/>
+<input id="showProposed" checked="checked" type="checkbox">Show merges with something in proposed</input>
+<input id="showMergeNeeded" checked="checked" type="checkbox">Show merges without something in proposed</input>
+<input id="showLongBinaries" checked="checked" type="checkbox">Show long lists of binaries (10+)</input>
+</div>
+              """,
             file=status,
         )
-        print(
-            "<title>Ubuntu Merge-o-Matic: %s</title>" % component,
-            file=status,
-        )
-        print("<style>", file=status)
-        print("img#ubuntu {", file=status)
-        print("    border: 0;", file=status)
-        print("}", file=status)
-        print("h1 {", file=status)
-        print("    padding-top: 0.5em;", file=status)
-        print("    font-family: sans-serif;", file=status)
-        print("    font-size: 2.0em;", file=status)
-        print("    font-weight: bold;", file=status)
-        print("}", file=status)
-        print("h2 {", file=status)
-        print("    padding-top: 0.5em;", file=status)
-        print("    font-family: sans-serif;", file=status)
-        print("    font-size: 1.5em;", file=status)
-        print("    font-weight: bold;", file=status)
-        print("}", file=status)
-        print("p, td {", file=status)
-        print("    font-family: sans-serif;", file=status)
-        print("    margin-bottom: 0;", file=status)
-        print("}", file=status)
-        print("li {", file=status)
-        print("    font-family: sans-serif;", file=status)
-        print("    margin-bottom: 1em;", file=status)
-        print("}", file=status)
-        print("tr.first td {", file=status)
-        print("    border-top: 2px solid white;", file=status)
-        print("}", file=status)
-        print("</style>", file=status)
-        print("<%", file=status)
-        print("import html", file=status)
-        print("from momlib import *", file=status)
-        print("%>", file=status)
-        print("</head>", file=status)
-        print("<body>", file=status)
-        print('<img src=".img/ubuntulogo-100.png" id="ubuntu">', file=status)
-        print("<h1>Ubuntu Merge-o-Matic: %s</h1>" % component, file=status)
-
-        print('<div id="filters">', file=status)
-        print("<b>Filters:</b>", file=status)
-        print('<input id="query" name="query"/>', file=status)
-        print(
-            '<input id="showProposed" checked="checked" type="checkbox">'
-            "Show merges with something in proposed</input>",
-            file=status,
-        )
-        print(
-            '<input id="showMergeNeeded" checked="checked" type="checkbox">'
-            "Show merges without something in proposed</input>",
-            file=status,
-        )
-        print(
-            '<input id="showLongBinaries" checked="checked" type="checkbox">'
-            "Show long lists of binaries (10+)</input>",
-            file=status,
-        )
-        print("</div>", file=status)
 
         for section in SECTIONS:
             section_merges = [m for m in merges if m[0] == section]
             print(
-                '<p><a href="#%s">%s %s merges</a></p>'
-                % (section, len(section_merges), section),
+                f'<p><a href="#{section}">{len(section_merges)} {section} merges</a></p>',
                 file=status,
             )
 
-        print("<ul>", file=status)
         print(
-            "<li>If you are not the previous uploader, ask the "
-            "previous uploader before doing the merge.  This "
-            "prevents two people from doing the same work.</li>",
+            """
+        <ul> 
+            <li>If you are not the previous uploader, ask the previous uploader before doing the merge. This prevents two people from doing the same work.</li>
+            <li>Before uploading, update the changelog to have your name and a list of the outstanding Ubuntu changes.</li>
+            <li>Try and keep the diff small, this may involve manually tweaking <tt>po</tt> files and the like.</li>
+        </ul> 
+        <% comment = get_comments() %>
+              """,
             file=status,
         )
-        print(
-            "<li>Before uploading, update the changelog to "
-            "have your name and a list of the outstanding "
-            "Ubuntu changes.</li>",
-            file=status,
-        )
-        print(
-            "<li>Try and keep the diff small, this may involve "
-            "manually tweaking <tt>po</tt> files and the "
-            "like.</li>",
-            file=status,
-        )
-        print("</ul>", file=status)
-
-        print("<% comment = get_comments() %>", file=status)
 
         for section in SECTIONS:
             section_merges = [m for m in merges if m[0] == section]
 
             print(
-                '<h2 id="%s">%s Merges</h2>' % (section, section.title()),
+                f'<h2 id="{section}">{section.title()} Merges</h2>',
                 file=status,
             )
 
@@ -383,18 +355,13 @@ def write_status_page(component, merges, left_distro, right_distro):
                 component,
             )
 
-        print("<h2 id=stats>Statistics</h2>", file=status)
         print(
-            '<img src="%s-now.png" title="Current stats">' % component,
-            file=status,
-        )
-        print(
-            '<img src="%s-trend.png" title="Six month trend">' % component,
-            file=status,
-        )
-        print(
-            "<p><small>Generated at %s.</small></p>"
-            % time.strftime("%Y-%m-%d %H:%M:%S %Z"),
+            f"""
+        <h2 id=stats>Statistics</h2>"
+        <img src="{component}-now.png" title="Current stats">
+        <img src="{component}-trend.png" title="Six month trend">
+        <p><small>Generated at {time.strftime("%Y-%m-%d %H:%M:%S %Z")}.</small></p>
+              """,
             file=status,
         )
 
@@ -495,29 +462,35 @@ def write_status_page(component, merges, left_distro, right_distro):
                     showMergeNeeded.addEventListener('change', filterText);
                     showLongBinaries.addEventListener('change', filterText);
                 })();
-            </script>""",
+            </script>
+            </body>
+            </html>
+            """,
             ),
             file=status,
         )
-        print("</body>", file=status)
-        print("</html>", file=status)
 
 
 def do_table(status, merges, left_distro, right_distro, component):
     """Output a table."""
-    print("<table cellspacing=0>", file=status)
-    print("<tr bgcolor=#d0d0d0>", file=status)
-    print("<td rowspan=2><b>Package [Responsible Teams]</b></td>", file=status)
-    print("<td colspan=3><b>Last Uploader</b></td>", file=status)
-    print("<td rowspan=2><b>Comment</b></td>", file=status)
-    print("<td rowspan=2><b>Bug</b></td>", file=status)
-    print("<td rowspan=2><b>Days Old</b></td>", file=status)
-    print("</tr>", file=status)
-    print("<tr bgcolor=#d0d0d0>", file=status)
-    print("<td><b>%s Version</b></td>" % left_distro.title(), file=status)
-    print("<td><b>%s Version</b></td>" % right_distro.title(), file=status)
-    print("<td><b>Base Version</b></td>", file=status)
-    print("</tr>", file=status)
+    print(
+        f"""
+    <table cellspacing=0>
+    <tr bgcolor=#d0d0d0>
+    <td rowspan=2><b>Package [Responsible Teams]</b></td>
+    <td colspan=3><b>Last Uploader</b></td>
+    <td rowspan=2><b>Comment</b></td>
+    <td rowspan=2><b>Bug</b></td>
+    <td rowspan=2><b>Days Old</b></td>
+    </tr>
+    <tr bgcolor=#d0d0d0>
+    <td><b>{left_distro.title()} Version</b></td>
+    <td><b>{right_distro.title()} Version</b></td>
+    <td><b>Base Version</b></td>
+    </tr>
+          """,
+        file=status,
+    )
 
     for (
         uploaded,
@@ -575,22 +548,17 @@ def do_table(status, merges, left_distro, right_distro, component):
             # grey and display the version number.
             colour_idx = 6
 
-        print("<tr bgcolor=%s class=first>" % COLOURS[colour_idx], file=status)
         print(
-            '<td><tt><a href="%s/%s/REPORT">'
-            "%s</a></tt>" % (pathhash(package), package, package),
+            f"""
+        <tr bgcolor={COLOURS[colour_idx]} class=first>
+            <td>
+                <tt><a href="{pathhash(package)}/{package}/REPORT">{package}</a></tt>
+                <sup><a href="https://launchpad.net/ubuntu/+source/{package}">LP</a></sup>
+                <sup><a href="https://tracker.debian.org/{package}">PTS</a></sup>
+              """,
             file=status,
         )
-        print(
-            ' <sup><a href="https://launchpad.net/ubuntu/'
-            '+source/%s">LP</a></sup>' % package,
-            file=status,
-        )
-        print(
-            ' <sup><a href="https://tracker.debian.org/'
-            '%s">PTS</a></sup>' % package,
-            file=status,
-        )
+
         cell_data = ""
         if teams:
             cell_data += "["
@@ -599,83 +567,95 @@ def do_table(status, merges, left_distro, right_distro, component):
         else:
             cell_data = "</td>"
         print(cell_data, file=status)
-        print("<td colspan=3>%s</td>" % who, file=status)
+
         print(
-            '<td rowspan=2><form method="get" action="addcomment.py"><br />',
-            file=status,
-        )
-        print(
-            '<input type="hidden" name="component" value="%s" />' % component,
-            file=status,
-        )
-        print(
-            '<input type="hidden" name="package" value="%s" />' % package,
+            f"""
+              <td colspan=3>{who}</td>
+              <td rowspan=2>
+                  <form method="get" action="addcomment.py"><br />
+                      <input type="hidden" name="component" value="{component}" />
+                      <input type="hidden" name="package" value="{package}" />
+              """,
             file=status,
         )
         print(
             textwrap.dedent(
-                """\
-                <%%
+                f"""\
+                <%
                 the_comment = ""
                 the_color = "white"
-                if "%s" in comment:
-                    the_comment = comment["%s"]
-                    the_color = "%s"
+                if "{package}" in comment:
+                    the_comment = comment["{package}"]
+                    the_color = "{COLOURS[colour_idx]}"
                 req.write(
                     "<input type=\\"text\\" "
-                    "style=\\"border-style: none; background-color: %%s\\" "
-                    "name=\\"comment\\" value=\\"%%s\\" title=\\"%%s\\" />" %%
+                    "style=\\"border-style: none; background-color: %s\\" "
+                    "name=\\"comment\\" value=\\"%s\\" title=\\"%s\\" />" %
                     (the_color, html.escape(the_comment, quote=True),
                      html.escape(the_comment))
                 )
-                %%>""",
-            )
-            % (package, package, COLOURS[colour_idx]),
+                %>
+                """
+            ),
             file=status,
         )
-        print("</form></td>", file=status)
-        print("<td rowspan=2>", file=status)
         print(
-            '<%%\n\
-if "%s" in comment:\n\
-    req.write("%%s" %% gen_buglink_from_comment(comment["%s"]))\n\
-else:\n\
-    req.write("&nbsp;")\n\
-\n\
-%%>'
-            % (package, package),
+            """
+            </form></td>
+            <td rowspan=2>
+            """,
             file=status,
         )
-        print("</td>", file=status)
-        print("<td rowspan=2>", file=status)
-        print("%s" % age, file=status)
-        print("</td>", file=status)
-        print("</tr>", file=status)
-        print("<tr bgcolor=%s>" % COLOURS[colour_idx], file=status)
+        print(
+            textwrap.dedent(
+                f"""
+                <%
+                if "{package}" in comment:
+                    req.write("%s" % gen_buglink_from_comment(comment["{package}"]))
+                else:
+                    req.write("&nbsp;")
+                %>"""
+            ),
+            file=status,
+        )
+        print(
+            f"""
+            </td>
+            <td rowspan=2>
+            {age}
+            </td>
+            </tr>
+            <tr bgcolor="{COLOURS[colour_idx]}">
+              """,
+            file=status,
+        )
         # If the given package list is more than 10, hide it
         if len(source["Binary"].strip().split(", ")) > 10:
             print(
-                "<td><small class='expanded'>%s</small></td>"
-                % source["Binary"],
+                f"<td><small class='expanded'>{source["Binary"]}</small></td>",
                 file=status,
             )
         else:
-            print("<td><small>%s</small></td>" % source["Binary"], file=status)
+            print(f"<td><small>{source["Binary"]}</small></td>", file=status)
         if proposed_version:
             excuses_url = (
                 "https://ubuntu-archive-team.ubuntu.com/"
                 "proposed-migration/update_excuses.html"
             )
             print(
-                '<td>%s (<a href="%s#%s">%s</a>)</td>'
-                % (left_version, excuses_url, package, proposed_version),
+                f'<td>{left_version} (<a href="{excuses_url}#{package}">{proposed_version}</a>)</td>',
                 file=status,
             )
         else:
-            print("<td>%s</td>" % left_version, file=status)
-        print("<td>%s</td>" % right_version, file=status)
-        print("<td>%s</td>" % base_version, file=status)
-        print("</tr>", file=status)
+            print(f"<td>{left_version}</td>", file=status)
+        print(
+            f"""
+              <td>{right_version}</td>
+              <td>{base_version}</td>
+              </tr>
+              """,
+            file=status,
+        )
 
     print("</table>", file=status)
 
