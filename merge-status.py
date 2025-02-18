@@ -632,11 +632,11 @@ def do_table(status, merges, left_distro, right_distro, component):
         # If the given package list is more than 10, hide it
         if len(source["Binary"].strip().split(", ")) > 10:
             print(
-                f"<td><small class='expanded'>{source["Binary"]}</small></td>",
+                f"<td><small class='expanded'>{source['Binary']}</small></td>",
                 file=status,
             )
         else:
-            print(f"<td><small>{source["Binary"]}</small></td>", file=status)
+            print(f"<td><small>{source['Binary']}</small></td>", file=status)
         if proposed_version:
             excuses_url = (
                 "https://ubuntu-archive-team.ubuntu.com/"
