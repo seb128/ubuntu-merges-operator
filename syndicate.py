@@ -314,7 +314,9 @@ previous version of the same source package in Ubuntu.""",
     changes_filename = changes_file(distro, this)
     changes = None
     if os.path.isfile(changes_filename):
-        changes = MIMEText(open(changes_filename, "rt").read())
+        changes = MIMEText(
+            open(changes_filename, "rt", errors="replace").read()
+        )
     elif os.path.isfile(changes_filename + ".bz2"):
         changes = MIMEText(
             bz2.BZ2File(changes_filename + ".bz2")
@@ -355,7 +357,7 @@ def patch_part(distro, this):
     """Construct an e-mail part containing the current patch."""
     patch_filename = patch_file(distro, this, True)
     if os.path.isfile(patch_filename):
-        part = MIMEText(open(patch_filename, "rt").read())
+        part = MIMEText(open(patch_filename, "rt", errors="replace").read())
     elif os.path.isfile(patch_filename + ".bz2"):
         part = MIMEText(
             bz2.BZ2File(patch_filename + ".bz2")
@@ -365,7 +367,9 @@ def patch_part(distro, this):
     else:
         patch_filename = patch_file(distro, this, False)
         if os.path.isfile(patch_filename):
-            part = MIMEText(open(patch_filename, "rt").read())
+            part = MIMEText(
+                open(patch_filename, "rt", errors="replace").read()
+            )
         elif os.path.isfile(patch_filename + ".bz2"):
             part = MIMEText(
                 bz2.BZ2File(patch_filename + ".bz2")
@@ -387,7 +391,7 @@ def diff_part(distro, this):
     """Construct an e-mail part containing the current diff."""
     diff_filename = diff_file(distro, this)
     if os.path.isfile(diff_filename):
-        part = MIMEText(open(diff_filename).read())
+        part = MIMEText(open(diff_filename, errors="replace").read())
     elif os.path.isfile(diff_filename + ".bz2"):
         part = MIMEText(
             bz2.BZ2File(diff_filename + ".bz2")
