@@ -25,6 +25,7 @@ import tempfile
 import multiprocessing
 from contextlib import contextmanager
 from urllib.request import urlretrieve
+import urllib.error
 
 from momlib import (
     DISTROS,
@@ -188,10 +189,9 @@ def update_pool(distro, source):
         ensure(filename)
         try:
             urlretrieve(url, filename)
-        except OSError as ex:
-            logging.exception("Downloading %s failed", url)
-            raise RuntimeError("Download failed") from ex
-        logging.info("Saved %s", tree.subdir(ROOT, filename))
+            logging.info("Saved %s", tree.subdir(ROOT, filename))
+        except (OSError, urllib.error.HTTPError) as ex:
+            logging.exception("Downloading %s failed (%s)", url, ex)
 
 
 if __name__ == "__main__":
