@@ -48,7 +48,8 @@ else
 fi
 
 cd "$MOMLIB_ROOT"/code
-#bzr update
+
+git pull
 
 mkdir -p "$MOMLIB_ROOT"/merges/.static
 cp -a static/* "$MOMLIB_ROOT"/merges/.static
