@@ -579,9 +579,14 @@ def do_table(status, merges, left_distro, right_distro, component):
             file=status,
         )
         print(
+            # The `start block` and `end block` are used to prevent mod_python's
+            # PSP handler from getting confused with the indentation.
+            # See https://modpython.org/live/current/doc-html/pythonapi.html#pyapi-psp
+            # for some details.
             textwrap.dedent(
                 f"""\
                 <%
+                # start block
                 the_comment = ""
                 the_color = "white"
                 if "{package}" in comment:
@@ -594,6 +599,7 @@ def do_table(status, merges, left_distro, right_distro, component):
                     (the_color, html.escape(the_comment, quote=True),
                      html.escape(the_comment))
                 )
+                # end block
                 %>
                 """
             ),
@@ -610,10 +616,12 @@ def do_table(status, merges, left_distro, right_distro, component):
             textwrap.dedent(
                 f"""
                 <%
+                # start block
                 if "{package}" in comment:
                     req.write("%s" % gen_buglink_from_comment(comment["{package}"]))
                 else:
                     req.write("&nbsp;")
+                # end block
                 %>"""
             ),
             file=status,
