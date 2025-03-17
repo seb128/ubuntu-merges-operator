@@ -806,7 +806,10 @@ def merge_changelog(left_dir, right_dir, merged_dir, filename):
 
     with open("%s/%s" % (merged_dir, filename), "wt") as output:
         for right_ver, right_text in right_cl:
-            left_ver = left_cl[0][0] or Version("0")
+            try:
+                left_ver = left_cl[0][0]
+            except IndexError:
+                left_ver = Version("0")
             right_ver = right_ver or Version("0")
             while len(left_cl) and left_cl[0][0] > right_ver:
                 (left_ver, left_text) = left_cl.pop(0)
