@@ -902,6 +902,7 @@ def remove_old_comments(status_file, merges):
         fcntl.flock(file_comments, fcntl.LOCK_EX)
 
         new_lines = []
+        file_comments.seek(0)
         for line in file_comments:
             if line.split(": ", 1)[0] not in toremove:
                 new_lines.append(line)
