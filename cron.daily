@@ -56,10 +56,10 @@ cp -a static/* "$MOMLIB_ROOT"/merges/.static
 cp -a addcomment.py "$MOMLIB_ROOT"/merges
 
 # Update the blocklist
-wget -q -O"$MOMLIB_ROOT"/sync-blocklist.txt https://people.canonical.com/~ubuntu-archive/sync-blocklist.txt
+wget -q -O"$MOMLIB_ROOT"/sync-blocklist.txt https://ubuntu-archive-team.ubuntu.com/sync-blocklist.txt
 
 # Update the package to team mapping
-wget -q -O"$MOMLIB_ROOT"/code/package-team-mapping.json https://people.canonical.com/~ubuntu-archive/package-team-mapping.json
+wget -q -O"$MOMLIB_ROOT"/code/package-team-mapping.json https://ubuntu-archive-team.ubuntu.com/package-team-mapping.json
 
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
