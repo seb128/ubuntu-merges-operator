@@ -1,0 +1,7 @@
+[Unit]
+Description=Run Merge-O-Matic
+
+[Service]
+Type=oneshot
+User=merge
+ExecStart=/home/merge/data/code/cron.daily
