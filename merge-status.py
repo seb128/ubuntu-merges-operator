@@ -268,7 +268,7 @@ def write_status_page(component, merges, left_distro, right_distro):
     status_file = "%s/merges/%s.html" % (ROOT, component)
     with tree.AtomicFile(status_file, "wt") as status:
         print(
-            f"""
+            f"""<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
