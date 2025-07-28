@@ -5,3 +5,4 @@ Description=Run Merge-O-Matic
 Type=oneshot
 User=merge
 ExecStart=/home/merge/data/code/cron.daily
+TimeoutStartSec=48h
