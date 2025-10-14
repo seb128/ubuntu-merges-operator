@@ -1,3 +1,5 @@
 # cjwatson 2019-12-24: crashes due to symlink confusion; exclude until we
 # have time to fix it
 ceph
+# skia 2025-10-14: big package, and Ubuntu maintains it in snap anyway
+thunderbird
