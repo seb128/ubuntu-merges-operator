@@ -77,7 +77,8 @@ export PYTHONPATH="$(pwd):$(pwd)/third-party/pychart"
 
 # Publish the Ubuntu patches so that Debian people can get at them
 ./publish-patches.py $QUIET
-./syndicate.py $QUIET
+# That script gets killed everytime, and not sure it's really needed
+# ./syndicate.py $QUIET
 
 # Run the merge tool
 ./produce-merges.py $QUIET -X data/merge-blocklist.txt -X data/experimental.txt -X data/unstable.txt -X data/testing-proposed-updates.txt
