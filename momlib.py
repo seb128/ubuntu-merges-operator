@@ -45,7 +45,7 @@ from deb.version import Version
 from util import tree
 
 # Output root
-ROOT = os.path.expanduser("~merge/data")
+ROOT = "/srv/merges"
 
 # Distribution definitions
 DISTROS = {

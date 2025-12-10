@@ -19,7 +19,7 @@
 set -e
 umask 002
 
-MOMLIB_ROOT="$HOME"/data
+MOMLIB_ROOT="/srv/merges"
 
 if [ "$DEBUG" = "y" ]; then
 	QUIET=""
