@@ -1,0 +1,8 @@
+[Unit]
+Description=Ubuntu Merges Service
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/srv/merges/code/cron.daily
+TimeoutStartSec=48h
