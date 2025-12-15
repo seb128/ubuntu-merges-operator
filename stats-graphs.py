@@ -169,9 +169,11 @@ def read_stats():
 def get_events(stats, start):
     """Get the list of interesting events."""
     events = []
-    for date, time, info in stats["event"]:
-        if date_to_datetime(date) >= start:
-            events.append((date, info))
+
+    if "event" in stats:
+        for date, time, info in stats["event"]:
+            if date_to_datetime(date) >= start:
+                events.append((date, info))
 
     return events
 
