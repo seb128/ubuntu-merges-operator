@@ -355,21 +355,13 @@ from momlib import *
                 component,
             )
 
-        git_describe = (
-            subprocess.check_output(
-                ["git", "describe", "--tags", "--always", "--dirty"],
-                cwd=os.path.dirname(__file__),
-            )
-            .decode()
-            .strip()
-        )
         print(
             f"""
         <h2 id=stats>Statistics</h2>
         <img src="{component}-now.png" title="Current stats">
         <img src="{component}-trend.png" title="Six month trend">
         <p><small>Generated at {time.strftime("%Y-%m-%d %H:%M:%S %Z")}, by
-        <a href="https://code.launchpad.net/~ubuntu-core-dev/merge-o-matic/+git/main">Merge-O-Matic</a> version {git_describe}.</small></p>
+        <a href="https://github.com/canonical/ubuntu-merges-operator">ubuntu-merges-operator</a>.</small></p>
               """,
             file=status,
         )
