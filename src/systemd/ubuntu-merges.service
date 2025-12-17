@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu Merges Service
+
+[Service]
+Type=oneshot
+# Let's use the non privileged user available by default
+User=ubuntu
+ExecStart=/srv/merges/code/cron.daily
+TimeoutStartSec=48h

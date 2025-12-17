@@ -1,3 +1,0 @@
-[submodule "third-party/pychart"]
-	path = app/third-party/pychart
-	url = https://git.launchpad.net/~liushuyu-011/+git/pychart

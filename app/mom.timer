@@ -1,8 +1,0 @@
-[Unit]
-Description=Run Merge-O-Matic more or less continuously
-
-[Timer]
-OnCalendar=minutely
-
-[Install]
-WantedBy=multi-user.target
