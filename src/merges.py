@@ -177,8 +177,9 @@ class Merges:
         """Restart the transition services."""
         try:
             systemd.service_restart("apache2")
-            systemd.service_start("ubuntu-merges")
             logger.debug("Apache2 service restarted")
+            systemd.service_start("--no-block", "ubuntu-merges")
+            logger.debug("Ubuntu-merges service started")
         except CalledProcessError as e:
             logger.error("Failed to start systemd service: %s", e)
             raise
