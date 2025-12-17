@@ -16,28 +16,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import calendar
 import datetime
-from contextlib import closing
-
-from pychart import (
-    area,
-    arrow,
-    axis,
-    canvas,
-    chart_data,
-    fill_style,
-    font,
-    legend,
-    line_style,
-    pie_plot,
-    range_plot,
-    text_box,
-    theme,
-)
+import logging
 
 from momlib import DISTROS, OUR_DISTRO, ROOT, run
+
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+
+logging.getLogger("matplotlib").setLevel(logging.WARNING)
 
 # Order of stats we pick out
 ORDER = [
@@ -61,12 +49,12 @@ LABELS = {
 
 # Colours (fill styles) used for each stat
 FILL_STYLES = {
-    "unmodified": fill_style.blue,
-    "needs-sync": fill_style.darkorchid,
-    "local": fill_style.aquamarine1,
-    "repackaged": fill_style.green,
-    "modified": fill_style.yellow,
-    "needs-merge": fill_style.red,
+    "unmodified": "blue",
+    "needs-sync": "darkorchid",
+    "local": "aquamarine",
+    "repackaged": "green",
+    "modified": "yellow",
+    "needs-merge": "red",
 }
 
 # Offsets of individual stats on the pie chart (for pulling out)
@@ -96,10 +84,6 @@ def main(options, args):
 
     # Read from the stats file
     stats = read_stats()
-
-    # Initialise pychart
-    theme.use_color = True
-    theme.reinitialize()
 
     # Get the range of the trend chart
     today = datetime.date.today()
@@ -235,108 +219,118 @@ def sources_intervals(max):
 
 def pie_chart(component, current):
     """Output a pie chart for the given component and data."""
-    data = list(
-        zip([LABELS[key] for key in ORDER], info_to_data(None, current)),
+    values = info_to_data(None, current)
+    labels = [LABELS[key] for key in ORDER]
+
+    explode = [ARC_OFFSETS[key] / 100.0 for key in ORDER]
+    colors = [FILL_STYLES[key] for key in ORDER]
+
+    fig, ax = plt.subplots(figsize=(7, 7))
+
+    ax.pie(
+        values,
+        explode=explode,
+        labels=labels,
+        colors=colors,
+        shadow=True,
+        startangle=90,
+        autopct="%1.1f%%",
+        wedgeprops={"edgecolor": "black", "linewidth": 0.5},
     )
 
-    filename = "%s/merges/%s-now.png" % (ROOT, component)
-    with closing(canvas.init(filename, format="png")) as c:
-        ar = area.T(
-            size=(600, 500),
-            legend=None,
-            x_grid_style=None,
-            y_grid_style=None,
-        )
+    ax.axis("equal")
 
-        plot = pie_plot.T(
-            data=data,
-            arrow_style=arrow.a0,
-            label_offset=25,
-            shadow=(2, -2, fill_style.gray50),
-            arc_offsets=[ARC_OFFSETS[key] for key in ORDER],
-            fill_styles=[FILL_STYLES[key] for key in ORDER],
-        )
-        ar.add_plot(plot)
-
-        ar.draw(c)
+    filename = f"{ROOT}/merges/{component}-now.png"
+    plt.savefig(filename, bbox_inches="tight")
+    plt.close(fig)
 
 
 def range_chart(component, history, start, today, events):
     """Output a range chart for the given component and data."""
-    data = chart_data.transform(
-        lambda x: [
-            date_to_ordinal(x[0]),
-            sum(x[1:1]),
-            sum(x[1:2]),
-            sum(x[1:3]),
-            sum(x[1:4]),
-            sum(x[1:5]),
-            sum(x[1:6]),
-            sum(x[1:7]),
-        ],
-        [info_to_data(date, info) for date, info in history],
+
+    data_list = [info_to_data(date, info) for date, info in history]
+
+    if not data_list:
+        return
+
+    dates_ordinal = [date_to_datetime(d[0]) for d in data_list]
+    raw_values = [[d[i] for d in data_list] for i in range(1, 7)]
+
+    colors = [FILL_STYLES[key] for key in ORDER]
+    labels = [LABELS[key] for key in ORDER]
+
+    # figsize in inches (900x450 pixels)
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    ax.stackplot(
+        dates_ordinal,
+        *raw_values,
+        labels=labels,
+        colors=colors,
+        edgecolor="black",
+        linewidth=0.2,
     )
 
-    (y_tic_interval, y_minor_tic_interval) = sources_intervals(
-        max(d[-1] for d in data),
-    )
+    ax.set_xlim(start, today)
 
-    filename = "%s/merges/%s-trend.png" % (ROOT, component)
-    with closing(canvas.init(filename, format="png")) as c:
-        ar = area.T(
-            size=(900, 450),
-            legend=legend.T(),
-            x_axis=axis.X(
-                label="Date",
-                format=ordinal_to_label,
-                tic_interval=date_tics,
-                tic_label_offset=(10, 0),
-            ),
-            y_axis=axis.Y(
-                label="Sources",
-                format="%d",
-                tic_interval=y_tic_interval,
-                minor_tic_interval=y_minor_tic_interval,
-                tic_label_offset=(-10, 0),
-                label_offset=(-10, 0),
-            ),
-            x_range=(start.toordinal(), today.toordinal()),
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
+
+    plt.xticks(rotation=45, ha="right", fontsize=9)
+    ax.set_xlabel("Date", fontsize=10)
+
+    max_y = max(sum(y) for y in zip(*raw_values)) if raw_values else 10
+    y_major, y_minor = sources_intervals(max_y)
+
+    ax.yaxis.set_major_locator(plt.MultipleLocator(y_major))
+    if y_minor:
+        ax.yaxis.set_minor_locator(plt.MultipleLocator(y_minor))
+
+    ax.set_ylabel("Sources", fontsize=10)
+    ax.set_ylim(0, max_y * 1.1)  # 10% top margin
+
+    ax.legend(loc="upper left", fontsize=9, frameon=True)
+    ax.grid(True, axis="y", linestyle=":", alpha=0.6)
+
+    levels = {}
+    y_limit = ax.get_ylim()[1]
+
+    for date_str, text in events:
+        d_ord = date_to_ordinal(date_str)
+
+        ax.axvline(
+            x=d_ord, color="black", linestyle="--", linewidth=0.7, alpha=0.5
+        )
+        x_pix, _ = ax.transData.transform((d_ord, 0))
+
+        level = 0
+        while level < 3:
+            if levels.get(level, -1) < x_pix:
+                break
+            level += 1
+
+        offset_y = 20 + (level * 25)
+
+        ax.annotate(
+            text,
+            xy=(d_ord, y_limit),
+            xytext=(10, offset_y),
+            textcoords="offset points",
+            fontsize=8,
+            arrowprops={"arrowstyle": "->", "color": "black", "lw": 0.5},
+            bbox={
+                "boxstyle": "round,pad=0.2",
+                "fc": "white",
+                "ec": "gray",
+                "alpha": 0.8,
+            },
         )
 
-        for idx, key in enumerate(ORDER):
-            plot = range_plot.T(
-                data=data,
-                label=LABELS[key],
-                min_col=idx + 1,
-                max_col=idx + 2,
-                fill_style=FILL_STYLES[key],
-            )
-            ar.add_plot(plot)
+        levels[level] = x_pix + (len(text) * 6) + 20
 
-        ar.draw(c)
-
-        levels = [0, 0, 0]
-
-        for date, text in events:
-            xpos = ar.x_pos(date_to_ordinal(date))
-            ypos = ar.loc[1] + ar.size[1]
-
-            for level, bar in enumerate(levels):
-                if bar < xpos:
-                    width = int(font.text_width(text))
-                    levels[level] = xpos + 25 + width
-                    break
-            else:
-                continue
-
-            tb = text_box.T(
-                loc=(xpos + 25, ypos + 45 - (20 * level)),
-                text=text,
-            )
-            tb.add_arrow((xpos, ypos))
-            tb.draw()
-
-            c.line(line_style.black_dash2, xpos, ar.loc[1], xpos, ypos)
+    filename = f"{ROOT}/merges/{component}-trend.png"
+    plt.savefig(filename, bbox_inches="tight", dpi=100)
+    plt.close(fig)
 
 
 if __name__ == "__main__":

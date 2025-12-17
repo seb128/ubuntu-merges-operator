@@ -59,9 +59,6 @@ wget -q -O"$MOMLIB_ROOT"/sync-blocklist.txt https://ubuntu-archive-team.ubuntu.c
 # Update the package to team mapping
 wget -q -O"$MOMLIB_ROOT"/package-team-mapping.json https://ubuntu-archive-team.ubuntu.com/package-team-mapping.json
 
-
-export PYTHONPATH="$(pwd):$(pwd)/third-party/pychart"
-
 # Download new packages
 ./update-pool.py $QUIET debian ubuntu
 
