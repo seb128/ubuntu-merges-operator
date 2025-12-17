@@ -151,7 +151,8 @@ class Merges:
         try:
             comments = SRVDIR / "comments.txt"
             comments.write_text("")
-            shutil.chown(comments, "www-data")
+            comments.chmod(0o664)
+            shutil.chown(comments, "www-data", "ubuntu")
         except OSError as e:
             logger.warning("Failed to change the comments.txt owner: %s", e)
 
