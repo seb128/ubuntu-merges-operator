@@ -49,8 +49,6 @@ fi
 
 cd "$MOMLIB_ROOT"/code
 
-git pull
-
 mkdir -p "$MOMLIB_ROOT"/merges/.static
 cp -a static/* "$MOMLIB_ROOT"/merges/.static
 cp -a addcomment.py "$MOMLIB_ROOT"/merges
