@@ -220,7 +220,7 @@ def get_responsible_team(source_package):
     global package_team_mapping
     if not package_team_mapping:
         package_team_mapping = defaultdict(set)
-        mapping_file = "%s/code/package-team-mapping.json" % ROOT
+        mapping_file = "%s/package-team-mapping.json" % ROOT
         if os.path.exists(mapping_file):
             with open(mapping_file) as ptm_file:
                 for team, packages in json.load(ptm_file).items():
@@ -239,7 +239,7 @@ def get_team_packages(team):
     if not team:
         return []
 
-    mapping_file = "%s/code/package-team-mapping.json" % ROOT
+    mapping_file = "%s/package-team-mapping.json" % ROOT
     if os.path.exists(mapping_file):
         with open(mapping_file) as ptm_file:
             for fteam, packages in json.load(ptm_file).items():
