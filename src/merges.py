@@ -193,5 +193,5 @@ class Merges:
         try:
             systemd.service_start("ubuntu-merges.service")
         except CalledProcessError as e:
-            logger.debug("Refreshing of the merges report failed: %s", e.stdout)
+            logger.debug("Refreshing of the merges report failed: %s", e)
             raise
