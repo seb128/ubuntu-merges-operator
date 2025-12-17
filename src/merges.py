@@ -140,7 +140,7 @@ class Merges:
         datadir = SRVDIR / "data"
 
         try:
-            os.makedirs(datadir, exist_ok=True)
+            datadir.mkdir(parents=True, exist_ok=True)
             shutil.chown(SRVDIR, "ubuntu", "ubuntu")
             shutil.chown(datadir, "ubuntu", "ubuntu")
             logger.debug("Directory %s created", datadir)
