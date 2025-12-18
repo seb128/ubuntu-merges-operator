@@ -244,8 +244,18 @@ def main(options, args):
 def write_status_page(component, merges, left_distro, right_distro):
     """Write out the manual merge status page."""
     merges.sort(reverse=True)
-
     status_file = "%s/merges/%s-manual.html" % (ROOT, component)
+
+    try:
+        from pathlib import Path
+        agent_dir = Path("/var/lib/juju/agents/")
+        charm_dir = next(agent_dir.glob("unit-ubuntu-merges-*")) / "charm"
+        revision = (charm_dir / "version").read_text().strip()
+    except (StopIteration, FileNotFoundError, PermissionError):
+        revision = "unknown"
+
+    now_str = datetime.datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
     with tree.AtomicFile(status_file, "wt") as status:
         print(
             f"""<!DOCTYPE html>
@@ -253,33 +263,81 @@ def write_status_page(component, merges, left_distro, right_distro):
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Ubuntu Merge-o-Matic: {component} manual</title>
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700" rel="stylesheet">
 <style>
-img#ubuntu {{
-    border: 0;
-}}
-h1 {{
-    padding-top: 0.5em;
-    font-family: sans-serif;
-    font-size: 2.0em;
-    font-weight: bold;
-}}
-h2 {{
-    padding-top: 0.5em;
-    font-family: sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-}}
-p, td {{
-    font-family: sans-serif;
-    margin-bottom: 0;
-}}
-li {{
-    font-family: sans-serif;
-    margin-bottom: 1em;
-}}
-tr.first td {{
-    border-top: 2px solid white;
-}}
+    :root {{
+        --ubuntu-orange: #e95420;
+        --ubuntu-aubergine: #772953;
+        --text-color: #1a1a1a;
+        --bg-page: #f3f4f6;
+    }}
+    body {{
+        font-family: "Ubuntu", sans-serif;
+        background-color: var(--bg-page);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        line-height: 1.5;
+    }}
+    h1 {{
+        color: var(--ubuntu-aubergine);
+        border-bottom: 4px solid var(--ubuntu-orange);
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+    }}
+    table {{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border: 2px solid #9ca3af;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }}
+    th {{
+        background-color: #4b5563;
+        color: white;
+        text-align: left;
+        padding: 15px;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 0.05em;
+    }}
+    td {{
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        vertical-align: top;
+    }}
+    tr.first td {{
+        border-top: 2px solid #6b7280;
+    }}
+    input[type="text"] {{
+        border: 1px solid #9ca3af !important;
+        background-color: white !important;
+        padding: 6px;
+        border-radius: 3px;
+        color: #000;
+        width: 95%;
+    }}
+    a {{
+        color: #c2410c;
+        text-decoration: none;
+        font-weight: bold;
+    }}
+    a:hover {{
+        text-decoration: underline;
+    }}
+    .expanded {{
+        display: none;
+    }}
+    footer {{
+        margin-top: 50px;
+        padding: 20px 0;
+        border-top: 1px solid #ccc;
+        font-size: 0.85rem;
+        color: #333;
+    }}
 </style>
 <%
 import html
@@ -287,8 +345,11 @@ from momlib import *
 %>
 </head>
 <body>
-<img src="./.static/img/ubuntulogo-100.png" id="ubuntu">
-<h1>Ubuntu Merge-o-Matic: {component} manual</h1>
+<div class="container">
+    <img src="./.static/img/ubuntulogo-100.png" id="ubuntu" alt="Ubuntu Logo">
+    <h1>Merge-o-Matic: {component} (Manual)</h1>
+    
+    <div id="navigation">
               """,
             file=status,
         )
@@ -296,7 +357,7 @@ from momlib import *
         for section in SECTIONS:
             section_merges = [m for m in merges if m[0] == section]
             print(
-                f'<p><a href="#{section}">{len(section_merges)} {section} merges</a></p>',
+                f'<a href="#{section}" style="margin-right: 15px;">&rarr; {len(section_merges)} {section} merges</a>',
                 file=status,
             )
 
@@ -304,28 +365,18 @@ from momlib import *
 
         for section in SECTIONS:
             section_merges = [m for m in merges if m[0] == section]
-
-            print(
-                f'<h2 id="{section}">{section.title()} Merges</h2>',
-                file=status,
-            )
-
-            do_table(
-                status,
-                section_merges,
-                left_distro,
-                right_distro,
-                component,
-            )
-
-        now_str = datetime.datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+            print(f'<h2 id="{section}">{section.title()} Merges</h2>', file=status)
+            do_table(status, section_merges, left_distro, right_distro, component)
 
         print(
             f"""
-        <p><small>Generated at {now_str}, by
-        <a href="https://github.com/canonical/ubuntu-merges-operator">ubuntu-merges-operator</a>.</small></p>
-        </body>
-        </html>
+    <footer>
+        Generated at {now_str} by 
+        <strong>ubuntu-merges-operator</strong> (revision {revision}).
+    </footer>
+</div>
+</body>
+</html>
               """,
             file=status,
         )

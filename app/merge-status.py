@@ -265,10 +265,21 @@ def get_uploader(distro, source):
             return line.split("Good signature from")[1].strip().strip('"')
     return None
 
-
 def write_status_page(component, merges, left_distro, right_distro):
     """Write out the merge status page."""
     status_file = "%s/merges/%s.html" % (ROOT, component)
+
+    try:
+        from pathlib import Path
+        agent_dir = Path("/var/lib/juju/agents/")
+        # Finds the first directory matching the pattern
+        charm_dir = next(agent_dir.glob("unit-ubuntu-merges-*")) / "charm"
+        revision = (charm_dir / "version").read_text().strip()
+    except (StopIteration, FileNotFoundError, PermissionError):
+        revision = "unknown"
+
+    now_str = datetime.datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
     with tree.AtomicFile(status_file, "wt") as status:
         print(
             f"""<!DOCTYPE html>
@@ -276,33 +287,109 @@ def write_status_page(component, merges, left_distro, right_distro):
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Ubuntu Merge-o-Matic: {component}</title>
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700" rel="stylesheet">
 <style>
-img#ubuntu {{
-    border: 0;
-}}
-h1 {{
-    padding-top: 0.5em;
-    font-family: sans-serif;
-    font-size: 2.0em;
-    font-weight: bold;
-}}
-h2 {{
-    padding-top: 0.5em;
-    font-family: sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-}}
-p, td {{
-    font-family: sans-serif;
-    margin-bottom: 0;
-}}
-li {{
-    font-family: sans-serif;
-    margin-bottom: 1em;
-}}
-tr.first td {{
-    border-top: 2px solid white;
-}}
+    :root {{
+        --ubuntu-orange: #e95420;
+        --ubuntu-aubergine: #772953;
+        --text-color: #1a1a1a;
+        --bg-page: #f3f4f6;
+    }}
+    body {{
+        font-family: "Ubuntu", sans-serif;
+        background-color: var(--bg-page);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        line-height: 1.5;
+    }}
+    h1 {{
+        color: var(--ubuntu-aubergine);
+        border-bottom: 4px solid var(--ubuntu-orange);
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+    }}
+    table {{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border: 2px solid #9ca3af;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }}
+    th {{
+        background-color: #4b5563;
+        color: white;
+        text-align: left;
+        padding: 15px;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 0.05em;
+    }}
+    td {{
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        vertical-align: top;
+    }}
+    tr.first td {{
+        border-top: 2px solid #6b7280;
+    }}
+    input[type="text"] {{
+        border: 1px solid #9ca3af !important;
+        background-color: white !important;
+        padding: 6px;
+        border-radius: 3px;
+        color: #000;
+        width: 95%;
+    }}
+    a {{
+        color: #c2410c;
+        text-decoration: none;
+        font-weight: bold;
+    }}
+    a:hover {{
+        text-decoration: underline;
+    }}
+    .stats-container {{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-top: 30px;
+        width: 100%;
+    }}
+
+    .stats-container img {{
+        box-sizing: border-box;
+        height: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        min-width: 300px;
+    }}
+
+    .stats-container img:first-child {{
+        flex: 0 1 calc(30% - 10px);
+    }}
+
+    .stats-container img:last-child {{
+        flex: 0 1 calc(70% - 10px);
+    }}
+
+    .expanded {{
+        display: none;
+    }}
+
+    footer {{
+        margin-top: 50px;
+        padding: 20px 0;
+        border-top: 1px solid #eee;
+        font-size: 0.85rem;
+        color: #333;
+    }}
 </style>
 <%
 import html
@@ -310,15 +397,20 @@ from momlib import *
 %>
 </head>
 <body>
-<img src="./.static/img/ubuntulogo-100.png" id="ubuntu">
-<h1>Ubuntu Merge-o-Matic: {component}</h1>
-<div id="filters">
-<b>Filters:</b>
-<input id="query" name="query"/>
-<input id="showProposed" checked="checked" type="checkbox">Show merges with something in proposed</input>
-<input id="showMergeNeeded" checked="checked" type="checkbox">Show merges without something in proposed</input>
-<input id="showLongBinaries" checked="checked" type="checkbox">Show long lists of binaries (10+)</input>
-</div>
+<div class="container">
+    <img src="./.static/img/ubuntulogo-100.png" id="ubuntu" alt="Ubuntu Logo">
+    <h1>Merge-o-Matic: {component}</h1>
+
+    <div id="filters">
+        <div style="margin-bottom: 10px;"><strong>Filters:</strong>
+            <input id="query" name="query" style="width: 300px;"/>
+        </div>
+        <label><input id="showProposed" checked="checked" type="checkbox"> Show Proposed</label> &nbsp;
+        <label><input id="showMergeNeeded" checked="checked" type="checkbox"> Show Merge Needed</label> &nbsp;
+        <label><input id="showLongBinaries" type="checkbox"> Show full binary list</label>
+    </div>
+
+    <div id="navigation">
               """,
             file=status,
         )
@@ -326,47 +418,45 @@ from momlib import *
         for section in SECTIONS:
             section_merges = [m for m in merges if m[0] == section]
             print(
-                f'<p><a href="#{section}">{len(section_merges)} {section} merges</a></p>',
+                f'<a href="#{section}" style="margin-right: 15px;">&rarr; {len(section_merges)} {section} merges</a>',
                 file=status,
             )
 
         print(
             """
-        <ul> 
-            <li>If you are not the previous uploader, ask the previous uploader before doing the merge. This prevents two people from doing the same work.</li>
-            <li>Before uploading, update the changelog to have your name and a list of the outstanding Ubuntu changes.</li>
+    </div>
+
+    <div style="background: #FFFBEB; border-left: 8px solid #F59E0B; padding: 20px; margin: 25px 0; color: #92400E; border-radius: 4px;">
+        <strong style="font-size: 1.1em; letter-spacing: 0.5px;">Guidelines:</strong>
+        <ul style="margin: 10px 0 0 0; padding-left: 20px; line-height: 1.6;">
+            <li>If you are not the previous uploader, ask them before starting to avoid duplicated effort.</li>
+            <li>Before uploading, update the changelog with your name and the list of outstanding Ubuntu changes.</li>
             <li>Try and keep the diff small, this may involve manually tweaking <tt>po</tt> files and the like.</li>
-        </ul> 
-        <% comment = get_comments() %>
+        </ul>
+    </div>
+    <% comment = get_comments() %>
               """,
             file=status,
         )
 
         for section in SECTIONS:
             section_merges = [m for m in merges if m[0] == section]
-
-            print(
-                f'<h2 id="{section}">{section.title()} Merges</h2>',
-                file=status,
-            )
-
-            do_table(
-                status,
-                section_merges,
-                left_distro,
-                right_distro,
-                component,
-            )
-
-        now_str = datetime.datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+            print(f'<h2 id="{section}">{section.title()} Merges</h2>', file=status)
+            do_table(status, section_merges, left_distro, right_distro, component)
 
         print(
             f"""
-        <h2 id=stats>Statistics</h2>
-        <img src="{component}-now.png" title="Current stats">
-        <img src="{component}-trend.png" title="Six month trend">
-        <p><small>Generated at {now_str}, by
-        <a href="https://github.com/canonical/ubuntu-merges-operator">ubuntu-merges-operator</a>.</small></p>
+    <h2 id="stats">Statistics</h2>
+    <div class="stats-container">
+        <img src="{component}-now.png" alt="Current Statistics">
+        <img src="{component}-trend.png" alt="Six Month Trend">
+    </div>
+
+    <footer>
+        Generated at {now_str} by 
+        <strong>ubuntu-merges-operator</strong> (revision {revision}).
+    </footer>
+</div>
               """,
             file=status,
         )
@@ -378,91 +468,30 @@ from momlib import *
                 (function() {
                     var query = document.getElementById("query");
                     var showProposed = document.getElementById("showProposed");
-                    var showMergeNeeded = document.getElementById(
-                        "showMergeNeeded"
-                    );
-                    var showLongBinaries = document.getElementById(
-                        "showLongBinaries"
-                    );
+                    var showMergeNeeded = document.getElementById("showMergeNeeded");
+                    var showLongBinaries = document.getElementById("showLongBinaries");
 
-                    // Function to filter stuff
                     function filterText() {
-                        var regexp=new RegExp(query.value, "i");
-                        var tables=document.getElementsByTagName("table");
+                        var regexp = new RegExp(query.value, "i");
+                        var tables = document.getElementsByTagName("table");
                         for (var t=0; t < tables.length; t++) {
-                            var rows=tables[t].getElementsByTagName("tr");
+                            var rows = tables[t].getElementsByTagName("tr");
                             for (var i=2; i < rows.length; i += 2)  {
                                 var hide = (
-                                    (query.value &&
-                                     !rows[i].textContent.match(regexp)) ||
-                                    (!showProposed.checked &&
-                                     rows[i].bgColor === '#d0d0d0') ||
-                                    (!showMergeNeeded.checked &&
-                                     rows[i].bgColor !== '#d0d0d0')
+                                    (query.value && !rows[i].textContent.match(regexp)) ||
+                                    (!showProposed.checked && rows[i].bgColor === '#d0d0d0') ||
+                                    (!showMergeNeeded.checked && rows[i].bgColor !== '#d0d0d0')
                                 );
-                                rows[i].hidden=rows[i+1].hidden=hide;
+                                rows[i].hidden = rows[i+1].hidden = hide;
                             }
                         }
-
                         var long_lines = document.getElementsByClassName("expanded");
-                        if (!showLongBinaries.checked) {
-                            var show_binaries = "none";
-                        } else {
-                            var show_binaries = "initial";
-                        }
+                        var show_binaries = showLongBinaries.checked ? "inline" : "none";
                         for (var i=0; i < long_lines.length; i++) {
                             long_lines[i].style.display = show_binaries;
                         }
-
-                        var search = (
-                            (query.value
-                             ? "query=" + encodeURIComponent(query.value) + "&"
-                             : "") +
-                            "showProposed=" +
-                            encodeURIComponent(showProposed.checked) +
-                            "&showMergeNeeded=" +
-                            encodeURIComponent(showMergeNeeded.checked) +
-                            "&showLongBinaries=" +
-                            encodeURIComponent(showLongBinaries.checked)
-                        );
-
-                        history.replaceState({
-                            "query": query.value,
-                            "showProposed": showProposed.checked,
-                            "showMergeNeeded": showMergeNeeded.checked,
-                            "showLongBinaries": showLongBinaries.checked
-                        }, "", "?" + search);
                     }
 
-                    // Set initial filter state from search part of URL
-                    var initState = location.search.substring(1).split("&");
-                    for (var i = 0; i < initState.length; i++) {
-                        var kv = initState[i].split("=");
-                        switch (decodeURIComponent(kv[0])) {
-                            case "query":
-                                query.value = decodeURIComponent(kv[1]);
-                                break;
-                            case "showProposed":
-                                showProposed.checked = (
-                                    "true" === decodeURIComponent(kv[1])
-                                );
-                                break;
-                            case "showMergeNeeded":
-                                showMergeNeeded.checked = (
-                                    "true" === decodeURIComponent(kv[1])
-                                );
-                                break;
-                            case "showLongBinaries":
-                                showLongBinaries.checked = (
-                                    "true" === decodeURIComponent(kv[1])
-                                );
-                                break;
-                        }
-                    }
-
-                    filterText();
-
-                    // Add event listeners
                     query.addEventListener('input', filterText);
                     showProposed.addEventListener('change', filterText);
                     showMergeNeeded.addEventListener('change', filterText);
@@ -475,7 +504,6 @@ from momlib import *
             ),
             file=status,
         )
-
 
 def do_table(status, merges, left_distro, right_distro, component):
     """Output a table."""
