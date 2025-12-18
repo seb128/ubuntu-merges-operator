@@ -20,6 +20,7 @@
 
 import bz2
 import datetime
+from datetime import timezone
 import json
 import logging
 import os
@@ -117,6 +118,8 @@ def options(parser):
 
 
 def main(options, args):
+    now = datetime.datetime.now(timezone.utc)
+
     src_distro = options.source_distro
     src_dist = options.source_suite
 
@@ -181,9 +184,9 @@ def main(options, args):
             if not date_superseded:
                 age = datetime.timedelta(0)
             else:
-                age = datetime.datetime.utcnow() - date_superseded.replace(
-                    tzinfo=None,
-                )
+                ds_aware = date_superseded.replace(tzinfo=timezone.utc)
+                age = now - ds_aware
+
             days_old = age.days
 
             filename = changes_file(our_distro, our_source)
@@ -315,9 +318,11 @@ from momlib import *
                 component,
             )
 
+        now_str = datetime.datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
         print(
             f"""
-        <p><small>Generated at {time.strftime("%Y-%m-%d %H:%M:%S %Z")}, by
+        <p><small>Generated at {now_str}, by
         <a href="https://github.com/canonical/ubuntu-merges-operator">ubuntu-merges-operator</a>.</small></p>
         </body>
         </html>
