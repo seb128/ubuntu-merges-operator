@@ -59,6 +59,10 @@ cp -a addcomment.py "$MOMLIB_ROOT"/merges
 cp data/HEADER-merges.html "$MOMLIB_ROOT"/merges/HEADER.html
 cp data/HEADER-patches.html "$MOMLIB_ROOT"/published/HEADER.html
 
+# Provides a robots.txt to try to lower bots activity
+cp data/robots.txt "$MOMLIB_ROOT"/merges/
+cp data/robots.txt "$MOMLIB_ROOT"/published/
+
 # Update the blocklist
 wget -q -O"$MOMLIB_ROOT"/sync-blocklist.txt https://ubuntu-archive-team.ubuntu.com/sync-blocklist.txt
 
