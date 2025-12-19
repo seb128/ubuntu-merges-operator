@@ -50,8 +50,14 @@ fi
 cd "$MOMLIB_ROOT"/code
 
 mkdir -p "$MOMLIB_ROOT"/merges/.static
+mkdir -p "$MOMLIB_ROOT"/published/.static
 cp -a static/* "$MOMLIB_ROOT"/merges/.static
+cp -a static/* "$MOMLIB_ROOT"/published/.static
 cp -a addcomment.py "$MOMLIB_ROOT"/merges
+
+# Include header with the instructions
+cp data/HEADER-merges.html "$MOMLIB_ROOT"/merges/HEADER.html
+cp data/HEADER-patches.html "$MOMLIB_ROOT"/published/HEADER.html
 
 # Update the blocklist
 wget -q -O"$MOMLIB_ROOT"/sync-blocklist.txt https://ubuntu-archive-team.ubuntu.com/sync-blocklist.txt
