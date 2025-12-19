@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # check-pool.py - check the pool against Launchpad
 #
 # Copyright © 2016 Canonical Ltd.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # update-sources.py - update the Sources files in a distribution's pool
 #
 # Copyright © 2008 Canonical Ltd.

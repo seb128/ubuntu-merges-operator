@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # generate-patches.py - generate patches between distributions
 #
 # Copyright © 2008 Canonical Ltd.

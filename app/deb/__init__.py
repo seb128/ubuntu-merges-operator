@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 #
 # Copyright © 2008 Canonical Ltd.
 # Author: Scott James Remnant <scott@ubuntu.com>.

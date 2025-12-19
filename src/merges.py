@@ -25,8 +25,6 @@ PACKAGES = [
     "git",
     "libapache2-mod-python",
     "python3-debian",
-    # TOFIX: to remove once the python2 instance is deprecated
-    "python-is-python3",
     "python3-matplotlib",
     "xz-utils",
 ]

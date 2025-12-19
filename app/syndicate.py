@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # syndicate.py - send out e-mails and update rss feeds
 #
 # Copyright © 2008 Canonical Ltd.

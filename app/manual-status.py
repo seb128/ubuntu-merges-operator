@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # manual-status.py - output status of manual merges
 #
 # Copyright © 2008 - 2015 Canonical Ltd.

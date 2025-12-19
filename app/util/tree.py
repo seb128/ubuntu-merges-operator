@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # util/tree.py - useful functions for dealing with trees of files
 #
 # Copyright © 2008 Canonical Ltd.

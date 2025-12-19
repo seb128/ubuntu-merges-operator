@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # deb/version.py - parse and compare Debian version strings.
 #
 # Copyright © 2008 Canonical Ltd.

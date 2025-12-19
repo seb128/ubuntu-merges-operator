@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # generate-dpatches.py - generate extracted debian patches for new packages
 #
 # Copyright © 2008 Canonical Ltd.

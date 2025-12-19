@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # update-pool.py - update a distribution's pool
 #
 # Copyright © 2008 Canonical Ltd.

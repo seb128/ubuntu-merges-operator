@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # generate-diffs.py - generate changes and diff files for new packages
 #
 # Copyright © 2008 Canonical Ltd.

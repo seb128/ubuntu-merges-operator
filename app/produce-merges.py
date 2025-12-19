@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # produce-merges.py - produce merged packages
 #
 # Copyright © 2008 Canonical Ltd.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # publish-patches.py - publish patches for the given distribution
 #
 # Copyright © 2008 Canonical Ltd.

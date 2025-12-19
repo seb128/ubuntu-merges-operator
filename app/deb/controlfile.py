@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # deb/controlfile.py - parse debian control files
 #
 # Copyright © 2008 Canonical Ltd.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # stats-graphs.py - output stats graphs
 #
 # Copyright © 2008 Canonical Ltd.

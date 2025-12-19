@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # merge-status.py - output merge status
 #
 # Copyright © 2008 - 2015 Canonical Ltd.

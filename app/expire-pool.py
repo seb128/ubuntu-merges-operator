@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # expire-pool.py - expires packages from all pools
 #
 # Copyright © 2008 Canonical Ltd.

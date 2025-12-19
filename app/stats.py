@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # stats.py - collect difference stats
 #
 # Copyright © 2008 Canonical Ltd.
