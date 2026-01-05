@@ -454,7 +454,7 @@ from momlib import *
 
     <footer>
         Generated at {now_str} by 
-        <strong>ubuntu-merges-operator</strong> (revision {revision}).
+        <strong>merge-o-matic</strong> (revision {revision}).
     </footer>
 </div>
               """,
