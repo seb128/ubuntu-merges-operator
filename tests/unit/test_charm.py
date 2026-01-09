@@ -8,7 +8,7 @@ and do not attempt to manipulate the underlying machine.
 """
 
 from subprocess import CalledProcessError
-from unittest.mock import patch, PropertyMock
+from unittest.mock import PropertyMock, patch
 
 import ops
 import pytest
@@ -133,7 +133,6 @@ def test_update_status_active(updating_mock, ctx, base_state):
     assert updating_mock.called
 
 
-
 @patch("charm.Merges.start")
 @pytest.mark.parametrize("exception", [CalledProcessError(1, "foo")])
 def test_start_failure(start_mock, exception, ctx, base_state):
@@ -191,9 +190,7 @@ def test_get_external_url_juju_info_binding(configure_mock, ctx):
     )
     out = ctx.run(ctx.on.config_changed(), state)
     assert out.unit_status == ActiveStatus()
-    configure_mock.assert_called_once_with(
-        "http://192.168.1.10:8080", "http://192.168.1.10:8081"
-    )
+    configure_mock.assert_called_once_with("http://192.168.1.10:8080", "http://192.168.1.10:8081")
 
 
 @patch("charm.Merges.configure")
