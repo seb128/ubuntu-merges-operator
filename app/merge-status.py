@@ -606,7 +606,7 @@ def do_table(status, merges, left_distro, right_distro, component):
             f"""
               <td colspan=3>{who}</td>
               <td rowspan=2>
-                  <form method="get" action="addcomment.py"><br />
+                  <form method="get" action="addcomment.psp"><br />
                       <input type="hidden" name="component" value="{component}" />
                       <input type="hidden" name="package" value="{package}" />
               """,

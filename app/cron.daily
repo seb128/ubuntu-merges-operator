@@ -53,7 +53,7 @@ mkdir -p "$MOMLIB_ROOT"/merges/.static
 mkdir -p "$MOMLIB_ROOT"/published/.static
 cp -a static/* "$MOMLIB_ROOT"/merges/.static
 cp -a static/* "$MOMLIB_ROOT"/published/.static
-cp -a addcomment.py "$MOMLIB_ROOT"/merges
+cp -a addcomment.psp "$MOMLIB_ROOT"/merges
 
 # Include header with the instructions
 cp data/HEADER-merges.html "$MOMLIB_ROOT"/merges/HEADER.html
