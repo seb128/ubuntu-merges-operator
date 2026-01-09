@@ -164,14 +164,14 @@ def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges
     mock_path.side_effect = path_side_effect
     
     # Setup the division operator to return our destination mocks
-    def truediv_side_effect(self, name):
+    def truediv_side_effect(name):
         if name == "ubuntu-merges.service":
             return mock_dest_service
         if name == "ubuntu-merges.timer":
             return mock_dest_timer
         return MagicMock()
     
-    mock_unit_loc.__truediv__ = truediv_side_effect
+    mock_unit_loc.__truediv__.side_effect = truediv_side_effect
 
     merges_obj._setup_systemd_units()
 
