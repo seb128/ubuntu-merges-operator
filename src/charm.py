@@ -97,6 +97,8 @@ class UbuntuMergesCharm(ops.CharmBase):
                 self._get_external_url(self.merges_ingress, MERGES_PORT),
                 self._get_external_url(self.patches_ingress, PATCHES_PORT),
             )
+            self._merges.restart_apache()
+            self.unit.set_ports(MERGES_PORT, PATCHES_PORT)
         except ValueError:
             self.unit.status = ops.BlockedStatus(
                 "Invalid configuration. Check `juju debug-log` for details."
