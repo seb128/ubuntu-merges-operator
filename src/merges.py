@@ -108,6 +108,11 @@ class Merges:
             logger.warning("Error copying config: %s", str(e))
             raise
 
+        # Helper so apache listens on those ports
+        Path("/etc/apache2/conf-enabled/z-merges-ports.conf").write_text(
+            "Listen 8080\nListen 8081\n"
+        )
+
     def _setup_systemd_units(self):
         """Set up the systemd service and timer."""
         systemd_unit_location = Path("/etc/systemd/system")
@@ -187,9 +192,10 @@ class Merges:
             logger.error("Failed to start systemd service: %s", e)
             raise
 
-    def configure(self, url: str):
+    def configure(self, merges_url: str, patches_url: str):
         """Configure the charm."""
-        logger.debug("The url in use is %s", url)
+        logger.debug("The merges url in use is %s", merges_url)
+        logger.debug("The patches url in use is %s", patches_url)
 
     def refresh_report(self):
         """Refresh the merges report."""
