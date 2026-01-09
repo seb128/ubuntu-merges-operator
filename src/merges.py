@@ -181,11 +181,19 @@ class Merges:
         self._setup_directories()
         self._install_application()
 
-    def start(self):
-        """Restart the transition services."""
+    def restart_apache(self):
+        """Restart the Apache2 service."""
         try:
             systemd.service_restart("apache2")
             logger.debug("Apache2 service restarted")
+        except CalledProcessError as e:
+            logger.error("Failed to restart apache2 service: %s", e)
+            raise
+
+    def start(self):
+        """Restart the transition services."""
+        self.restart_apache()
+        try:
             systemd.service_start("--no-block", "ubuntu-merges")
             logger.debug("Ubuntu-merges service started")
         except CalledProcessError as e:

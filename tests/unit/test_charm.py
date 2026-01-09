@@ -88,15 +88,22 @@ def test_upgrade_failure(install_mock, exception, ctx, base_state):
     )
 
 
+@patch("charm.Merges.restart_apache")
 @patch("charm.Merges.configure")
-def test_config_changed(configure_mock, ctx, base_state):
+def test_config_changed(configure_mock, restart_apache_mock, ctx, base_state):
     out = ctx.run(ctx.on.config_changed(), base_state)
     assert out.unit_status == ActiveStatus()
     assert configure_mock.called
+    assert restart_apache_mock.called
+    assert out.opened_ports == {
+        TCPPort(port=8080, protocol="tcp"),
+        TCPPort(port=8081, protocol="tcp"),
+    }
 
 
+@patch("charm.Merges.restart_apache")
 @patch("charm.Merges.configure")
-def test_config_changed_failed_bad_config(configure_mock, ctx, base_state):
+def test_config_changed_failed_bad_config(configure_mock, restart_apache_mock, ctx, base_state):
     configure_mock.side_effect = ValueError
     out = ctx.run(ctx.on.config_changed(), base_state)
     assert out.unit_status == BlockedStatus(
@@ -161,10 +168,13 @@ def test_merges_refresh_failure(refresh_report_mock, ctx, base_state):
     )
 
 
+@patch("charm.Merges.restart_apache")
 @patch("charm.Merges.configure")
 @patch("charm.socket.getfqdn")
 @patch("ops.model.Model.get_binding")
-def test_get_external_url_fqdn_fallback(get_binding_mock, getfqdn_mock, configure_mock, ctx):
+def test_get_external_url_fqdn_fallback(
+    get_binding_mock, getfqdn_mock, configure_mock, restart_apache_mock, ctx
+):
     """Test that FQDN is used when no juju-info binding and no ingress."""
     get_binding_mock.return_value = None
     getfqdn_mock.return_value = "test-host.example.com"
@@ -176,8 +186,9 @@ def test_get_external_url_fqdn_fallback(get_binding_mock, getfqdn_mock, configur
     )
 
 
+@patch("charm.Merges.restart_apache")
 @patch("charm.Merges.configure")
-def test_get_external_url_juju_info_binding(configure_mock, ctx):
+def test_get_external_url_juju_info_binding(configure_mock, restart_apache_mock, ctx):
     """Test that unit IP is used when juju-info binding exists."""
     state = State(
         leader=True,
@@ -193,8 +204,9 @@ def test_get_external_url_juju_info_binding(configure_mock, ctx):
     configure_mock.assert_called_once_with("http://192.168.1.10:8080", "http://192.168.1.10:8081")
 
 
+@patch("charm.Merges.restart_apache")
 @patch("charm.Merges.configure")
-def test_get_external_url_ingress_url(configure_mock, ctx):
+def test_get_external_url_ingress_url(configure_mock, restart_apache_mock, ctx):
     """Test that ingress URL takes priority when available."""
     merges_relation = Relation(
         endpoint="ingress-merges",
