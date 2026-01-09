@@ -47,7 +47,11 @@ actions:
       Refresh the content of the merges report
 
 requires:
-  ingress:
+  ingress-merges:
+    interface: ingress
+    limit: 1
+    optional: true
+  ingress-patches:
     interface: ingress
     limit: 1
     optional: true

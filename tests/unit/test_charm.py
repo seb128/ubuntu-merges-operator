@@ -109,7 +109,10 @@ def test_start_success(start_mock, ctx, base_state):
     out = ctx.run(ctx.on.start(), base_state)
     assert out.unit_status == ops.MaintenanceStatus("Generating merges report")
     assert start_mock.called
-    assert out.opened_ports == {TCPPort(port=80, protocol="tcp")}
+    assert out.opened_ports == {
+        TCPPort(port=8080, protocol="tcp"),
+        TCPPort(port=8081, protocol="tcp"),
+    }
 
 
 @patch("charm.Merges.updating", new_callable=PropertyMock)
@@ -169,7 +172,9 @@ def test_get_external_url_fqdn_fallback(get_binding_mock, getfqdn_mock, configur
     state = State(leader=True)
     out = ctx.run(ctx.on.config_changed(), state)
     assert out.unit_status == ActiveStatus()
-    configure_mock.assert_called_once_with("http://test-host.example.com:80")
+    configure_mock.assert_called_once_with(
+        "http://test-host.example.com:8080", "http://test-host.example.com:8081"
+    )
 
 
 @patch("charm.Merges.configure")
@@ -186,17 +191,25 @@ def test_get_external_url_juju_info_binding(configure_mock, ctx):
     )
     out = ctx.run(ctx.on.config_changed(), state)
     assert out.unit_status == ActiveStatus()
-    configure_mock.assert_called_once_with("http://192.168.1.10:80")
+    configure_mock.assert_called_once_with(
+        "http://192.168.1.10:8080", "http://192.168.1.10:8081"
+    )
 
 
 @patch("charm.Merges.configure")
 def test_get_external_url_ingress_url(configure_mock, ctx):
     """Test that ingress URL takes priority when available."""
-    ingress_relation = Relation(
-        endpoint="ingress",
+    merges_relation = Relation(
+        endpoint="ingress-merges",
         interface="ingress",
         remote_app_name="traefik",
-        remote_app_data={"ingress": '{"url": "https://ingress.example.com/"}'},
+        remote_app_data={"ingress": '{"url": "https://merges.example.com/"}'},
+    )
+    patches_relation = Relation(
+        endpoint="ingress-patches",
+        interface="ingress",
+        remote_app_name="traefik",
+        remote_app_data={"ingress": '{"url": "https://patches.example.com/"}'},
     )
     state = State(
         leader=True,
@@ -206,8 +219,10 @@ def test_get_external_url_ingress_url(configure_mock, ctx):
                 bind_addresses=[BindAddress(addresses=[Address("192.168.1.10")])],
             ),
         },
-        relations={ingress_relation},
+        relations={merges_relation, patches_relation},
     )
     out = ctx.run(ctx.on.config_changed(), state)
     assert out.unit_status == ActiveStatus()
-    configure_mock.assert_called_once_with("https://ingress.example.com/")
+    configure_mock.assert_called_once_with(
+        "https://merges.example.com/", "https://patches.example.com/"
+    )

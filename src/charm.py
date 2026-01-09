@@ -17,7 +17,8 @@ from merges import Merges
 
 logger = logging.getLogger(__name__)
 
-PORT = 80
+MERGES_PORT = 8080
+PATCHES_PORT = 8081
 
 
 class UbuntuMergesCharm(ops.CharmBase):
@@ -26,7 +27,12 @@ class UbuntuMergesCharm(ops.CharmBase):
     def __init__(self, framework: ops.Framework):
         super().__init__(framework)
 
-        self.ingress = IngressRequirer(self, port=PORT, strip_prefix=True, relation_name="ingress")
+        self.ingress_merges = IngressRequirer(
+            self, port=MERGES_PORT, strip_prefix=True, relation_name="ingress-merges"
+        )
+        self.ingress_patches = IngressRequirer(
+            self, port=PATCHES_PORT, strip_prefix=True, relation_name="ingress-patches"
+        )
 
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.start, self._on_start)
@@ -37,8 +43,10 @@ class UbuntuMergesCharm(ops.CharmBase):
 
         # Ingress URL changes require updating the configuration and also regenerating sitemaps,
         # therefore we can bind events for this relation to the config_changed event.
-        framework.observe(self.ingress.on.ready, self._on_config_changed)
-        framework.observe(self.ingress.on.revoked, self._on_config_changed)
+        framework.observe(self.ingress_merges.on.ready, self._on_config_changed)
+        framework.observe(self.ingress_merges.on.revoked, self._on_config_changed)
+        framework.observe(self.ingress_patches.on.ready, self._on_config_changed)
+        framework.observe(self.ingress_patches.on.revoked, self._on_config_changed)
 
         self._merges = Merges()
 
@@ -72,7 +80,7 @@ class UbuntuMergesCharm(ops.CharmBase):
                 "Failed to start services. Check `juju debug-log` for details."
             )
             return
-        self.unit.set_ports(PORT)
+        self.unit.set_ports(MERGES_PORT, PATCHES_PORT)
 
     def _on_update_status(self, event: ops.UpdateStatusEvent):
         """Reflecting the status of the systemd service."""
@@ -85,7 +93,10 @@ class UbuntuMergesCharm(ops.CharmBase):
         """Update configuration."""
         self.unit.status = ops.MaintenanceStatus("Updating configuration")
         try:
-            self._merges.configure(self._get_external_url())
+            self._merges.configure(
+                self._get_external_url(self.ingress_merges, MERGES_PORT),
+                self._get_external_url(self.ingress_patches, PATCHES_PORT),
+            )
         except ValueError:
             self.unit.status = ops.BlockedStatus(
                 "Invalid configuration. Check `juju debug-log` for details."
@@ -108,17 +119,17 @@ class UbuntuMergesCharm(ops.CharmBase):
             return
         self.unit.status = ops.ActiveStatus()
 
-    def _get_external_url(self) -> str:
+    def _get_external_url(self, ingress, port) -> str:
         """Report URL to access Ubuntu Merges."""
         # Default: FQDN
-        external_url = f"http://{socket.getfqdn()}:{PORT}"
+        external_url = f"http://{socket.getfqdn()}:{port}"
         # If can connect to juju-info, get unit IP
         if binding := self.model.get_binding("juju-info"):
             unit_ip = str(binding.network.bind_address)
-            external_url = f"http://{unit_ip}:{PORT}"
+            external_url = f"http://{unit_ip}:{port}"
         # If ingress is set, get ingress url
-        if self.ingress.url:
-            external_url = self.ingress.url
+        if ingress.url:
+            external_url = ingress.url
         return external_url
 
 
