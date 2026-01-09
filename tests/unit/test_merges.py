@@ -138,8 +138,7 @@ def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges
     mock_service_file.read_text.return_value = "[Service]\n"
     mock_timer_file = MagicMock()
     mock_timer_file.read_text.return_value = ""
-
-    mock_path.return_value = MagicMock()  # generic path mock
+    mock_written_service_file = MagicMock()
 
     # We need to setup proxies before calling this method
     merges_obj.proxies = {"http": "http://p", "https": "https://p"}
@@ -150,15 +149,24 @@ def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges
             return mock_service_file
         if arg == "src/systemd/ubuntu-merges.timer":
             return mock_timer_file
-        # Return a new mock for other paths (like the written service file)
-        # but keep it consistent for same args
+        if arg == "/etc/systemd/system":
+            # Return a mock that handles the division operator for file paths
+            mock_unit_loc = MagicMock()
+            mock_unit_loc.__truediv__ = MagicMock(side_effect=lambda x: mock_written_service_file if x == "ubuntu-merges.service" else MagicMock())
+            return mock_unit_loc
         return MagicMock()
 
     mock_path.side_effect = path_side_effect
 
     merges_obj._setup_systemd_units()
 
-    # Verifies lines 124-128 via coverage (implicit)
+    # Verify that write_text is called with content containing proxy environment variables
+    mock_written_service_file.write_text.assert_called_once()
+    written_content = mock_written_service_file.write_text.call_args[0][0]
+    assert "Environment=http_proxy=http://p" in written_content
+    assert "Environment=HTTP_PROXY=http://p" in written_content
+    assert "Environment=https_proxy=https://p" in written_content
+    assert "Environment=HTTPS_PROXY=https://p" in written_content
 
 
 @patch("merges.Path")
