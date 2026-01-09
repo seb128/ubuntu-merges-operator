@@ -8,8 +8,9 @@ and do not attempt to manipulate the underlying machine.
 """
 
 from subprocess import CalledProcessError
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
+import ops
 import pytest
 from charmlibs.apt import PackageError, PackageNotFoundError
 from ops.testing import (
@@ -106,9 +107,28 @@ def test_config_changed_failed_bad_config(configure_mock, ctx, base_state):
 @patch("charm.Merges.start")
 def test_start_success(start_mock, ctx, base_state):
     out = ctx.run(ctx.on.start(), base_state)
-    assert out.unit_status == ActiveStatus()
+    assert out.unit_status == ops.MaintenanceStatus("Generating merges report")
     assert start_mock.called
     assert out.opened_ports == {TCPPort(port=80, protocol="tcp")}
+
+
+@patch("charm.Merges.updating", new_callable=PropertyMock)
+def test_update_status_updating(updating_mock, ctx, base_state):
+    """Test update_status when service is updating."""
+    updating_mock.return_value = True
+    out = ctx.run(ctx.on.update_status(), base_state)
+    assert out.unit_status == ops.MaintenanceStatus("Generating merges report")
+    assert updating_mock.called
+
+
+@patch("charm.Merges.updating", new_callable=PropertyMock)
+def test_update_status_active(updating_mock, ctx, base_state):
+    """Test update_status when service is active (not updating)."""
+    updating_mock.return_value = False
+    out = ctx.run(ctx.on.update_status(), base_state)
+    assert out.unit_status == ActiveStatus()
+    assert updating_mock.called
+
 
 
 @patch("charm.Merges.start")

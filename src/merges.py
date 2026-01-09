@@ -53,6 +53,11 @@ class Merges:
             self.env["HTTPS_PROXY"] = juju_https_proxy
             self.proxies["https"] = juju_https_proxy
 
+    @property
+    def updating(self) -> bool:
+        """Check if the systemd service is active."""
+        return systemd.service_running("ubuntu-merges.service")
+
     def _install_packages(self):
         """Install the Debian packages needed."""
         try:
