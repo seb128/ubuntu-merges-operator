@@ -153,12 +153,14 @@ def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges
         if arg == "/etc/systemd/system":
             # Return a mock that handles the division operator for file paths
             mock_unit_loc = MagicMock()
+
             def truediv_side_effect(x):
                 if x == "ubuntu-merges.service":
                     return mock_written_service_file
                 elif x == "ubuntu-merges.timer":
                     return mock_written_timer_file
                 return MagicMock()
+
             mock_unit_loc.__truediv__ = MagicMock(side_effect=truediv_side_effect)
             return mock_unit_loc
         return MagicMock()
