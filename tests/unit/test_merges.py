@@ -134,6 +134,10 @@ def test_setup_systemd_units_success(mock_service_enable, mock_path, merges_obj)
 @patch("charms.operator_libs_linux.v1.systemd.service_enable")
 @patch("merges.Path")
 def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges_obj):
+    # Test proxy URLs
+    http_proxy_url = "http://proxy.example.com:8080"
+    https_proxy_url = "https://proxy.example.com:8443"
+    
     mock_unit_loc = MagicMock()
     mock_service_file = MagicMock()
     mock_service_file.read_text.return_value = "[Service]\n"
@@ -145,7 +149,7 @@ def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges
     mock_dest_timer = MagicMock()
 
     # We need to setup proxies before calling this method
-    merges_obj.proxies = {"http": "http://proxy.example.com:8080", "https": "https://proxy.example.com:8443"}
+    merges_obj.proxies = {"http": http_proxy_url, "https": https_proxy_url}
 
     # We need to intercept the specific path calls
     def path_side_effect(arg):
@@ -160,7 +164,14 @@ def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges
     mock_path.side_effect = path_side_effect
     
     # Setup the division operator to return our destination mocks
-    mock_unit_loc.__truediv__ = lambda self, name: mock_dest_service if name == "ubuntu-merges.service" else mock_dest_timer
+    def truediv_side_effect(self, name):
+        if name == "ubuntu-merges.service":
+            return mock_dest_service
+        if name == "ubuntu-merges.timer":
+            return mock_dest_timer
+        return MagicMock()
+    
+    mock_unit_loc.__truediv__ = truediv_side_effect
 
     merges_obj._setup_systemd_units()
 
@@ -169,10 +180,10 @@ def test_setup_systemd_units_with_proxies(mock_path, mock_service_enable, merges
     written_service_content = mock_dest_service.write_text.call_args[0][0]
     
     # Verify proxy environment variables are in the written content
-    assert "Environment=http_proxy=http://proxy.example.com:8080" in written_service_content
-    assert "Environment=HTTP_PROXY=http://proxy.example.com:8080" in written_service_content
-    assert "Environment=https_proxy=https://proxy.example.com:8443" in written_service_content
-    assert "Environment=HTTPS_PROXY=https://proxy.example.com:8443" in written_service_content
+    assert f"Environment=http_proxy={http_proxy_url}" in written_service_content
+    assert f"Environment=HTTP_PROXY={http_proxy_url}" in written_service_content
+    assert f"Environment=https_proxy={https_proxy_url}" in written_service_content
+    assert f"Environment=HTTPS_PROXY={https_proxy_url}" in written_service_content
     
     # Verify the original service content is also present
     assert "[Service]" in written_service_content
