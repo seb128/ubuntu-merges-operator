@@ -257,8 +257,12 @@ def test_install(merges_obj):
 
 
 def test_configure(merges_obj, caplog):
-    merges_obj.configure("http://example.com")
-    assert any("http://example.com" in rec.message for rec in caplog.records)
+    merges_url = "http://merges.example.com"
+    patches_url = "http://patches.example.com"
+    with caplog.at_level("DEBUG"):
+        merges_obj.configure(merges_url, patches_url)
+    assert any(merges_url in rec.message for rec in caplog.records)
+    assert any(patches_url in rec.message for rec in caplog.records)
 
 
 @patch("merges.shutil.copytree")
