@@ -355,7 +355,7 @@ def write_status_page(component, merges, left_distro, right_distro):
     .stats-container {{
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: flex-start;
         gap: 20px;
         margin-top: 30px;
@@ -369,15 +369,11 @@ def write_status_page(component, merges, left_distro, right_distro):
         border-radius: 4px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         min-width: 300px;
+        flex: 0 1 auto;
+        max-width: 100%;
     }}
 
-    .stats-container img:first-child {{
-        flex: 0 1 calc(30% - 10px);
-    }}
 
-    .stats-container img:last-child {{
-        flex: 0 1 calc(70% - 10px);
-    }}
 
     .expanded {{
         display: none;
